@@ -1,0 +1,131 @@
+---
+title: Getting started
+---
+
+import { ToggleLayer, anchor } from "react-laag";
+import { Link } from "gatsby";
+import Button from "../components/Button";
+import ResizeObserver from "resize-observer-polyfill";
+
+# Getting started
+
+## Installation
+
+To download react-laag run:
+
+```bash
+yarn add react-laag
+```
+
+## Create a first component
+
+Let's create a very minimal pop-over component. In order for it to work we need two things: a trigger and a layer. We want the layer to show when we click on the trigger element, and close when we click the trigger element again. We also want to position the layer right below the trigger and center it. It looks like this:
+
+<ToggleLayer
+  ResizeObserver={ResizeObserver}
+  placement={{ anchor: anchor.BOTTOM_CENTER }}
+  renderLayer={({ layerProps, isOpen }) =>
+    isOpen && (
+      <div
+        ref={layerProps.ref}
+        style={{
+          ...layerProps.style,
+          backgroundColor: "rgba(115, 164, 224, 0.9)",
+          width: 200,
+          height: 200,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: 20,
+          fontWeight: 700,
+          color: "white",
+          borderRadius: 4
+        }}
+      >
+        Layer
+      </div>
+    )
+  }
+>
+  {({ toggle, triggerRef }) => (
+    <div
+      ref={triggerRef}
+      onClick={toggle}
+      style={{
+        display: "inline-block",
+        marginBottom: 24,
+        padding: "8px 16px",
+        border: "1px solid var(--text)",
+        borderRadius: 4,
+        cursor: "pointer",
+        color: "var(--text)",
+        fontSize: 16
+      }}
+    >
+      Trigger
+    </div>
+  )}
+</ToggleLayer>
+
+```jsx
+import React from "react";
+import { ToggleLayer, anchors } from "react-laag";
+
+export default function SimplePopover() {
+  return (
+    <ToggleLayer
+      // provide placement config
+      placement={{ anchor: anchors.BOTTOM_CENTER }}
+      // render-prop to render our layer
+      renderLayer={({ layerProps, isOpen }) =>
+        // only render on `isOpen`
+        isOpen && (
+          <div
+            // for calculation stuff
+            ref={layerProps.ref}
+            style={{
+              // inject calculated positional styles
+              ...layerProps.style,
+
+              // style the layer however you like
+              backgroundColor: "rgba(115, 164, 224, 0.9)",
+              width: 200,
+              height: 200,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: 20,
+              fontWeight: 700,
+              color: "white",
+              borderRadius: 4
+            }}
+          />
+        )
+      }
+    >
+      {({ toggle, triggerRef }) => (
+        <div
+          // only the `triggerRef` is required...
+          ref={triggerRef}
+          // ...the rest is up to you
+          onClick={toggle}
+          style={{
+            padding: "8px 16px",
+            border: "1px solid black",
+            borderRadius: 4,
+            cursor: "pointer"
+          }}
+        />
+      )}
+    </ToggleLayer>
+  );
+}
+```
+
+## Learn more
+
+We have only scratched the surface with this tiny example. There are much more things react-laag can do!
+
+<Link to="/docs">
+  <Button>Goto documentation</Button>
+</Link>

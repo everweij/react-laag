@@ -1,0 +1,680 @@
+---
+title: docs
+---
+
+import { ToggleLayer, anchor } from "react-laag";
+import Prop from "../components/PropDescription";
+import GitHubButton from "react-github-btn";
+
+[![NPM](https://img.shields.io/npm/v/react-laag.svg)](https://www.npmjs.com/package/react-laag)
+[![TYPESCRIPT](https://img.shields.io/badge/%3C%2F%3E-typescript-blue)](http://www.typescriptlang.org/)
+
+<GitHubButton
+  href="https://github.com/everweij/react-laag"
+  data-show-count="true"
+  aria-label="Star everweij/react-laag on GitHub"
+>
+  Star
+</GitHubButton>
+
+### Installation
+
+To download react-laag run:
+
+```bash
+yarn add react-laag
+```
+
+### Top Features
+
+- Build your own tooltips / dropdown-menu's / pop-overs / etc...
+- Not opinionated regarding styling or animations
+- Highly customizable
+- Only ~5kb minified and gzipped
+- Zero dependencies
+- Built with typescript / ships with typescript definitions
+- Integrates well with other libraries
+- Automatically adjusts your layer's placement to fit the screen
+- Works with nested scroll-containers
+- Observes and reacts to changes in dimensions
+
+### Browser compatibility
+
+react-laag has been tested on all modern browsers and should also work in IE 11.
+
+In order to watch elements for resizing, react-laag makes use of _ResizeObserver_. If your browser does not come with ResizeObserver out of the box, you can inject a polyfill via props, ie.:
+
+```jsx
+import ResizeObserver from "resize-observer-polyfill";
+import { ToggleLayer } from "react-laag";
+
+<ToggleLayer ResizeObserver={ResizeObserver} />;
+```
+
+### Server-side rendering
+
+react-laag is fully compatible with server-side rendering.
+
+# ToggleLayer
+
+```jsx
+import { ToggleLayer } from "react-laag";
+```
+
+ToggleLayer is the most important component of `react-laag`. As the name suggests, this component is used to toggle layers (between _show_ and _don't show_). It assumes there are two key components at play:
+
+- a **trigger**, which can be any html-element
+- a **layer**, the element we want to toggle, can also be any html-element
+
+### position: relative;
+
+react-laag expects you to style the (scroll-)parent where you want to contain your layer in `position: relative`. If your layer does not need to be contained, because the trigger scrolls with the rest of the page for instance, you don't have to do anything, because react-laag looks at the `document.body` by default.
+
+### Render props
+
+In order to give you as much control as possible, react-laag makes use of the _render prop_ pattern; Instead of a normal react-element, react-laag expects you to pass in a function which in turn returns a react-element.
+To illustrate:
+
+```jsx
+// Plain react-element...
+<div />
+
+// ...becomes
+() => <div />
+```
+
+The cool thing about this is that react-laag provides you with tools, and you get to decide _if_ and _how_ to use them!
+
+### Controlled vs. uncontrolled
+
+By default react-laag behaves uncontrolled. That means that some state is managed internally inside react-laag. Most of the time this works fine, but there are cases where more control is desirable. Fortunately, react-laag watches certain props and can tell if you want to manage parts of the state yourself.
+
+## Props
+
+<Prop
+  name="children()"
+  required
+  type={
+    <>
+      ( <Prop.Arg>props</Prop.Arg>: <Prop.Obj linked>ChildProps</Prop.Obj> ):{" "}
+      <Prop.Obj>ReactNode</Prop.Obj>
+    </>
+  }
+  misc={
+    <>
+      <Prop.TypeBox
+        name="ChildProps"
+        props={
+          <>
+            <Prop
+              name="triggerRef"
+              required
+              type={<Prop.Obj>RefObject</Prop.Obj>}
+              misc={
+                <>
+                  In order to calculate the layer's position, react-laag needs
+                  access to the trigger's dom-element. Assign{" "}
+                  <Prop.Ref>triggerRef</Prop.Ref> to the{" "}
+                  <Prop.Ref>ref</Prop.Ref> prop when using a React-element or
+                  Component (make sure that you the <Prop.Ref>ref</Prop.Ref> is
+                  forwarded with <Prop.Ref>React.forwardRef</Prop.Ref>)
+                </>
+              }
+            />
+            <Prop
+              name="isOpen"
+              type={<Prop.Obj>boolean</Prop.Obj>}
+              misc="Describes whether the layer is open or closed"
+            />
+            <Prop name="open()" type={<>(): void</>} misc="Shows the layer" />
+            <Prop name="close()" type={<>(): void</>} misc="Hides the layer" />
+            <Prop
+              name="toggle()"
+              type={<>(): void</>}
+              misc="Toggles between show/hide"
+            />
+            <Prop
+              name="layerSide"
+              type={
+                <>
+                  <Prop.Obj>LayerSide</Prop.Obj> | <Prop.Obj>null</Prop.Obj>
+                </>
+              }
+              misc={
+                <>
+                  <Prop.Ref>null</Prop.Ref> when the layer is closed.
+                  <br />
+                  When the layer is open, <Prop.Ref>layerSide</Prop.Ref>{" "}
+                  describes on which side the layer is currently positioned
+                  relative to the trigger.
+                  <br />
+                  <Prop.Obj as="span">LayerSide</Prop.Obj> ={" "}
+                  <Prop.Str as="span">"top"</Prop.Str> |{" "}
+                  <Prop.Str as="span">"right"</Prop.Str> |{" "}
+                  <Prop.Str as="span">"bottom"</Prop.Str> |
+                  <Prop.Str as="span">"left"</Prop.Str>
+                </>
+              }
+            />
+          </>
+        }
+      />
+    </>
+  }
+/>
+
+<Prop
+  name="placement"
+  required
+  type={<Prop.Obj>PlacementConfig</Prop.Obj>}
+  misc={
+    <>
+      <Prop.TypeBox
+        name="PlacementConfig"
+        props={
+          <>
+            <Prop
+              name="anchor"
+              required
+              type={<Prop.Obj>AnchorEnum</Prop.Obj>}
+              misc={
+                <>
+                  Tells react-laag which anchor (location of the layer) you
+                  prefer. <br />
+                  Possible values: <Prop.Str as="span">"TOP_LEFT"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"TOP_CENTER"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"TOP_RIGHT"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"BOTTOM_LEFT"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"BOTTOM_CENTER"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"BOTTOM_RIGHT"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"LEFT_TOP"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"LEFT_CENTER"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"LEFT_BOTTOM"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"RIGHT_TOP"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"RIGHT_CENTER"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"RIGHT_BOTTOM"</Prop.Str>
+                </>
+              }
+            />
+            <Prop
+              name="possibleAnchors"
+              type={<Prop.Obj>AnchorEnum[]</Prop.Obj>}
+              defaultValue="All anchors"
+              misc={
+                <>
+                  <Prop.Ref>possibleAnchors</Prop.Ref> has only effect when{" "}
+                  <Prop.Ref>autoAdjust</Prop.Ref> is enabled. <br />
+                  It describes which anchors should be considered when finding the
+                  best suitable anchor to fit on the screen.
+                </>
+              }
+            />
+            <Prop
+              name="autoAdjust"
+              type={<Prop.Obj>boolean</Prop.Obj>}
+              defaultValue={<Prop.Bool>false</Prop.Bool>}
+              misc={
+                <>
+                  Determines whether react-laag should find another anchor when
+                  the preferred one does not fit the current screen.
+                  <br />
+                  When <Prop.Ref>snapToAnchor</Prop.Ref> is set to{" "}
+                  <Prop.Bool>false</Prop.Bool>, there will be a smooth
+                  'sliding'-like effect from one anchor to the next.
+                </>
+              }
+            />
+            <Prop
+              name="snapToAnchor"
+              type={<Prop.Obj>boolean</Prop.Obj>}
+              defaultValue={<Prop.Bool>false</Prop.Bool>}
+              misc={
+                <>
+                  Determines whether the layer can place itself between to
+                  anchors, creating a 'sliding'-effect when scrolling the
+                  page/element. With <Prop.Ref>snapToAnchor</Prop.Ref> enabled,
+                  the layer will 'jump' from one anchor to the next one
+                  instantly.
+                </>
+              }
+            />
+            <Prop
+              name="preferX"
+              type={
+                <>
+                  <Prop.Str as="span">"LEFT"</Prop.Str> |{" "}
+                  <Prop.Str as="span">"RIGHT"</Prop.Str>
+                </>
+              }
+              defaultValue={<Prop.Str>"RIGHT"</Prop.Str>}
+              misc={
+                <>
+                  Only has effect when <Prop.Ref>autoAdjust</Prop.Ref> is
+                  enabled. <br />
+                  Determines which side is preferred when the layer fits on both
+                  the left and right side of the trigger.
+                </>
+              }
+            />
+            <Prop
+              name="preferY"
+              type={
+                <>
+                  <Prop.Str as="span">"TOP"</Prop.Str> |{" "}
+                  <Prop.Str as="span">"BOTTOM"</Prop.Str>
+                </>
+              }
+              defaultValue={<Prop.Str>"BOTTOM"</Prop.Str>}
+              misc={
+                <>
+                  Only has effect when <Prop.Ref>autoAdjust</Prop.Ref> is
+                  enabled. <br />
+                  Determines which side is preferred when the layer fits on both
+                  the top and bottom side of the trigger.
+                </>
+              }
+            />
+            <Prop
+              name="triggerOffset"
+              type={<Prop.Obj>number</Prop.Obj>}
+              defaultValue={0}
+              misc={
+                <>
+                  Determines the distance in pixels between the layer and the
+                  trigger.
+                </>
+              }
+            />
+            <Prop
+              name="scrollOffset"
+              type={<Prop.Obj>number</Prop.Obj>}
+              defaultValue={0}
+              misc={
+                <>
+                  Determines the distance in pixels between the layer and the
+                  scroll-containers (incl. viewport)
+                </>
+              }
+            />
+          </>
+        }
+      />
+    </>
+  }
+/>
+
+<Prop
+  name="renderLayer()"
+  required
+  type={
+    <>
+      ( <Prop.Arg>props</Prop.Arg>: <Prop.Obj linked>RenderLayerProps</Prop.Obj>{" "}
+      ): <Prop.Obj>ReactNode</Prop.Obj>
+    </>
+  }
+  misc={
+    <>
+      <Prop.TypeBox
+        name="RenderLayerProps"
+        props={
+          <>
+            <Prop
+              name="layerProps"
+              required
+              type={
+                <>
+                  {"{ "}ref: <Prop.Obj>RefObject</Prop.Obj>, style:{" "}
+                  <Prop.Obj>CSSProperties</Prop.Obj>
+                  {" }"}
+                </>
+              }
+              misc={
+                <>
+                  In some cases you can spread these{" "}
+                  <Prop.Ref>layerProps</Prop.Ref> directly onto your component
+                  or element like so: <br />
+                  <Prop.Ref>{"<div {...layerProps} />"}</Prop.Ref>
+                  <br />
+                  <br />
+                  But sometimes you want to add styles on top of the
+                  style-object react-laag provides. Such scenario's can be
+                  handled like this:
+                  <br />
+                  <Prop.Ref>
+                    {
+                      "<div ref={layerProps.ref} style={{ ...layerProps.style, backgroundColor: 'blue'}} />"
+                    }
+                  </Prop.Ref>
+                </>
+              }
+            />
+            <Prop
+              name="isOpen"
+              type={
+                <>
+                  <Prop.Obj>boolean</Prop.Obj>
+                </>
+              }
+              misc={
+                <>
+                  Determines whether we should render the layer or not. The
+                  reason for providing this prop, and not to ignore the{" "}
+                  <Prop.Ref>renderLayer</Prop.Ref> prop entirely when{" "}
+                  <Prop.Ref>isOpen</Prop.Ref> === <Prop.Bool>false</Prop.Bool>,
+                  is that you still have control over what to do when the layer
+                  is closed (ie. handling transitions / animations).
+                </>
+              }
+            />
+            <Prop
+              name="layerSide"
+              type={
+                <>
+                  <Prop.Obj>LayerSide</Prop.Obj> | <Prop.Obj>null</Prop.Obj>
+                </>
+              }
+              misc={
+                <>
+                  <Prop.Ref>null</Prop.Ref> when the layer is closed.
+                  <br />
+                  When the layer is open, <Prop.Ref>layerSide</Prop.Ref>{" "}
+                  describes on which side the layer is currently positioned
+                  relative to the trigger.
+                  <br />
+                  <Prop.Obj as="span">LayerSide</Prop.Obj> ={" "}
+                  <Prop.Str as="span">"top"</Prop.Str> |{" "}
+                  <Prop.Str as="span">"right"</Prop.Str> |{" "}
+                  <Prop.Str as="span">"bottom"</Prop.Str> |
+                  <Prop.Str as="span">"left"</Prop.Str>
+                </>
+              }
+            />
+            <Prop
+              name="arrowStyle"
+              type={
+                <>
+                  <Prop.Obj>CSSProperties</Prop.Obj>
+                </>
+              }
+              misc={
+                <>
+                  If you want to display an arrow-like element, which many
+                  tooltip-like components do, you can utilize the{" "}
+                  <Prop.Ref>arrowStyle</Prop.Ref>. This style object gives the
+                  position of the center of the trigger, relative to the layer.
+                  How you style your arrow further is up to you. You could use a
+                  svg-element for instance, and calculate it's rotation based on
+                  the <Prop.Ref>layerSide</Prop.Ref> prop. Another possibility
+                  is to inject the positions into a styled-component and use a{" "}
+                  <Prop.Ref>&::before{"{}"}</Prop.Ref> selector
+                </>
+              }
+            />
+            <Prop
+              name="triggerRect"
+              type={
+                <>
+                  <Prop.Obj>ClientRect</Prop.Obj>
+                </>
+              }
+              misc={
+                <>
+                  Useful if you want to style your layer according to the
+                  trigger's width for instance.
+                </>
+              }
+            />
+            <Prop
+              name="close()"
+              type={<>(): void</>}
+              misc={
+                <>
+                  Useful if you want to close the layer, from within the layer
+                  itself. For instance, when a menu-item was clicked.
+                </>
+              }
+            />
+          </>
+        }
+      />
+    </>
+  }
+/>
+
+<p>
+  A quick example to illustrate all provided{" "}
+  <Prop.Obj>RenderLayerProp</Prop.Obj>'s:
+</p>
+
+```jsx
+<ToggleLayer
+  renderLayer={({ layerProps, isOpen, triggerRect, arrowStyle, close }) => {
+    if (isOpen) {
+      return (
+        <div
+          ref={layerProps.ref}
+          className="layer"
+          style={{
+            ...layerProps.style,
+            width: triggerRect.width
+          }}
+        >
+          <div className="layer-arrow" style={arrowStyle} />
+
+          <button onClick={close}>close</button>
+        </div>
+      );
+    }
+
+    return null;
+  }}
+
+  // rest of props skipped for brevity
+/>
+```
+
+<Prop
+  name="fixed"
+  type={<Prop.Obj>boolean</Prop.Obj>}
+  defaultValue={<Prop.Bool>false</Prop.Bool>}
+  misc={
+    <>
+      By default react-laag tries to render the layer within the closest
+      scroll-container. But in some cases you want the layer to show outside
+      it's parent scroll-container. This is especially true for tooltip-like
+      components. It's called 'fixed'-mode, because instead of positioning the
+      layer absolute, relative to it's parent, the layer gets positioned fixed
+      against the viewport.
+      <br />
+      <br />
+      Note: Only the viewport boundaries are taken into account when using <Prop.Ref>
+        placement.autoAdjust
+      </Prop.Ref>.
+    </>
+  }
+/>
+<Prop
+  name="isOpen"
+  type={<Prop.Obj>boolean</Prop.Obj>}
+  misc={
+    <>
+      By setting the <Prop.Ref>isOpen</Prop.Ref> prop, you are controlling when the layer should show or not. <br />
+      This also means that trying to call the <Prop.Ref>open()</Prop.Ref>, <Prop.Ref>close()</Prop.Ref> and <Prop.Ref>toggle()</Prop.Ref> functions from the children-props, will result in an error being thrown.
+    </>
+  }
+/>
+<Prop
+  name="onStyle()"
+  type={
+    <>
+      ( <Prop.Arg>layerStyle</Prop.Arg>: <Prop.Obj>CSSProperties</Prop.Obj>, <Prop.Arg>arrowStyle</Prop.Arg>: <Prop.Obj>CSSProperties</Prop.Obj>, <Prop.Arg>layerSide</Prop.Arg>: <Prop.Obj>LayerSide</Prop.Obj>): void
+    </>
+  }
+  misc={
+    <>
+      By passing <Prop.Ref>onStyle</Prop.Ref> you get control over how the relevant elements are styled. This is an advanced feature, and should generally only be used when necessary. A reason to control the styles yourself, is when you run into performance issues because your layer/trigger is expensive to render, and you want to update the styles without causing React to re-render.
+      <br />
+      Note: by using this prop you will receive no further style updates via the <Prop.Ref>renderLayer</Prop.Ref> prop when things like the layer's anchor has changed.
+    </>
+  }
+/>
+<Prop
+  name="closeOnOutsideClick"
+  type={<Prop.Obj>boolean</Prop.Obj>}
+  misc={
+   <>
+    By setting this flag, react-laag will close the layer when a click has ocurred somewhere except the layer / trigger.
+   </>
+  }
+/>
+<Prop
+  name="onOutsideClick()"
+  type={<>(): void</>}
+  misc={
+   <>
+    By using this prop, react-laag will notify you when a click has ocurred somewhere except the layer / trigger. Useful in combination with <Prop.Obj>isOpen</Prop.Obj>.
+   </>
+  }
+/>
+<Prop
+  name="closeOnDisappear"
+  type={<>undefined | <Prop.Str as="span">"partial"</Prop.Str> | <Prop.Str as="span">"full"</Prop.Str></>}
+  misc={
+   <>
+    The behavior depends on whether <Prop.Ref>fixed</Prop.Ref> is set to true or false: <br /><br />
+    In <strong>fixed</strong> mode, the layer will close when the <strong>trigger</strong> has fully / partially disappeared. <br />
+    In <strong>non-fixed</strong> mode, the layer will close when the <strong>layer</strong> has fully / partially disappeared. <br />
+   </>
+  }
+/>
+<Prop
+  name="onDisappear()"
+  type={<>( <Prop.Arg>type</Prop.Arg>: <Prop.Str as="span">"partial"</Prop.Str> | <Prop.Str as="span">"full"</Prop.Str> ): void</>}
+  misc={
+   <>
+    By using this prop, react-laag will notify you when: <br />
+    - in <strong>fixed</strong> mode, and the <strong>trigger</strong> has fully / partially disappeared. <br />
+    - in <strong>non-fixed</strong> mode, and the <strong>layer</strong> has fully / partially disappeared. <br />
+   </>
+  }
+/>
+
+<Prop
+  name="ResizeObserver"
+  type={<Prop.Obj>ResizeObserver</Prop.Obj>}
+  misc={
+    <>
+      Use this prop to inject a ResizeObserver polyfill for browsers that have
+      no support out of the box.
+    </>
+  }
+/>
+
+# useHover()
+
+When working with tooltips for instance, you sometimes want specific behavior regarding timing. If you show a tooltip immediately when the mouse enters the trigger element, the user may perceive the tooltip as annoying. That's why it's common to only show a tooltip after a certain time has passed while the user has been hovering over the trigger element. `useHover` is a hook which helps you control this kind of behavior.
+
+```jsx
+import { useHover } from "react-laag";
+```
+
+<Prop.Label>Type</Prop.Label>
+<Prop.Type>
+  ( <Prop.Arg>config</Prop.Arg>: <Prop.Obj>UseHoverConfig</Prop.Obj> ): [
+  <Prop.Obj>boolean</Prop.Obj>, <Prop.Obj>HoverProps</Prop.Obj>]
+</Prop.Type>
+<Prop.TypeBox
+  name="UseHoverConfig"
+  props={
+    <>
+      <Prop
+        name="delayEnter"
+        type={<Prop.Obj>number</Prop.Obj>}
+        defaultValue={0}
+        misc={"Amount of time in ms that should pass while hovering in order to show the layer"}
+      />
+      <Prop
+        name="delayLeave"
+        type={<Prop.Obj>number</Prop.Obj>}
+        defaultValue={0}
+        misc={"Amount of time in ms that should pass while user has left the element before the layer hides again"}
+      />
+    </>
+  }
+/>
+<Prop.TypeBox
+  name="HoverProps"
+  props={
+    <>
+      <Prop
+        name="onMouseEnter"
+        type={<>(): void</>}
+      />
+      <Prop
+        name="onMouseLeave"
+        type={<>(): void</>}
+      />
+    </>
+  }
+/>
+
+Example:
+
+```jsx
+function UseHoverExample() {
+  const [show, hoverProps] = useHover({ delayEnter: 300, delayLeave: 200 });
+
+  return (
+    <ToggleLayer
+      isOpen={show}
+      renderLayer={() => (isOpen ? <Layer /> : null)}
+      // rest of props...
+    >
+      {({ triggerRef }) => (
+        <div ref={triggerRef} {...hoverProps}>
+          hover me!
+        </div>
+      )}
+    </ToggleLayer>
+  );
+}
+```
+
+# Recipes
+
+## Popover menu
+
+https://codesandbox.io/s/popover-menu-bvplm
+
+## Tooltip
+
+https://codesandbox.io/s/tooltip-pt2en
+
+## Input validation
+
+https://codesandbox.io/s/password-270o7
+
+## Autocomplete with Downshift
+
+https://codesandbox.io/s/downshift-rw4hb
+
+## Animations
+
+### framer-motion
+
+https://codesandbox.io/s/framer-motion-hgkm4
+
+### react-spring
+
+https://codesandbox.io/s/react-spring-nb6h3

@@ -1,0 +1,65 @@
+{
+  "name": "gatsby-starter-hello-world",
+  "private": true,
+  "description": "A simplified bare-bones starter for Gatsby",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "start": "yarn develop",
+    "start:lan": "yarn develop -H 0.0.0.0 -p 8000",
+    "serve": "gatsby serve",
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing \"",
+    "clean": "rm -rf .cache"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "^1.5.0",
+    "@mdx-js/react": "^1.5.0",
+    "@types/styled-components": "^4.1.19",
+    "body-scroll-lock": "^2.6.4",
+    "core-js": "^2.6.0",
+    "framer-motion": "^1.6.7",
+    "gatsby": "^2.15.28",
+    "gatsby-plugin-favicon": "^3.1.6",
+    "gatsby-plugin-google-analytics": "^2.1.20",
+    "gatsby-plugin-mdx": "^1.0.46",
+    "gatsby-plugin-react-helmet": "^3.1.10",
+    "gatsby-plugin-robots-txt": "^1.5.0",
+    "gatsby-plugin-sitemap": "^2.2.16",
+    "gatsby-plugin-styled-components": "^3.1.5",
+    "gatsby-remark-embedder": "^1.2.0",
+    "gatsby-remark-prismjs": "^3.3.16",
+    "gatsby-source-filesystem": "^2.1.28",
+    "gatsby-transformer-remark": "^2.6.26",
+    "normalize.css": "^8.0.1",
+    "prismjs": "^1.17.1",
+    "react": "link:../node_modules/react",
+    "react-app-polyfill": "^1.0.1",
+    "react-dom": "link:../node_modules/react-dom",
+    "react-github-btn": "^1.0.6",
+    "react-helmet": "^5.2.1",
+    "react-laag": "link:..",
+    "remark-slug": "^5.1.2",
+    "resize-observer-polyfill": "^1.5.1",
+    "smoothscroll-polyfill": "^0.4.4",
+    "styled-components": "^4.3.2",
+    "styled-media-query": "^2.1.2"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gatsbyjs/gatsby-starter-hello-world"
+  },
+  "bugs": {
+    "url": "https://github.com/gatsbyjs/gatsby/issues"
+  },
+  "browserslist": [
+    ">0.25%",
+    "not dead",
+    "IE 11"
+  ]
+}
