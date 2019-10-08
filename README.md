@@ -45,13 +45,13 @@ yarn add react-laag
 
 ```jsx
 import React from "react";
-import { ToggleLayer, anchors } from "react-laag";
+import { ToggleLayer, anchor } from "react-laag";
 
 function SimplePopover() {
   return (
     <ToggleLayer
       // provide placement config
-      placement={{ anchor: anchors.BOTTOM_CENTER }}
+      placement={{ anchor: anchor.BOTTOM_CENTER }}
       // render-prop to render our layer
       renderLayer={({ layerProps, isOpen }) =>
         // only render on `isOpen`
