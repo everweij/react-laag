@@ -1,4 +1,6 @@
 import * as React from "react";
+import { safeWindow } from "./domApi";
+import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 
 export default function useTrackElementResize(
   injectedResizeObserver: any,
@@ -11,7 +13,8 @@ export default function useTrackElementResize(
   callbackRef.current = callback;
 
   const ResizeObserver =
-    injectedResizeObserver || (window as any).ResizeObserver;
+    injectedResizeObserver ||
+    safeWindow((window: any) => window.ResizeObserver, class ResizeObserver {});
 
   if (!ResizeObserver) {
     throw new Error(
@@ -27,7 +30,7 @@ export default function useTrackElementResize(
     })
   );
 
-  React.useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (isOpen) {
       if (triggerElement) {
         resizeObserver.current.observe(triggerElement);

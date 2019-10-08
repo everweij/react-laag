@@ -7,6 +7,7 @@ import useOnScroll from "./useOnScroll";
 import useElementRef from "./useElementRef";
 import useOnWindowResize from "./useOnWindowResize";
 import useTrackElementResize from "./useTrackElementResize";
+import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 
 import findFirstRelativeParent from "./findFirstRelativeParent";
 import findScrollContainers from "./findScrollContainers";
@@ -325,7 +326,7 @@ function ToggleLayer({
   );
 
   // On every render, check a few things...
-  React.useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     /**
      * A.
      * Ignore when render is caused by internal style change
