@@ -1,4 +1,4 @@
-![react-laag logo](./logo-full.png =180x76)
+<img alt="react-laag logo" src="./logo-full.png" width="180px" />
 
 [![NPM](https://img.shields.io/npm/v/react-laag.svg)](https://www.npmjs.com/package/react-laag)
 [![TYPESCRIPT](https://img.shields.io/badge/%3C%2F%3E-typescript-blue)](http://www.typescriptlang.org/)
@@ -7,7 +7,7 @@ Primitive to build things like tooltips, dropdown menu's and pop-overs.
 
 Basically any kind of layer that can be toggled. Focus on **what** your layer should look like, and let react-laag take care of **where** and **when** to show it.
 
-![Menu Demo](./menu.gif =400x)
+<img alt="menu demo" src="./menu.gif" width="400px" />
 
 ### Documentation
 
