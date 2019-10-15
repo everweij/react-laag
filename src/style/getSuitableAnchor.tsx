@@ -1,4 +1,4 @@
-import { Rects, AnchorEnum } from "../types";
+import { Rects, AnchorEnum, LayerDimensions } from "../types";
 import { getPrimaryDirection } from "../anchor";
 import {
   doesAnchorFitWithinScrollParents,
@@ -31,7 +31,8 @@ function findAnchorByLayerSurface(
   rects: Rects,
   anchorOptions: AnchorEnum[],
   triggerOffset: number,
-  scrollOffset: number
+  scrollOffset: number,
+  layerDimensions?: LayerDimensions
 ): AnchorEnum {
   const result = anchorOptions
     .map(anchor => {
@@ -41,7 +42,8 @@ function findAnchorByLayerSurface(
         layer: rects.layer,
         trigger: rects.trigger,
         scrollOffset,
-        triggerOffset
+        triggerOffset,
+        layerDimensions
       });
 
       // get smallest visible layer surface for current anchor
@@ -75,12 +77,19 @@ export default function findBestSuitableAnchor(
   rects: Rects,
   anchorOptions: AnchorEnum[],
   triggerOffset: number,
-  scrollOffset: number
+  scrollOffset: number,
+  layerDimensions?: LayerDimensions
 ): AnchorEnum {
   // STRATEGY A
   // find first that fits parent
   const anchor = anchorOptions.find(anchor =>
-    doesAnchorFitWithinScrollParents(anchor, rects, triggerOffset, scrollOffset)
+    doesAnchorFitWithinScrollParents(
+      anchor,
+      rects,
+      triggerOffset,
+      scrollOffset,
+      layerDimensions
+    )
   );
 
   if (anchor) {
@@ -93,6 +102,7 @@ export default function findBestSuitableAnchor(
     rects,
     anchorOptions,
     triggerOffset,
-    scrollOffset
+    scrollOffset,
+    layerDimensions
   );
 }

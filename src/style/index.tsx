@@ -1,4 +1,10 @@
-import { Rects, AnchorEnum, PreferedX, PreferedY } from "../types";
+import {
+  Rects,
+  AnchorEnum,
+  PreferedX,
+  PreferedY,
+  LayerDimensions
+} from "../types";
 
 import { getAnchorPriority } from "../anchor";
 
@@ -23,6 +29,7 @@ type GetAutoAdjustStyleArgs = {
   possibleAnchors: AnchorEnum[];
   autoAdjust: boolean;
   snapToAnchor: boolean;
+  layerDimensions?: LayerDimensions;
 };
 
 export default function getAbsoluteStyle({
@@ -38,10 +45,12 @@ export default function getAbsoluteStyle({
   preferedX,
   preferedY,
   autoAdjust,
-  snapToAnchor
+  snapToAnchor,
+  layerDimensions
 }: GetAutoAdjustStyleArgs): {
   layerStyle: React.CSSProperties;
   layerRect: ClientRect;
+  anchor: AnchorEnum;
 } {
   // get a list of possible anchors bases on user set props
   const possibleAnchorsByPriority = getAnchorPriority(
@@ -58,16 +67,18 @@ export default function getAbsoluteStyle({
         rects,
         possibleAnchorsByPriority,
         triggerOffset,
-        scrollOffset
+        scrollOffset,
+        layerDimensions
       )
     : preferedAnchor;
 
   // calculate a secondary offset when `autoAdjust` is set
   // and `snapToAnchor` is not.
-  // Basically it created a visual effect where it seems that
+  // Basically it creates a visual effect where it seems that
   // the layer has glued to it's parents sides
+  // Note: `offsetSecondary` is disabled when anchor is CENTER
   const offsetSecondary =
-    autoAdjust && !snapToAnchor
+    autoAdjust && !snapToAnchor && anchor !== "CENTER"
       ? getSecondaryOffset(
           anchor,
           possibleAnchorsByPriority,
@@ -93,11 +104,18 @@ export default function getAbsoluteStyle({
     trigger: rects.trigger,
     layer: rects.layer,
     triggerOffset,
-    offsetSecondary
+    offsetSecondary,
+    layerDimensions
   });
+
+  if (layerDimensions) {
+    layerStyle.width = layerRect.width;
+    layerStyle.height = layerRect.height;
+  }
 
   return {
     layerStyle,
-    layerRect
+    layerRect,
+    anchor
   };
 }

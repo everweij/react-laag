@@ -1,5 +1,11 @@
 import * as React from "react";
-import { AnchorEnum, PreferedX, PreferedY, LayerSide } from "./types";
+import {
+  AnchorEnum,
+  PreferedX,
+  PreferedY,
+  LayerSide,
+  LayerDimensions
+} from "./types";
 import Layer from "./Layer";
 
 import useOutsideClick from "./useOutsideClick";
@@ -22,12 +28,11 @@ import {
 
 import getAbsoluteStyle, { getArrowStyle } from "./style";
 
-import { POSSIBLE_ANCHORS } from "./anchor";
+import { POSSIBLE_ANCHORS, getLayerSideByAnchor } from "./anchor";
 
 import {
   doesEntireLayerFitWithinScrollParents,
-  isLayerCompletelyInvisible,
-  getLayerSide
+  isLayerCompletelyInvisible
 } from "./rect";
 
 type RenderChildrenProps = {
@@ -48,6 +53,7 @@ type Placement = {
   snapToAnchor?: boolean;
   preferX?: PreferedX;
   preferY?: PreferedY;
+  layerDimensions?: LayerDimensions;
 };
 
 type DisappearType = "partial" | "full";
@@ -197,7 +203,8 @@ function ToggleLayer({
         relativeParentElement === document.body
           ? 0
           : relativeParentElement!.scrollTop,
-      relativeParentElement
+      relativeParentElement,
+      layerDimensions: placement.layerDimensions
     };
 
     const layerBox = layerRef.current!.getBoundingClientRect();
@@ -227,7 +234,7 @@ function ToggleLayer({
     const scrollbarHeight =
       rects.relativeParent.height - relativeParentElement!.clientHeight;
 
-    const { layerRect, layerStyle } = getAbsoluteStyle({
+    const { layerRect, layerStyle, anchor } = getAbsoluteStyle({
       rects,
       scrollbarWidth,
       scrollbarHeight,
@@ -243,10 +250,14 @@ function ToggleLayer({
 
     // determine in which side to layer will be relative to
     // the trigger
-    const layerSide = getLayerSide(layerRect, triggerRect);
+    const layerSide = getLayerSideByAnchor(anchor);
 
     // get optional arrow positions
-    const arrowStyle = getArrowStyle(layerRect, triggerRect, layerSide);
+    // anchor-style is pointless when rendered anchor is CENTER
+    const arrowStyle =
+      anchor === "CENTER"
+        ? EMPTY_STYLE
+        : getArrowStyle(layerRect, triggerRect, layerSide);
 
     const newStyles: ResultingStyles = {
       layer: layerStyle,
@@ -445,7 +456,7 @@ function ToggleLayer({
               arrowStyle: {
                 ...(isSet(onStyle) ? EMPTY_STYLE : styles.arrow),
                 position: "absolute",
-                willChange: "top, bottom, left, right"
+                willChange: "top, bottom, left, right, width, height"
               },
               isOpen,
               layerSide: styles.layerSide,

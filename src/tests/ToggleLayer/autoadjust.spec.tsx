@@ -291,4 +291,41 @@ describe("Auto Adjust", () => {
     // expect to render BOTTOM_RIGHT
     expect(layer.style.right).toEqual("-550px");
   });
+
+  it("renders different dimensions, based on the layerSide", async () => {
+    const tools = render(
+      <ScrollBox>
+        <ToggleLayerTest
+          placement={{
+            anchor: "CENTER",
+            preferX: "LEFT",
+            possibleAnchors: [
+              "BOTTOM_CENTER",
+              "TOP_CENTER",
+              "LEFT_CENTER",
+              "RIGHT_CENTER"
+            ],
+            autoAdjust: true,
+            snapToAnchor: true,
+            layerDimensions: layerSide => ({
+              width: layerSide === "center" ? 200 : 300,
+              height: layerSide === "center" ? 200 : 100
+            })
+          }}
+        />
+      </ScrollBox>
+    );
+
+    const layer = centerAndTrigger(tools);
+    await nextFrame();
+    expect(layer.style.width).toEqual("200px");
+    expect(layer.style.height).toEqual("200px");
+
+    scroll(tools.getByTestId("scrollbox"), 190, 0);
+
+    await nextFrame();
+    expect(layer.style.left).toEqual("1050px");
+    expect(layer.style.width).toEqual("300px");
+    expect(layer.style.height).toEqual("100px");
+  });
 });

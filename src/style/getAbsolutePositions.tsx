@@ -139,6 +139,31 @@ const secondaryStyleGetters: Record<Side, PositionGetter> = {
   }
 };
 
+const centerGetter: PositionGetter = ({ rects, scrollTop, scrollLeft }) => {
+  const { trigger, relativeParent, layer } = rects;
+
+  const left =
+    trigger.left -
+    relativeParent.left +
+    scrollLeft +
+    trigger.width / 2 -
+    layer.width / 2;
+
+  const top =
+    trigger.top -
+    relativeParent.top +
+    scrollTop +
+    trigger.height / 2 -
+    layer.height / 2;
+
+  return {
+    top,
+    left,
+    right: null as any,
+    bottom: null as any
+  };
+};
+
 type GetAbsolutePositionsArgs = {
   anchor: AnchorEnum;
   rects: Rects;
@@ -160,6 +185,19 @@ export default function getAbsolutePositions({
   scrollbarWidth,
   scrollbarHeight
 }: GetAbsolutePositionsArgs) {
+  if (anchor === "CENTER") {
+    return centerGetter({
+      rects,
+      triggerOffset,
+      offsetSecondary,
+      scrollLeft,
+      scrollTop,
+      primaryDirection: "Y",
+      scrollbarWidth,
+      scrollbarHeight
+    });
+  }
+
   const { primary, secondary } = splitAnchor(anchor);
 
   const primaryDirection = getPrimaryDirection(anchor);

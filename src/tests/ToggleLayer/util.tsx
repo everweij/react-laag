@@ -63,10 +63,10 @@ export function ToggleLayerTest(props: ToggleLayerProps) {
             <div
               ref={props.layerProps.ref}
               style={{
-                ...props.layerProps.style,
                 width: LAYER_DIMENSIONS.width,
                 height: LAYER_DIMENSIONS.height,
-                backgroundColor: "green"
+                backgroundColor: "green",
+                ...props.layerProps.style
               }}
             >
               <div

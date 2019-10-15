@@ -1,6 +1,6 @@
-import { AnchorEnum, Direction, Primary, Side } from "./types";
+import { AnchorEnum, Direction, Primary, Side, LayerSide } from "./types";
 
-export const Anchor: Record<AnchorEnum, AnchorEnum> = {
+export const Anchor: Record<Exclude<AnchorEnum, "CENTER">, AnchorEnum> = {
   BOTTOM_LEFT: "BOTTOM_LEFT",
   BOTTOM_RIGHT: "BOTTOM_RIGHT",
   BOTTOM_CENTER: "BOTTOM_CENTER",
@@ -140,13 +140,27 @@ export function splitAnchor(anchor: AnchorEnum): SplitAnchor {
   return { primary, secondary };
 }
 
+export function getLayerSideByAnchor(anchor: AnchorEnum): LayerSide {
+  if (anchor === "CENTER") {
+    return "center";
+  }
+
+  return splitAnchor(anchor).primary.toLowerCase() as LayerSide;
+}
+
 export function getAnchorPriority(
   preferedAnchor: AnchorEnum,
   possibleAnchors: AnchorEnum[],
   preferedX: "LEFT" | "RIGHT",
   preferedY: "TOP" | "BOTTOM"
 ) {
-  const { primary, secondary } = splitAnchor(preferedAnchor);
+  const { primary, secondary } =
+    preferedAnchor !== "CENTER"
+      ? splitAnchor(preferedAnchor)
+      : {
+          primary: preferedY as Primary,
+          secondary: "CENTER" as Side
+        };
 
   let anchors = POSSIBLE_ANCHORS.map((_, index) => {
     return `${getPrimaryByIndex(

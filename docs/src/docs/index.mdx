@@ -146,13 +146,18 @@ By default react-laag behaves uncontrolled. That means that some state is manage
                   <br />
                   When the layer is open, <Prop.Ref>layerSide</Prop.Ref>{" "}
                   describes on which side the layer is currently positioned
-                  relative to the trigger.
+                  relative to the trigger. <br />
+                  When <Prop.Ref>layerSide</Prop.Ref> is <Prop.Str as="span">
+                    "center"
+                  </Prop.Str>, it means that the layer is anchored <Prop.Str as="span">
+                    "CENTER"
+                  </Prop.Str>
                   <br />
-                  <Prop.Obj as="span">LayerSide</Prop.Obj> ={" "}
-                  <Prop.Str as="span">"top"</Prop.Str> |{" "}
-                  <Prop.Str as="span">"right"</Prop.Str> |{" "}
-                  <Prop.Str as="span">"bottom"</Prop.Str> |
-                  <Prop.Str as="span">"left"</Prop.Str>
+                  <Prop.Obj as="span">LayerSide</Prop.Obj> = <Prop.Str as="span">
+                    "top"
+                  </Prop.Str> | <Prop.Str as="span">"right"</Prop.Str> | <Prop.Str as="span">
+                    "bottom"
+                  </Prop.Str> |<Prop.Str as="span">"left"</Prop.Str> | <Prop.Str as="span">"center"</Prop.Str>
                 </>
               }
             />
@@ -181,6 +186,10 @@ By default react-laag behaves uncontrolled. That means that some state is manage
                 <>
                   Tells react-laag which anchor (location of the layer) you
                   prefer. <br />
+                  <Prop.Str as="span">"CENTER"</Prop.Str> behaves a bit different
+                  compared to the rest of the anchors, in that it centers both horizontally
+                  and vertically, overlapping the trigger element. <br />
+                  <br />
                   Possible values: <Prop.Str as="span">"TOP_LEFT"</Prop.Str>
                   {" | "}
                   <Prop.Str as="span">"TOP_CENTER"</Prop.Str>
@@ -204,6 +213,8 @@ By default react-laag behaves uncontrolled. That means that some state is manage
                   <Prop.Str as="span">"RIGHT_CENTER"</Prop.Str>
                   {" | "}
                   <Prop.Str as="span">"RIGHT_BOTTOM"</Prop.Str>
+                  {" | "}
+                  <Prop.Str as="span">"CENTER"</Prop.Str>
                 </>
               }
             />
@@ -307,6 +318,31 @@ By default react-laag behaves uncontrolled. That means that some state is manage
                 </>
               }
             />
+            <Prop
+              name="layerDimensions"
+              type={
+                <>
+                  {"{"} <Prop.Arg>width</Prop.Arg>: <Prop.Obj>number</Prop.Obj>,{" "}
+                  <Prop.Arg>height</Prop.Arg>: <Prop.Obj>number</Prop.Obj> {"}"}{" "}
+                  | ( <Prop.Arg>layerSide</Prop.Arg>:{" "}
+                  <Prop.Obj>LayerSide</Prop.Obj> ): {"{"}{" "}
+                  <Prop.Arg>width</Prop.Arg>: <Prop.Obj>number</Prop.Obj>,{" "}
+                  <Prop.Arg>height</Prop.Arg>: <Prop.Obj>number</Prop.Obj> {"}"}
+                </>
+              }
+              misc={
+                <>
+                  Sometimes your layer needs a different width and / or height
+                  based on certain conditions, ie. on which side the layer is
+                  relative to the trigger-element. react-laag needs to
+                  anticipate these conditional dimensions on order to find the
+                  best suitable place to render the layer. Otherwise, react-laag
+                  will 'see' the layer's dimensions only after it has been
+                  re-positioned, which may result in an infinite loop of
+                  positional calculations.
+                </>
+              }
+            />
           </>
         }
       />
@@ -390,13 +426,18 @@ By default react-laag behaves uncontrolled. That means that some state is manage
                   <br />
                   When the layer is open, <Prop.Ref>layerSide</Prop.Ref>{" "}
                   describes on which side the layer is currently positioned
-                  relative to the trigger.
+                  relative to the trigger. <br />
+                  When <Prop.Ref>layerSide</Prop.Ref> is <Prop.Str as="span">
+                    "center"
+                  </Prop.Str>, it means that the layer is anchored <Prop.Str as="span">
+                    "CENTER"
+                  </Prop.Str>
                   <br />
-                  <Prop.Obj as="span">LayerSide</Prop.Obj> ={" "}
-                  <Prop.Str as="span">"top"</Prop.Str> |{" "}
-                  <Prop.Str as="span">"right"</Prop.Str> |{" "}
-                  <Prop.Str as="span">"bottom"</Prop.Str> |
-                  <Prop.Str as="span">"left"</Prop.Str>
+                  <Prop.Obj as="span">LayerSide</Prop.Obj> = <Prop.Str as="span">
+                    "top"
+                  </Prop.Str> | <Prop.Str as="span">"right"</Prop.Str> | <Prop.Str as="span">
+                    "bottom"
+                  </Prop.Str> |<Prop.Str as="span">"left"</Prop.Str> | <Prop.Str as="span">"center"</Prop.Str>
                 </>
               }
             />
@@ -638,7 +679,9 @@ function UseHoverExample() {
   return (
     <ToggleLayer
       isOpen={show}
-      renderLayer={() => (isOpen ? <Layer /> : null)}
+      renderLayer={({ layerProps }) =>
+        isOpen ? <Layer {...layerProps} /> : null
+      }
       // rest of props...
     >
       {({ triggerRef }) => (

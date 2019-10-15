@@ -1,6 +1,38 @@
-import { Direction, Primary, Side, AnchorEnum } from "../types";
+import {
+  Direction,
+  Primary,
+  Side,
+  AnchorEnum,
+  LayerDimensions
+} from "../types";
 
-import { splitAnchor, getPrimaryDirection } from "../anchor";
+import {
+  splitAnchor,
+  getPrimaryDirection,
+  getLayerSideByAnchor
+} from "../anchor";
+
+// if user provided `layerDimensions` to the `placement` prop,
+// anticipate the width / height based on the current anchor
+function fixLayerDimensions(
+  originalLayer: ClientRect,
+  anchor: AnchorEnum,
+  layerDimensions: LayerDimensions
+): ClientRect {
+  const dimensions =
+    typeof layerDimensions === "function"
+      ? layerDimensions(getLayerSideByAnchor(anchor))
+      : layerDimensions;
+
+  return {
+    top: originalLayer.top,
+    left: originalLayer.left,
+    right: originalLayer.right,
+    bottom: originalLayer.bottom,
+    width: dimensions.width,
+    height: dimensions.height
+  };
+}
 
 type LayerRectGetter = (args: {
   trigger: ClientRect;
@@ -101,6 +133,7 @@ type GetLayerRectArgs = {
   triggerOffset: number;
   scrollOffset?: number;
   offsetSecondary?: number;
+  layerDimensions?: LayerDimensions;
 };
 
 export default function getLayerRectByAnchor({
@@ -109,33 +142,58 @@ export default function getLayerRectByAnchor({
   anchor,
   triggerOffset,
   scrollOffset = 0,
-  offsetSecondary = 0
+  offsetSecondary = 0,
+  layerDimensions
 }: GetLayerRectArgs): ClientRect {
-  const { primary, secondary } = splitAnchor(anchor);
+  let primaryRect: Partial<ClientRect>;
+  let secondaryRect: Partial<ClientRect>;
 
-  const primaryDirection = getPrimaryDirection(anchor);
+  const layerRect = layerDimensions
+    ? fixLayerDimensions(layer, anchor, layerDimensions)
+    : layer;
 
-  const primaryRect = primaryLayerRectGetters[primary]({
-    trigger,
-    layer,
-    primaryDirection,
-    triggerOffset,
-    offsetSecondary
-  });
-  const secondaryRect = secondaryLayerRectGetters[secondary]({
-    trigger,
-    layer,
-    primaryDirection,
-    triggerOffset,
-    offsetSecondary
-  });
+  if (anchor === "CENTER") {
+    primaryRect = secondaryLayerRectGetters.CENTER({
+      trigger,
+      layer: layerRect,
+      primaryDirection: "Y",
+      triggerOffset,
+      offsetSecondary
+    });
+    secondaryRect = secondaryLayerRectGetters.CENTER({
+      trigger,
+      layer: layerRect,
+      primaryDirection: "X",
+      triggerOffset,
+      offsetSecondary
+    });
+  } else {
+    const { primary, secondary } = splitAnchor(anchor);
+
+    const primaryDirection = getPrimaryDirection(anchor);
+
+    primaryRect = primaryLayerRectGetters[primary]({
+      trigger,
+      layer: layerRect,
+      primaryDirection,
+      triggerOffset,
+      offsetSecondary
+    });
+    secondaryRect = secondaryLayerRectGetters[secondary]({
+      trigger,
+      layer: layerRect,
+      primaryDirection,
+      triggerOffset,
+      offsetSecondary
+    });
+  }
 
   const result = {
     ...layer,
     ...primaryRect,
     ...secondaryRect,
-    width: layer.width,
-    height: layer.height
+    width: layerRect.width,
+    height: layerRect.height
   };
 
   result.top = result.top - scrollOffset;

@@ -1,4 +1,4 @@
-import { Rects, AnchorEnum, OffsetSide, LayerSide } from "../types";
+import { Rects, AnchorEnum, OffsetSide, LayerDimensions } from "../types";
 import getLayerRectByAnchor from "./getLayerRectByAnchor";
 
 const ALL_OFFSET_SIDES: OffsetSide[] = ["bottom", "top", "left", "right"];
@@ -11,7 +11,6 @@ function getLayerOffsetsToParent(
 ): LayerOffsets {
   return {
     top: layer.top - parent.top,
-    // bottom: parent.top + parent.height - (layer.top + layer.height),
     bottom: parent.bottom - layer.bottom,
     left: layer.left - parent.left,
     right: parent.right - layer.right
@@ -111,14 +110,16 @@ export function doesAnchorFitWithinScrollParents(
   anchor: AnchorEnum,
   rects: Rects,
   triggerOffset: number,
-  scrollOffset: number
+  scrollOffset: number,
+  layerDimensions?: LayerDimensions
 ) {
   const layerRect = getLayerRectByAnchor({
     anchor,
     trigger: rects.trigger,
     layer: rects.layer,
     triggerOffset,
-    scrollOffset
+    scrollOffset,
+    layerDimensions
   });
   return doesEntireLayerFitWithinScrollParents(layerRect, rects.scrollParents);
 }
@@ -141,19 +142,19 @@ export function getLayerOffsetsToScrollParentsByAnchor(
   );
 }
 
-export function getLayerSide(
-  layer: ClientRect,
-  trigger: ClientRect
-): LayerSide {
-  if (layer.top >= trigger.bottom) {
-    return "bottom";
-  }
-  if (layer.left >= trigger.right) {
-    return "right";
-  }
-  if (layer.bottom <= trigger.top) {
-    return "top";
-  }
+// export function getLayerSide(
+//   layer: ClientRect,
+//   trigger: ClientRect
+// ): LayerSide {
+//   if (layer.top >= trigger.bottom) {
+//     return "bottom";
+//   }
+//   if (layer.left >= trigger.right) {
+//     return "right";
+//   }
+//   if (layer.bottom <= trigger.top) {
+//     return "top";
+//   }
 
-  return "left";
-}
+//   return "left";
+// }

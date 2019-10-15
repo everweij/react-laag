@@ -214,4 +214,21 @@ describe("Anchors", () => {
       left: 1050
     });
   });
+
+  it("renders CENTER", async () => {
+    const tools = render(
+      <ScrollBox>
+        <ToggleLayerTest
+          placement={{
+            anchor: "CENTER"
+          }}
+        />
+      </ScrollBox>
+    );
+
+    expectLayerStyle(centerAndTrigger(tools), {
+      top: 925,
+      left: 925
+    });
+  });
 });

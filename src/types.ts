@@ -24,7 +24,8 @@ export type AnchorEnum =
   | "LEFT_CENTER"
   | "RIGHT_BOTTOM"
   | "RIGHT_TOP"
-  | "RIGHT_CENTER";
+  | "RIGHT_CENTER"
+  | "CENTER";
 
 export type Primary = Exclude<Side, "CENTER">;
 export type Side = "TOP" | "BOTTOM" | "LEFT" | "RIGHT" | "CENTER";
@@ -34,7 +35,7 @@ export type PreferedX = "LEFT" | "RIGHT";
 export type PreferedY = "TOP" | "BOTTOM";
 
 export type OffsetSide = "left" | "right" | "top" | "bottom";
-export type LayerSide = OffsetSide;
+export type LayerSide = OffsetSide | "center";
 
 export type RenderLayerProps = {
   layerProps: {
@@ -47,3 +48,7 @@ export type RenderLayerProps = {
   isOpen: boolean;
   close: () => void;
 };
+
+export type LayerDimensions = (
+  layerSide: LayerSide
+) => { width: number; height: number } | { width: number; height: number };
