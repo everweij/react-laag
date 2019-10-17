@@ -16,6 +16,7 @@ function areStylesTheSame(a: React.CSSProperties, b: React.CSSProperties) {
 
   for (let i = 0; i < Math.max(aKeys.length, bKeys.length); i++) {
     const key: keyof React.CSSProperties = aKeys[i] || (bKeys[i] as any);
+
     if (a[key] !== b[key]) {
       return false;
     }
@@ -46,5 +47,40 @@ export function getWindowClientRect(): ClientRect {
     bottom: window.innerHeight,
     height: window.innerHeight,
     width: window.innerWidth
+  };
+}
+
+const convertFloat = (value: string) => parseFloat(value.replace("px", ""));
+
+export function getContentBox(element: HTMLElement) {
+  const {
+    width,
+    height,
+    boxSizing,
+    borderLeft,
+    borderRight,
+    borderTop,
+    borderBottom,
+    paddingLeft,
+    paddingRight,
+    paddingTop,
+    paddingBottom
+  } = window.getComputedStyle(element);
+
+  return {
+    width:
+      boxSizing === "border-box"
+        ? convertFloat(width!)
+        : [width, borderLeft, borderRight, paddingLeft, paddingRight].reduce(
+            (total, value) => total + (value ? convertFloat(value!) : 0),
+            0
+          ),
+    height:
+      boxSizing === "border-box"
+        ? convertFloat(height!)
+        : [height, borderTop, borderBottom, paddingTop, paddingBottom].reduce(
+            (total, value) => total + (value ? convertFloat(value!) : 0),
+            0
+          )
   };
 }

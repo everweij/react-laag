@@ -53,7 +53,7 @@ describe("Auto Adjust", () => {
     scroll(tools.getByTestId("scrollbox"), -190, 0);
 
     await nextFrame();
-    expect(layer.style.right).toEqual("-560px");
+    expect(layer.style.left).toEqual("910px");
   });
 
   it("renders the layer as close to the prioritized anchor as possible (LEFT_CENTER / prefer top)", async () => {
@@ -93,7 +93,7 @@ describe("Auto Adjust", () => {
     scroll(tools.getByTestId("scrollbox"), 0, -190);
 
     await nextFrame();
-    expect(layer.style.bottom).toEqual("-560px");
+    expect(layer.style.top).toEqual("910px");
   });
 
   it("renders the layer as close to the prioritized anchor as possible with limited available anchors", async () => {
@@ -115,7 +115,7 @@ describe("Auto Adjust", () => {
     // adjusting layer on same bottom anchor
     scroll(tools.getByTestId("scrollbox"), -190, 0);
     await nextFrame();
-    expect(layer.style.right).toEqual("-560px");
+    expect(layer.style.left).toEqual("910px");
 
     // since BOTTOM_LEFT is not on the possible anchors,
     // it should fallback to RIGHT_CENTER
@@ -251,7 +251,7 @@ describe("Auto Adjust", () => {
 
     await nextFrame();
 
-    expect(layer.style.bottom).toEqual("-550px");
+    expect(layer.style.top).toEqual("900px");
     expect(layer.style.left).toEqual(`1050px`);
   });
 
@@ -289,7 +289,7 @@ describe("Auto Adjust", () => {
     await nextFrame();
 
     // expect to render BOTTOM_RIGHT
-    expect(layer.style.right).toEqual("-550px");
+    expect(layer.style.left).toEqual("900px");
   });
 
   it("renders different dimensions, based on the layerSide", async () => {

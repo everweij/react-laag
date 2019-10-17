@@ -14,16 +14,15 @@ import useElementRef from "./useElementRef";
 import useOnWindowResize from "./useOnWindowResize";
 import useTrackElementResize from "./useTrackElementResize";
 import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
-
-import findFirstRelativeParent from "./findFirstRelativeParent";
-import findScrollContainers from "./findScrollContainers";
 import compensateScrollbars from "./compensateScrollbars";
+import findScrollContainers from "./findScrollContainers";
 
 import {
   EMPTY_STYLE,
   isSet,
   shouldUpdateStyles,
-  getWindowClientRect
+  getWindowClientRect,
+  getContentBox
 } from "./util";
 
 import getAbsoluteStyle, { getArrowStyle } from "./style";
@@ -92,6 +91,7 @@ export type Props = {
   onDisappear?: (type: DisappearType) => void;
   ResizeObserver?: any;
   fixed?: boolean;
+  container?: HTMLElement | (() => HTMLElement);
 };
 
 type UseTriggerElementState = {
@@ -111,6 +111,7 @@ function ToggleLayer({
   onDisappear,
   closeOnDisappear,
   fixed,
+  container,
   ...props
 }: Props) {
   /**
@@ -123,17 +124,38 @@ function ToggleLayer({
   ] = useElementRef<UseTriggerElementState>(
     { triggerElement: null, relativeParentElement: null, scrollParents: [] },
     React.useCallback((triggerElement: HTMLElement) => {
-      const relativeParentElement =
-        findFirstRelativeParent(triggerElement.parentElement) || document.body;
+      const scrollParents = findScrollContainers(triggerElement);
+
+      const relativeParentElement = scrollParents[0] || document.body;
 
       if (relativeParentElement === document.body) {
         document.body.style.position = "relative";
+      } else if (process.env.NODE_ENV === "development") {
+        // Check if we should warn the user about 'position: relative; stuff...'
+        const containerElement =
+          typeof container === "function" ? container() : container;
+
+        const position = window.getComputedStyle(relativeParentElement)
+          .position;
+        const shouldWarnAboutPositionStyle =
+          position !== "relative" &&
+          position !== "absolute" &&
+          position !== "fixed" &&
+          !fixed &&
+          !containerElement;
+
+        if (shouldWarnAboutPositionStyle) {
+          console.warn(
+            `react-laag: Set the 'position' style of the nearest scroll-container to 'relative', 'absolute' or 'fixed', or set the 'fixed' prop to true. This is needed in order to position the layers properly. Currently the scroll-container is positioned: "${position}". Visit https://react-laag.com/docs/#position-relative for more info.`,
+            relativeParentElement
+          );
+        }
       }
 
       return {
         triggerElement,
         relativeParentElement,
-        scrollParents: findScrollContainers(triggerElement)
+        scrollParents
       };
     }, [])
   );
@@ -216,10 +238,9 @@ function ToggleLayer({
       right: layerBox.right,
       bottom: layerBox.bottom,
 
-      // use offsetWidth / offsetHeight in order the handle things like
-      // scale-transforms
-      width: layerRef.current!.offsetWidth,
-      height: layerRef.current!.offsetHeight
+      // use `window.getComputedProperty` for width / height in order
+      // to handle things like scale-transforms
+      ...getContentBox(layerRef.current!)
     };
 
     const rects = {
@@ -229,21 +250,12 @@ function ToggleLayer({
       trigger: triggerRect
     };
 
-    const scrollbarWidth =
-      rects.relativeParent.width - relativeParentElement!.clientWidth;
-    const scrollbarHeight =
-      rects.relativeParent.height - relativeParentElement!.clientHeight;
-
     const { layerRect, layerStyle, anchor } = getAbsoluteStyle({
       rects,
-      scrollbarWidth,
-      scrollbarHeight,
       ...options
     });
 
     if (fixed) {
-      layerStyle.bottom = undefined;
-      layerStyle.right = undefined;
       layerStyle.top = layerRect.top;
       layerStyle.left = layerRect.left;
     }
@@ -395,6 +407,9 @@ function ToggleLayer({
     }, [isOpen, setOpenInternal, isOpenExternal])
   );
 
+  const containerElement =
+    typeof container === "function" ? container() : container;
+
   return (
     <>
       <>
@@ -434,7 +449,7 @@ function ToggleLayer({
         })}
 
         {relativeParentElement && (
-          <Layer parentElement={relativeParentElement}>
+          <Layer parentElement={containerElement || relativeParentElement}>
             {renderLayer({
               layerProps: {
                 ref: element => {
@@ -450,13 +465,13 @@ function ToggleLayer({
                 style: {
                   ...(isSet(onStyle) ? EMPTY_STYLE : styles.layer),
                   position: fixed ? "fixed" : "absolute",
-                  willChange: "top, bottom, left, right"
+                  willChange: "top, bottom, left, right, width, height"
                 }
               },
               arrowStyle: {
                 ...(isSet(onStyle) ? EMPTY_STYLE : styles.arrow),
                 position: "absolute",
-                willChange: "top, bottom, left, right, width, height"
+                willChange: "top, bottom, left, right"
               },
               isOpen,
               layerSide: styles.layerSide,

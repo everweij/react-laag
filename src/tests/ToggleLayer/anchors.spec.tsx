@@ -23,7 +23,7 @@ describe("Anchors", () => {
     );
 
     expectLayerStyle(centerAndTrigger(tools), {
-      bottom: -450,
+      top: 800,
       left: 950
     });
   });
@@ -40,7 +40,7 @@ describe("Anchors", () => {
     );
 
     expectLayerStyle(centerAndTrigger(tools), {
-      bottom: -450,
+      top: 800,
       left: 925
     });
   });
@@ -57,8 +57,8 @@ describe("Anchors", () => {
     );
 
     expectLayerStyle(centerAndTrigger(tools), {
-      bottom: -450,
-      right: -550
+      top: 800,
+      left: 900
     });
   });
 
@@ -109,7 +109,7 @@ describe("Anchors", () => {
 
     expectLayerStyle(centerAndTrigger(tools), {
       top: 1050,
-      right: -550
+      left: 900
     });
   });
 
@@ -126,7 +126,7 @@ describe("Anchors", () => {
 
     expectLayerStyle(centerAndTrigger(tools), {
       top: 950,
-      right: -450
+      left: 800
     });
   });
 
@@ -143,7 +143,7 @@ describe("Anchors", () => {
 
     expectLayerStyle(centerAndTrigger(tools), {
       top: 925,
-      right: -450
+      left: 800
     });
   });
 
@@ -159,8 +159,8 @@ describe("Anchors", () => {
     );
 
     expectLayerStyle(centerAndTrigger(tools), {
-      bottom: -550,
-      right: -450
+      top: 900,
+      left: 800
     });
   });
 
@@ -210,7 +210,7 @@ describe("Anchors", () => {
     );
 
     expectLayerStyle(centerAndTrigger(tools), {
-      bottom: -550,
+      top: 900,
       left: 1050
     });
   });

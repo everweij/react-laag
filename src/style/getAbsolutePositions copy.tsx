@@ -9,6 +9,8 @@ type PositionGetterArguments = {
   triggerOffset: number;
   offsetSecondary: number;
   primaryDirection: Direction;
+  scrollbarWidth: number;
+  scrollbarHeight: number;
 };
 
 type PositionGetter = (args: PositionGetterArguments) => React.CSSProperties;
@@ -21,28 +23,32 @@ const primaryStyleGetters: Record<Primary, PositionGetter> = {
         trigger.top +
         trigger.height -
         (relativeParent.top - scrollTop) +
-        triggerOffset
+        triggerOffset,
+      bottom: null as any
     };
   },
-  TOP: ({ rects, scrollTop, triggerOffset }) => {
-    const { trigger, relativeParent, layer } = rects;
+  TOP: ({ rects, scrollTop, triggerOffset, scrollbarHeight }) => {
+    const { trigger, relativeParent } = rects;
     return {
-      top:
+      bottom:
+        relativeParent.bottom -
         trigger.top -
-        layer.height -
-        (relativeParent.top - scrollTop) -
-        triggerOffset
+        scrollTop +
+        triggerOffset -
+        scrollbarHeight,
+      top: null as any
     };
   },
-  LEFT: ({ rects, scrollLeft, triggerOffset }) => {
-    const { trigger, relativeParent, layer } = rects;
-
+  LEFT: ({ rects, scrollLeft, triggerOffset, scrollbarWidth }) => {
+    const { trigger, relativeParent } = rects;
     return {
-      left:
+      right:
+        relativeParent.right -
         trigger.left -
-        layer.width -
-        (relativeParent.left - scrollLeft) -
-        triggerOffset
+        scrollLeft +
+        triggerOffset -
+        scrollbarWidth,
+      left: null as any
     };
   },
   RIGHT: ({ rects, scrollLeft, triggerOffset }) => {
@@ -53,7 +59,8 @@ const primaryStyleGetters: Record<Primary, PositionGetter> = {
         relativeParent.left +
         scrollLeft +
         trigger.width +
-        triggerOffset
+        triggerOffset,
+      right: null as any
     };
   }
 };
@@ -62,18 +69,20 @@ const secondaryStyleGetters: Record<Side, PositionGetter> = {
   TOP: ({ rects, scrollTop, offsetSecondary }) => {
     const { trigger, relativeParent } = rects;
     return {
-      top: trigger.top - relativeParent.top + scrollTop + offsetSecondary
+      top: trigger.top - relativeParent.top + scrollTop + offsetSecondary,
+      bottom: null as any
     };
   },
-  BOTTOM: ({ rects, scrollTop, offsetSecondary }) => {
-    const { trigger, relativeParent, layer } = rects;
-
+  BOTTOM: ({ rects, scrollTop, offsetSecondary, scrollbarHeight }) => {
+    const { trigger, relativeParent } = rects;
     return {
-      top:
+      bottom:
+        relativeParent.bottom -
         trigger.bottom -
-        layer.height -
-        (relativeParent.top - scrollTop) -
-        offsetSecondary
+        scrollTop +
+        offsetSecondary -
+        scrollbarHeight,
+      top: null as any
     };
   },
   CENTER: ({
@@ -93,7 +102,8 @@ const secondaryStyleGetters: Record<Side, PositionGetter> = {
           scrollLeft +
           trigger.width / 2 -
           layer.width / 2 -
-          offsetSecondary
+          offsetSecondary,
+        right: null as any
       };
     }
 
@@ -104,24 +114,27 @@ const secondaryStyleGetters: Record<Side, PositionGetter> = {
         scrollTop +
         trigger.height / 2 -
         layer.height / 2 +
-        offsetSecondary
+        offsetSecondary,
+      bottom: null as any
     };
   },
   LEFT: ({ rects, scrollLeft, offsetSecondary }) => {
     const { trigger, relativeParent } = rects;
     return {
-      left: trigger.left - relativeParent.left + scrollLeft + offsetSecondary
+      left: trigger.left - relativeParent.left + scrollLeft + offsetSecondary,
+      right: null as any
     };
   },
-  RIGHT: ({ rects, scrollLeft, offsetSecondary }) => {
-    const { trigger, relativeParent, layer } = rects;
-
+  RIGHT: ({ rects, scrollLeft, offsetSecondary, scrollbarWidth }) => {
+    const { trigger, relativeParent } = rects;
     return {
-      left:
+      right:
+        relativeParent.right -
         trigger.right -
-        layer.width -
-        (relativeParent.left - scrollLeft) -
-        offsetSecondary
+        scrollLeft +
+        offsetSecondary -
+        scrollbarWidth,
+      left: null as any
     };
   }
 };
@@ -145,7 +158,9 @@ const centerGetter: PositionGetter = ({ rects, scrollTop, scrollLeft }) => {
 
   return {
     top,
-    left
+    left,
+    right: null as any,
+    bottom: null as any
   };
 };
 
@@ -156,6 +171,8 @@ type GetAbsolutePositionsArgs = {
   scrollLeft: number;
   triggerOffset: number;
   offsetSecondary: number;
+  scrollbarWidth: number;
+  scrollbarHeight: number;
 };
 
 export default function getAbsolutePositions({
@@ -164,7 +181,9 @@ export default function getAbsolutePositions({
   triggerOffset,
   offsetSecondary,
   scrollLeft,
-  scrollTop
+  scrollTop,
+  scrollbarWidth,
+  scrollbarHeight
 }: GetAbsolutePositionsArgs) {
   if (anchor === "CENTER") {
     return centerGetter({
@@ -173,7 +192,9 @@ export default function getAbsolutePositions({
       offsetSecondary,
       scrollLeft,
       scrollTop,
-      primaryDirection: "Y"
+      primaryDirection: "Y",
+      scrollbarWidth,
+      scrollbarHeight
     });
   }
 
@@ -187,7 +208,9 @@ export default function getAbsolutePositions({
     offsetSecondary,
     scrollLeft,
     scrollTop,
-    primaryDirection
+    primaryDirection,
+    scrollbarWidth,
+    scrollbarHeight
   });
   const secondaryStyle = secondaryStyleGetters[secondary]({
     rects,
@@ -195,7 +218,9 @@ export default function getAbsolutePositions({
     offsetSecondary,
     scrollLeft,
     scrollTop,
-    primaryDirection
+    primaryDirection,
+    scrollbarWidth,
+    scrollbarHeight
   });
 
   return {

@@ -17,8 +17,6 @@ export { default as getArrowStyle } from "./getArrowStyle";
 
 type GetAutoAdjustStyleArgs = {
   rects: Rects;
-  scrollbarWidth: number;
-  scrollbarHeight: number;
   scrollTop: number;
   scrollLeft: number;
   triggerOffset: number;
@@ -34,8 +32,6 @@ type GetAutoAdjustStyleArgs = {
 
 export default function getAbsoluteStyle({
   rects,
-  scrollbarWidth,
-  scrollbarHeight,
   scrollTop,
   scrollLeft,
   triggerOffset,
@@ -94,9 +90,7 @@ export default function getAbsoluteStyle({
     triggerOffset,
     offsetSecondary,
     scrollLeft,
-    scrollTop,
-    scrollbarWidth,
-    scrollbarHeight
+    scrollTop
   });
 
   const layerRect = getLayerRectByAnchor({

@@ -68,7 +68,7 @@ ToggleLayer is the most important component of `react-laag`. As the name suggest
 
 ### position: relative;
 
-react-laag expects you to style the (scroll-)parent where you want to contain your layer in `position: relative`. If your layer does not need to be contained, because the trigger scrolls with the rest of the page for instance, you don't have to do anything, because react-laag looks at the `document.body` by default.
+react-laag expects you to style the scroll-parent where you want to contain your layer in `position: relative` (or `absolute` | `fixed`). If your layer does not need to be contained, because the trigger scrolls with the rest of the page for instance, you don't have to do anything, because react-laag looks at the `document.body` by default.
 
 ### Render props
 
@@ -610,7 +610,6 @@ By default react-laag behaves uncontrolled. That means that some state is manage
    </>
   }
 />
-
 <Prop
   name="ResizeObserver"
   type={<Prop.Obj>ResizeObserver</Prop.Obj>}
@@ -620,6 +619,17 @@ By default react-laag behaves uncontrolled. That means that some state is manage
       no support out of the box.
     </>
   }
+/>
+<Prop
+  name="container"
+  experimental
+  type={<><Prop.Obj>HTMLElement</Prop.Obj> | (): <Prop.Obj>HTMLElement</Prop.Obj></>}
+  misc={
+    <>
+      Normally, react-laag renders the layers inside the closest scroll-parent. However, there might be use-cases where you want to control in which container the layers are rendered in. Since react-laag (in non-fixed mode) looks at the <Prop.Ref>scrollTop</Prop.Ref> and <Prop.Ref>scrollLeft</Prop.Ref> properties of the scroll-parent for positioning, it is advised to also put the container element inside the the same scroll-parent as the layer. It is possible to place the container element outside of the scroll-parent, but that will only work in 'fixed' mode. <br/>
+      Note: for elements that are part of the React render tree, it is recommended to pass a getter function which returns a reference to the element, because it could be that the element has not been mounted by React yet. For containers defined in an 'index.html' for example, a <Prop.Ref>document.getElementById</Prop.Ref> will suffice.
+    </>
+}
 />
 
 # useHover()

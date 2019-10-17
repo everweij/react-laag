@@ -16,6 +16,16 @@ const Required = styled.span`
   padding: 2px 6px;
 `;
 
+const Experimental = styled.span`
+  background-color: #c3e2e1;
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 16px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  padding: 2px 6px;
+`;
+
 const Label = styled.div`
   font-weight: 700;
   font-size: 11px;
@@ -123,12 +133,14 @@ export default function Prop({
   type,
   defaultValue,
   required,
+  experimental,
   misc
 }) {
   return (
     <Base style={style}>
       <Name>
-        {name} {required && <Required>Required</Required>}
+        {name} {required && <Required>Required</Required>}{" "}
+        {experimental && <Experimental>Experimental</Experimental>}
       </Name>
 
       <TypeBase>{type}</TypeBase>
