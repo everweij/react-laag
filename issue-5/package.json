@@ -1,0 +1,35 @@
+{
+  "name": "react-laag-example",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@types/styled-components": "^4.1.15",
+    "downshift": "^3.3.4",
+    "framer-motion": "^1.6.8",
+    "react": "link:../node_modules/react",
+    "react-dom": "link:../node_modules/react-dom",
+    "react-laag": "link:..",
+    "react-scripts": "2.1.8",
+    "react-spring": "^8.0.27",
+    "resize-observer-polyfill": "^1.5.1",
+    "styled-components": "^4.2.0",
+    "styled-icons": "^8.5.1",
+    "typescript": "^3.6.2",
+    "@popmotion/popcorn": "0.4.0",
+    "array-move": "2.1.0",
+    "sillyname": "0.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
