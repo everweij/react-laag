@@ -8,6 +8,7 @@ Primitive to build things like tooltips, dropdown menu's and pop-overs.
 Basically any kind of layer that can be toggled. Focus on **what** your layer should look like, and let react-laag take care of **where** and **when** to show it.
 
 <img alt="menu demo" src="./menu.gif" width="400px" />
+<img alt="circular-menu demo" src="./circular.gif" width="400px" />
 
 ### Documentation
 
