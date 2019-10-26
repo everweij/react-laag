@@ -50,7 +50,7 @@ yarn add react-laag
 import React from "react";
 import { ToggleLayer, anchor } from "react-laag";
 
-function SimplePopover() {
+function Example() {
   return (
     <ToggleLayer
       // provide placement config
@@ -82,6 +82,29 @@ function SimplePopover() {
         />
       )}
     </ToggleLayer>
+  );
+}
+```
+
+...or use the hook:
+
+```jsx
+import React from "react";
+import { useToggleLayer, anchor } from "react-laag";
+
+function Example() {
+  const [element, toggleLayerProps] = useToggleLayer(
+    // render the layer
+    ({ layerProps, isOpen }) => isOpen && <div {...layerProps} />,
+    // provide some options, like placement
+    { placement: { anchor: anchor.BOTTOM_CENTER } }
+  );
+
+  return (
+    <div>
+      {element}
+      <div onClick={toggleLayerProps.openFromMouseEvent}>Click me!</div>
+    </div>
   );
 }
 ```
