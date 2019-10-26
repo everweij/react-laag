@@ -5,7 +5,7 @@
 [![BUNDLEPHOBIA](https://badgen.net/bundlephobia/minzip/react-laag)](https://bundlephobia.com/result?p=react-laag)
 [![Weekly downloads](https://badgen.net/npm/dw/react-laag)](https://badgen.net/npm/dw/react-laag)
 
-Primitive to build things like tooltips, dropdown menu's and pop-overs.
+Primitives to build things like tooltips, dropdown menu's and pop-overs.
 
 Basically any kind of layer that can be toggled. Focus on **what** your layer should look like, and let react-laag take care of **where** and **when** to show it.
 

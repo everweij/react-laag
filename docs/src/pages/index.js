@@ -31,7 +31,8 @@ export default ({ data }) => {
     <Main title="Home" pageUrl="/">
       <Header>
         <h1 style={{ marginBottom: 16 }}>
-          Primitive to build things like tooltips, dropdown menu's and pop-overs
+          Primitives to build things like tooltips, dropdown menu's and
+          pop-overs
         </h1>
         <Motto>
           Basically any kind of layer that can be toggled. Focus on{" "}

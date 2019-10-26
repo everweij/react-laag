@@ -8,10 +8,11 @@ const path = require("path");
 
 module.exports = {
   siteMetadata: {
-    titlePostfix: "- react-laag",
+    titlePostfix:
+      "- react-laag | Primitives to build things like tooltips, dropdown menu's and popovers in React",
     author: "react-laag",
     description:
-      "Primitive to build things like tooltips, dropdown menu's and pop-overs",
+      "Primitives to build things like tooltips, dropdown menu's and popovers",
     siteUrl: "https://www.react-laag.com",
     keywords: ["react", "layer", "tooltip", "popover", "dropdown", "menu"],
     image: "/logo.png"
@@ -71,7 +72,7 @@ module.exports = {
       options: {
         host: "https://www.react-laag.com",
         sitemap: "https://www.react-laag.com/sitemap.xml",
-        policy: [{ userAgent: "*", allow: "/" }]
+        policy: [{ userAgent: "*" }]
       }
     }
   ]
