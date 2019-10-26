@@ -111,7 +111,7 @@ export function doesAnchorFitWithinScrollParents(
   rects: Rects,
   triggerOffset: number,
   scrollOffset: number,
-  layerDimensions?: LayerDimensions
+  layerDimensions: LayerDimensions | null
 ) {
   const layerRect = getLayerRectByAnchor({
     anchor,
@@ -136,25 +136,9 @@ export function getLayerOffsetsToScrollParentsByAnchor(
       trigger: rects.trigger,
       layer: rects.layer,
       triggerOffset,
-      scrollOffset
+      scrollOffset,
+      layerDimensions: null
     }),
     rects.scrollParents
   );
 }
-
-// export function getLayerSide(
-//   layer: ClientRect,
-//   trigger: ClientRect
-// ): LayerSide {
-//   if (layer.top >= trigger.bottom) {
-//     return "bottom";
-//   }
-//   if (layer.left >= trigger.right) {
-//     return "right";
-//   }
-//   if (layer.bottom <= trigger.top) {
-//     return "top";
-//   }
-
-//   return "left";
-// }

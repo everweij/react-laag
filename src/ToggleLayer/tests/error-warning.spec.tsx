@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cleanup, render, fireEvent } from "@testing-library/react";
 
-import ToggleLayer from "../../ToggleLayer";
+import ToggleLayer from "../ToggleLayer";
 
 import { ignoreWindowErrorsCallback } from "./util";
 

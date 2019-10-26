@@ -4,7 +4,7 @@ import { cleanup, render, fireEvent } from "@testing-library/react";
 
 import ResizeObserver from "resize-observer-polyfill";
 
-import ToggleLayer from "../../ToggleLayer";
+import ToggleLayer from "../ToggleLayer";
 
 import {
   ScrollBox,

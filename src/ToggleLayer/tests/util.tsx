@@ -1,5 +1,5 @@
 import * as React from "react";
-import ToggleLayer, { Props } from "../../ToggleLayer";
+import ToggleLayer, { Props } from "../ToggleLayer";
 import expect from "expect";
 import { RenderResult, fireEvent, act } from "@testing-library/react";
 

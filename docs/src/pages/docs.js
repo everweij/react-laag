@@ -14,7 +14,7 @@ const Base = styled.section`
 
 export default function Docs({ data }) {
   return (
-    <Main title="Documentation">
+    <Main title="Documentation" pageUrl="/docs/">
       <Base>
         <h1 style={{ marginBottom: 64, color: "#ffa25f" }}>Documentation</h1>
 

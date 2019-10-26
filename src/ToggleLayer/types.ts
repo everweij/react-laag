@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 /**
  * Client Rect stuff
  */
@@ -49,6 +51,46 @@ export type RenderLayerProps = {
   close: () => void;
 };
 
+export type RenderLayer = (props: RenderLayerProps) => ReactNode;
+
 export type LayerDimensions = (
   layerSide: LayerSide
 ) => { width: number; height: number } | { width: number; height: number };
+
+export type Placement = {
+  anchor?: AnchorEnum;
+  triggerOffset?: number;
+  scrollOffset?: number;
+  possibleAnchors?: AnchorEnum[];
+  autoAdjust?: boolean;
+  snapToAnchor?: boolean;
+  preferX?: PreferedX;
+  preferY?: PreferedY;
+  layerDimensions?: LayerDimensions | null;
+};
+
+export type ResultingStyles = {
+  layer: React.CSSProperties;
+  arrow: React.CSSProperties;
+  layerSide: LayerSide;
+};
+
+export type DisappearType = "partial" | "full";
+
+export type OnStyle = (
+  layerStyle: React.CSSProperties,
+  arrowStyle: React.CSSProperties,
+  layerSide: LayerSide
+) => void;
+
+export type Container = HTMLElement | (() => HTMLElement);
+
+export type ToggleLayerOptions = {
+  placement?: Placement;
+  onStyle?: OnStyle;
+  closeOnOutsideClick?: boolean;
+  closeOnDisappear?: DisappearType;
+  ResizeObserver?: any;
+  fixed?: boolean;
+  container?: Container;
+};

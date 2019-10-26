@@ -2,6 +2,8 @@
 
 [![NPM](https://img.shields.io/npm/v/react-laag.svg)](https://www.npmjs.com/package/react-laag)
 [![TYPESCRIPT](https://img.shields.io/badge/%3C%2F%3E-typescript-blue)](http://www.typescriptlang.org/)
+[![BUNDLEPHOBIA](https://badgen.net/bundlephobia/minzip/react-laag)](https://bundlephobia.com/result?p=react-laag)
+[![Weekly downloads](https://badgen.net/npm/dw/react-laag)](https://badgen.net/npm/dw/react-laag)
 
 Primitive to build things like tooltips, dropdown menu's and pop-overs.
 

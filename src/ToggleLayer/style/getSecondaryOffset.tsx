@@ -74,7 +74,8 @@ export default function findSecondaryOffset(
     anchor,
     rects,
     triggerOffset,
-    scrollOffset
+    scrollOffset,
+    null
   );
 
   if (currentAnchorHasHighestPriority && currentAnchorFits) {
@@ -93,7 +94,8 @@ export default function findSecondaryOffset(
       anchor,
       rects,
       triggerOffset,
-      scrollOffset
+      scrollOffset,
+      null
     );
   })!;
 
@@ -122,14 +124,7 @@ export default function findSecondaryOffset(
   );
 
   // ensure `secondaryOffset` is always negative or 0
-  let secondaryOffset = Math.min(-currentOffsets[affectedSide], 0);
-
-  // when current anchor is center, make `secondaryOffset` positive
-  // when affectedSide is bottom or right
-  const isCenter = anchor.includes("_CENTER");
-  if (isCenter && (affectedSide === "bottom" || affectedSide === "left")) {
-    secondaryOffset = -secondaryOffset;
-  }
+  const secondaryOffset = Math.min(-currentOffsets[affectedSide], 0);
 
   return secondaryOffset;
 }

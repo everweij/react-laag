@@ -9,15 +9,16 @@
   "types": "dist/index.d.ts",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
+  "sideEffects": false,
   "scripts": {
     "clean": "rm -rf dist",
     "type-check": "tsc --emitDeclarationOnly true --declaration true",
     "test": "nodemon",
     "test:ci": "karma start --single-run",
     "test:debug": "karma start --browsers=ChromeDebugging",
-    "build": "yarn run clean && yarn test:ci && rollup -c && node ssr-test && yarn run type-check && yarn run uglify && gzip ./dist/index.min.js",
+    "build": "yarn run clean && yarn test:ci && rollup -c && node ssr-test && yarn run type-check && yarn run uglify && gzip ./dist/index.es.min.js",
     "start": "rollup -c -w",
-    "uglify": "uglifyjs ./dist/index.js --compress --mangle -o ./dist/index.min.js",
+    "uglify": "uglifyjs ./dist/index.es.js --compress --mangle -o ./dist/index.es.min.js",
     "prepare": "yarn run build",
     "coverage": "open -a 'Google Chrome' ./coverage/index.html "
   },

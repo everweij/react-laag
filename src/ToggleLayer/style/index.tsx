@@ -27,7 +27,7 @@ type GetAutoAdjustStyleArgs = {
   possibleAnchors: AnchorEnum[];
   autoAdjust: boolean;
   snapToAnchor: boolean;
-  layerDimensions?: LayerDimensions;
+  layerDimensions: LayerDimensions | null;
 };
 
 export default function getAbsoluteStyle({

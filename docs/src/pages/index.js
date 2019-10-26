@@ -28,7 +28,7 @@ const Motto = styled.div`
 
 export default ({ data }) => {
   return (
-    <Main title="Home">
+    <Main title="Home" pageUrl="/">
       <Header>
         <h1 style={{ marginBottom: 16 }}>
           Primitive to build things like tooltips, dropdown menu's and pop-overs

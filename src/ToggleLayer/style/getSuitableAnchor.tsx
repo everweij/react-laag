@@ -32,7 +32,7 @@ function findAnchorByLayerSurface(
   anchorOptions: AnchorEnum[],
   triggerOffset: number,
   scrollOffset: number,
-  layerDimensions?: LayerDimensions
+  layerDimensions: LayerDimensions | null
 ): AnchorEnum {
   const result = anchorOptions
     .map(anchor => {
@@ -78,7 +78,7 @@ export default function findBestSuitableAnchor(
   anchorOptions: AnchorEnum[],
   triggerOffset: number,
   scrollOffset: number,
-  layerDimensions?: LayerDimensions
+  layerDimensions: LayerDimensions | null
 ): AnchorEnum {
   // STRATEGY A
   // find first that fits parent

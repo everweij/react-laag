@@ -1,5 +1,7 @@
 import React from "react";
 
+import useEvent from "./useEvent";
+
 function isChildOf(parent: HTMLElement, target: HTMLElement) {
   if (parent === target) {
     return true;
@@ -24,29 +26,28 @@ function useOutsideClick(
   refs: Array<React.RefObject<HTMLElement | null | undefined>>,
   callback: () => void
 ) {
-  React.useEffect(() => {
-    function onClick(evt: any) {
-      for (const ref of refs) {
-        if (!ref.current) {
-          continue;
+  const [events] = React.useState(["click", "touchstart"]);
+
+  useEvent(
+    typeof document !== "undefined" ? document : null,
+    events,
+    React.useCallback(
+      (evt: any) => {
+        for (const ref of refs) {
+          if (!ref.current) {
+            continue;
+          }
+
+          if (isChildOf(ref.current, evt.target as HTMLElement)) {
+            return;
+          }
         }
 
-        if (isChildOf(ref.current, evt.target as HTMLElement)) {
-          return;
-        }
-      }
-
-      callback();
-    }
-
-    document.addEventListener("click", onClick);
-    document.addEventListener("touchstart", onClick);
-
-    return () => {
-      document.removeEventListener("click", onClick);
-      document.removeEventListener("touchstart", onClick);
-    };
-  });
+        callback();
+      },
+      [callback]
+    )
+  );
 }
 
 export default useOutsideClick;

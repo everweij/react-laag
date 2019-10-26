@@ -1,4 +1,4 @@
-import { ResultingStyles } from "./ToggleLayer";
+import { ResultingStyles } from "./types";
 
 export const EMPTY_STYLE: React.CSSProperties = {};
 
@@ -39,6 +39,7 @@ export function shouldUpdateStyles(
   return true;
 }
 
+// creates a ClientRect-like object from the viewport's dimensions
 export function getWindowClientRect(): ClientRect {
   return {
     top: 0,
@@ -52,6 +53,9 @@ export function getWindowClientRect(): ClientRect {
 
 const convertFloat = (value: string) => parseFloat(value.replace("px", ""));
 
+// get the outer width / height of an element
+// We effectively want the same width / height that `getBoundingClientRect()`
+// gives, minus optional `scale` transforms
 export function getContentBox(element: HTMLElement) {
   const {
     width,
@@ -83,4 +87,31 @@ export function getContentBox(element: HTMLElement) {
             0
           )
   };
+}
+
+// converts a ClientRect (or DOMRect) to a plain js-object
+// usefull for destructuring for instance
+export function clientRectToObject(clientRect: ClientRect): ClientRect {
+  return {
+    top: clientRect.top,
+    left: clientRect.left,
+    right: clientRect.right,
+    bottom: clientRect.bottom,
+    width: clientRect.width,
+    height: clientRect.height
+  };
+}
+
+export function getElementFromAnchorNode(anchorNode: Node): HTMLElement | null {
+  let currentElement = anchorNode as HTMLElement;
+
+  while (!currentElement.getBoundingClientRect) {
+    if (!currentElement.parentElement) {
+      return null;
+    }
+
+    currentElement = currentElement.parentElement;
+  }
+
+  return currentElement;
 }

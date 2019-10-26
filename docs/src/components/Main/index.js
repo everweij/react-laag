@@ -12,7 +12,7 @@ const Base = styled.div`
   /* position: relative; */
 `;
 
-export default function Main({ children, title }) {
+export default function Main({ children, title, pageUrl = "" }) {
   const data = useStaticQuery(
     graphql`
       query {
@@ -41,7 +41,7 @@ export default function Main({ children, title }) {
       <Helmet>
         <meta charSet="utf-8" />
         <title>{t}</title>
-        <link rel="canonical" href={data.site.siteMetadata.siteUrl} />
+        <link rel="canonical" href={data.site.siteMetadata.siteUrl + pageUrl} />
         <html lang={"en"} />
 
         <meta name="description" content={description} />

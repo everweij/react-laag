@@ -1,7 +1,7 @@
 import * as React from "react";
 import expect from "expect";
 import { cleanup, render, fireEvent } from "@testing-library/react";
-import ToggleLayer from "../../ToggleLayer";
+import ToggleLayer from "../ToggleLayer";
 
 import {
   nextFrame,
