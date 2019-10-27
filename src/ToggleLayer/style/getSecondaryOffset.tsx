@@ -124,7 +124,14 @@ export default function findSecondaryOffset(
   );
 
   // ensure `secondaryOffset` is always negative or 0
-  const secondaryOffset = Math.min(-currentOffsets[affectedSide], 0);
+  let secondaryOffset = Math.min(-currentOffsets[affectedSide], 0);
+
+  // when current anchor is center, make `secondaryOffset` positive
+  // when affectedSide is top or right
+  const isCenter = anchor.includes("_CENTER");
+  if (isCenter && (affectedSide === "top" || affectedSide === "left")) {
+    secondaryOffset = -secondaryOffset;
+  }
 
   return secondaryOffset;
 }
