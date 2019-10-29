@@ -274,7 +274,7 @@ By default react-laag behaves uncontrolled. That means that some state is manage
                   <Prop.Ref>arrowStyle</Prop.Ref>. This style object gives the
                   position of the center of the trigger, relative to the layer.
                   How you style your arrow further is up to you. You could use a
-                  svg-element for instance, and calculate it's rotation based on
+                  svg-element for instance, and calculate its rotation based on
                   the <Prop.Ref>layerSide</Prop.Ref> prop. Another possibility
                   is to inject the positions into a styled-component and use a{" "}
                   <Prop.Ref>&::before{"{}"}</Prop.Ref> selector
@@ -533,9 +533,9 @@ By default react-laag behaves uncontrolled. That means that some state is manage
     <>
       By default react-laag tries to render the layer within the closest
       scroll-container. But in some cases you want the layer to show outside
-      it's parent scroll-container. This is especially true for tooltip-like
+      its parent scroll-container. This is especially true for tooltip-like
       components. It's called 'fixed'-mode, because instead of positioning the
-      layer absolute, relative to it's parent, the layer gets positioned fixed
+      layer absolute, relative to its parent, the layer gets positioned fixed
       against the viewport.
       <br />
       <br />
@@ -679,7 +679,7 @@ import { useToggleLayer } from "react-laag";
               type={<>(<Prop.Arg>event</Prop.Arg>: <Prop.Obj>MouseEvent</Prop.Obj>): void</>}
               misc={
                 <>
-                  Utility method that shows the layer with a mouse event as it's source.
+                  Utility method that shows the layer with a mouse event as its source.
                 </>
               } />
             <Prop
@@ -687,7 +687,7 @@ import { useToggleLayer } from "react-laag";
               type={<>(<Prop.Arg>event</Prop.Arg>: <Prop.Obj>MouseEvent</Prop.Obj>): void</>}
               misc={
                 <>
-                  Utility method that shows the layer with a context-menu-event as it's source.
+                  Utility method that shows the layer with a context-menu-event as its source.
                 </>
               } />
             <Prop name="close()" type={<>(): void</>} misc="Hides the layer" />
