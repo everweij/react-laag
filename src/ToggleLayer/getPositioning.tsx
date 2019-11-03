@@ -29,7 +29,7 @@ export const defaultPlacement: Required<Placement> = {
   possibleAnchors: POSSIBLE_ANCHORS,
   preferX: "RIGHT",
   preferY: "BOTTOM",
-  scrollOffset: 0,
+  scrollOffset: 10,
   triggerOffset: 0
 };
 

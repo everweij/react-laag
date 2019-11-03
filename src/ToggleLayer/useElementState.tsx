@@ -37,7 +37,7 @@ export default function useElementState(
           !containerElement;
 
         if (shouldWarnAboutPositionStyle) {
-          console.warn(
+          console.error(
             `react-laag: Set the 'position' style of the nearest scroll-container to 'relative', 'absolute' or 'fixed', or set the 'fixed' prop to true. This is needed in order to position the layers properly. Currently the scroll-container is positioned: "${position}". Visit https://react-laag.com/docs/#position-relative for more info.`,
             relativeParentElement
           );

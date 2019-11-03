@@ -57,7 +57,7 @@ import { ToggleLayer } from "react-laag";
 
 react-laag is fully compatible with server-side rendering.
 
-# ToggleLayer
+# < ToggleLayer />
 
 ```jsx
 import { ToggleLayer } from "react-laag";
@@ -485,11 +485,11 @@ By default react-laag behaves uncontrolled. That means that some state is manage
             <Prop
               name="scrollOffset"
               type={<Prop.Obj>number</Prop.Obj>}
-              defaultValue={0}
+              defaultValue={10}
               misc={
                 <>
-                  Determines the distance in pixels between the layer and the
-                  scroll-containers (incl. viewport)
+                  Determines the minimum margin in pixels between the layer and
+                  the scroll-containers (incl. viewport)
                 </>
               }
             />
@@ -764,7 +764,7 @@ import { useHover } from "react-laag";
 
 <Prop.Label>Type</Prop.Label>
 <Prop.Type>
-  ( <Prop.Arg>config</Prop.Arg>: <Prop.Obj>UseHoverConfig</Prop.Obj> ): [
+  ( <Prop.Arg>config</Prop.Arg>?: <Prop.Obj>UseHoverConfig</Prop.Obj> ): [
   <Prop.Obj>boolean</Prop.Obj>, <Prop.Obj>HoverProps</Prop.Obj>]
 </Prop.Type>
 <Prop.TypeBox
@@ -824,6 +824,195 @@ function UseHoverExample() {
     </ToggleLayer>
   );
 }
+```
+
+# < Arrow />
+
+`<Arrow />` is a utility component that is useful if you want to add an arrow to your layer. This is a common practice for especially tooltips, as well as menu's. The `<Arrow />` component composes a svg dynamically based on a couple of props you provide. The goal is to add arrow functionality in a declarative way, without the need to do any arrow specific calculations.
+
+```jsx
+import { Arrow } from "react-laag";
+```
+
+## Props
+
+<Prop
+  name="layerSide"
+  type={
+    <>
+      <Prop.Obj>LayerSide</Prop.Obj>
+    </>
+  }
+  defaultValue={"top"}
+  misc={<>Determines which side the layer is currently on. This property is normally provided as part of the <Prop.Obj>RenderLayerProps</Prop.Obj>.</>}
+/>
+<Prop
+  name="style"
+  type={
+    <>
+      <Prop.Obj>CSSProperties</Prop.Obj>
+    </>
+  }
+  defaultValue={"top"}
+  misc={<>Style that positions the arrow. This property (`arrowStyle`) is normally provided as part of the <Prop.Obj>RenderLayerProps</Prop.Obj>.</>}
+/>
+<Prop
+  name="size"
+  type={
+    <>
+      <Prop.Obj>number</Prop.Obj>
+    </>
+  }
+  defaultValue={8}
+  misc={<>Distance in pixels between point of the arrow and the layer</>}
+/>
+<Prop
+  name="angle"
+  type={
+    <>
+      <Prop.Obj>number</Prop.Obj>
+    </>
+  }
+  defaultValue={45}
+  misc={<>Angle of the point of the arrow in degrees. Accepts a value between 0-80, where a lower value results in a more pointy arrow.</>}
+/>
+<Prop
+  name="roundness"
+  type={
+    <>
+      <Prop.Obj>number</Prop.Obj>
+    </>
+  }
+  defaultValue={0}
+  misc={<>Value between 0 and 1. Determines how 'sharp' the point of the arrow should be, much like the 'border-radius' in css.</>}
+/>
+<Prop
+  name="borderWidth"
+  type={
+    <>
+      <Prop.Obj>number</Prop.Obj>
+    </>
+  }
+  defaultValue={0}
+  misc={<>The width of the border</>}
+/>
+<Prop
+  name="borderColor"
+  type={
+    <>
+      <Prop.Obj>string</Prop.Obj>
+    </>
+  }
+  defaultValue={"black"}
+  misc={<>The color of the border</>}
+/>
+<Prop
+  name="backgroundColor"
+  type={
+    <>
+      <Prop.Obj>string</Prop.Obj>
+    </>
+  }
+  defaultValue={"white"}
+  misc={<>The background-color of the arrow</>}
+/>
+
+## Example
+
+```jsx
+import * as React from "react";
+import { ToggleLayer, Arrow } from "react-laag";
+
+<ToggleLayer
+  renderLayer={({ layerProps, layerSide, arrowStyle }) =>
+    isOpen && (
+      <div {...layerProps}>
+        <Arrow
+          style={arrowStyle}
+          layerSide={layerSide}
+          size={8}
+          angle={45}
+          roundness={1}
+          borderWidth={1}
+          borderColor="black"
+          backgroundColor="white"
+        />
+      </div>
+    )
+  }
+>
+  {({ triggerRef, toggle }) => (
+    <button ref={triggerRef} onClick={toggle}>
+      Toggle
+    </button>
+  )}
+</ToggleLayer>;
+```
+
+# < Transition />
+
+Utility component that lets you transition the appearance / disappearance of the layer in a simple way. Best used if you want to use simple css-transitions like `opacity` or `transform` and don't want to depend on an animation library. For more complex transitions it is recommended to use tools like `framer-motion` or `react-spring`.
+
+```jsx
+import { Transition } from "react-laag";
+```
+
+<Prop
+  name="isOpen"
+  type={
+    <>
+      <Prop.Obj>boolean</Prop.Obj>
+    </>
+  }
+  required
+  misc={<>Determines if the layer is currently open or closed.</>}
+/>
+<Prop
+  name="children()"
+  type={
+    <>
+      ( <Prop.Arg>isOpen</Prop.Arg>: <Prop.Obj>boolean</Prop.Obj>, <Prop.Arg>onTransitionEnd</Prop.Arg>: <Prop.Obj>() => void</Prop.Obj> ):{" "}
+      <Prop.Obj>ReactNode</Prop.Obj>
+    </>
+  }
+  required
+/>
+
+```jsx
+import * as React from "react";
+import { ToggleLayer, Transition } from "react-laag";
+
+<ToggleLayer
+  renderLayer={({ isOpen, layerProps }) => (
+    <Transition isOpen={isOpen}>
+      {(isOpen, onTransitionEnd) => (
+        <div
+          ref={layerProps.ref}
+
+          // `onTransitionEnd` is required in order for `<Transition />`
+          // to determine when the layer should be unmounted.
+          onTransitionEnd={onTransitionEnd}
+          style={{
+            ...layerProps.style,
+            // `transition` is required for the `onTransitionEnd` to fire
+            transition: '0.2s ease-in-out'
+
+            // declare styles based on whether the layer is open or closed
+            opacity: isOpen ? 1 : 0
+          }}
+        >
+          Layer
+        </div>
+      )}
+    </Transition>
+  )}
+>
+  {({ triggerRef, toggle }) => (
+    <button ref={triggerRef} onClick={toggle}>
+      Toggle
+    </button>
+  )}
+</ToggleLayer>;
 ```
 
 # Tutorials

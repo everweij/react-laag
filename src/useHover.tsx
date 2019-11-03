@@ -10,7 +10,7 @@ type TimeoutState = "entering" | "leaving" | null;
 export default function useHover({
   delayEnter = 0,
   delayLeave = 0
-}: UseHoverProps) {
+}: UseHoverProps = {}) {
   const [show, setShow] = React.useState(false);
   const timeoutRef = React.useRef<number | null>(null);
 
