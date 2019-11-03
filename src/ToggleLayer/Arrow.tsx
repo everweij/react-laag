@@ -168,7 +168,7 @@ export default function Arrow({
         })}
       />
       <path
-        fill="white"
+        fill={backgroundColor}
         d={getBorderMaskPath({ sizeA, sizeB, angle, borderWidth, layerSide })}
       />
     </svg>
