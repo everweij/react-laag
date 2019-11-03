@@ -131,7 +131,8 @@ export function ToggleLayerTest({
           ResizeObserver={RO_Polyfill}
           placement={{
             anchor: "BOTTOM_CENTER",
-            autoAdjust: true
+            autoAdjust: true,
+            scrollOffset: 0
           }}
           renderLayer={props =>
             props.isOpen ? <Layer {...props.layerProps} /> : null

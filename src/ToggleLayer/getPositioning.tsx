@@ -1,5 +1,5 @@
 import { Placement, ResultingStyles } from "./types";
-import { getWindowClientRect, getContentBox, EMPTY_STYLE } from "./util";
+import { getWindowClientRect, getContentBox, EMPTY_STYLE, isSet } from "./util";
 import { POSSIBLE_ANCHORS, getLayerSideByAnchor } from "./anchor";
 import getAbsoluteStyle, { getArrowStyle } from "./style";
 
@@ -83,8 +83,12 @@ export default function getPositioning({
   const options = {
     autoAdjust: placement.autoAdjust || defaultPlacement.autoAdjust,
     snapToAnchor: placement.snapToAnchor || defaultPlacement.snapToAnchor,
-    triggerOffset: placement.triggerOffset || defaultPlacement.triggerOffset,
-    scrollOffset: placement.scrollOffset || defaultPlacement.scrollOffset,
+    triggerOffset: (isSet(placement.triggerOffset)
+      ? placement.triggerOffset
+      : defaultPlacement.triggerOffset) as number,
+    scrollOffset: (isSet(placement.scrollOffset)
+      ? placement.scrollOffset
+      : defaultPlacement.scrollOffset) as number,
     possibleAnchors:
       placement.possibleAnchors || defaultPlacement.possibleAnchors,
     preferedAnchor: placement.anchor || defaultPlacement.anchor,

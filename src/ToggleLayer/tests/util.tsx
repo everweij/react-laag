@@ -45,7 +45,7 @@ function getArrowTranslate(layerSide: string) {
   return `translate(${x}, ${y}) rotate(45deg)`;
 }
 
-export function ToggleLayerTest(props: ToggleLayerProps) {
+export function ToggleLayerTest(props: ToggleLayerProps = {}) {
   return (
     <div
       style={{
@@ -58,6 +58,10 @@ export function ToggleLayerTest(props: ToggleLayerProps) {
     >
       <ToggleLayer
         {...props}
+        placement={{
+          scrollOffset: 0,
+          ...props.placement
+        }}
         renderLayer={props =>
           props.isOpen ? (
             <div
