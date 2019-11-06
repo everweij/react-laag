@@ -2,7 +2,11 @@ import * as React from "react";
 
 type TransitionProps = {
   isOpen: boolean;
-  children: (isOpen: boolean, onTransitionEnd: any) => React.ReactElement;
+  children: (
+    isOpen: boolean,
+    onTransitionEnd: any,
+    isLeaving: boolean
+  ) => React.ReactElement;
 };
 
 export default function Transition({
@@ -38,9 +42,13 @@ export default function Transition({
     return null;
   }
 
-  return children(state.isOpenInternal, () => {
-    if (!state.isOpenInternal) {
-      setState(s => ({ ...s, isLeaving: false }));
-    }
-  });
+  return children(
+    state.isOpenInternal,
+    () => {
+      if (!state.isOpenInternal) {
+        setState(s => ({ ...s, isLeaving: false }));
+      }
+    },
+    state.isLeaving
+  );
 }
