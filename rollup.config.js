@@ -8,30 +8,65 @@ import pkg from "./package.json";
 
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
 
-export default {
-  input: "src/index.tsx",
-  output: [
-    {
+function getBabelConfig({ useESModules }, targets) {
+  return {
+    babelrc: false,
+    runtimeHelpers: true,
+    presets: [
+      ["@babel/preset-env", { loose: true, modules: false, targets }],
+      "@babel/preset-react",
+      "@babel/preset-typescript"
+    ],
+    plugins: [
+      "@babel/plugin-proposal-export-default-from",
+      "@babel/plugin-proposal-class-properties",
+      ["@babel/transform-runtime", { regenerator: false, useESModules }]
+    ],
+    extensions
+  };
+}
+
+const input = "src/index.tsx";
+
+export default [
+  {
+    input,
+    output: {
+      file: pkg.module,
+      format: "esm",
+      exports: "named",
+      sourcemap: true
+    },
+
+    plugins: [
+      external(),
+      babel(
+        getBabelConfig(
+          { useESModules: true },
+          ">1%, not dead, not ie 11, not op_mini all"
+        )
+      ),
+      resolve({ extensions })
+    ]
+  },
+  {
+    input,
+    output: {
       file: pkg.main,
       format: "cjs",
       exports: "named",
       sourcemap: true
     },
-    {
-      file: pkg.module,
-      format: "es",
-      exports: "named",
-      sourcemap: true
-    }
-  ],
-  plugins: [
-    external(),
-    resolve({ extensions }),
-    commonjs(),
-    babel({
-      babelrc: false,
-      extensions,
-      configFile: "./babel.config.build.js"
-    })
-  ]
-};
+    plugins: [
+      external(),
+      commonjs(),
+      babel(
+        getBabelConfig(
+          { useESModules: false },
+          ">1%, not dead, not ie 11, not op_mini all"
+        )
+      ),
+      resolve({ extensions })
+    ]
+  }
+];
