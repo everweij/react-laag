@@ -1,6 +1,3 @@
-p > code {
-  background-color: #ececec !important;
-}
 p + div.gatsby-highlight {
   margin-top: 32px;
 }
@@ -13,7 +10,8 @@ pre[class*="language-"] {
   font-size: 14px;
   color: white;
   background: none;
-  font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace;
+  font-family: Fira Mono, Consolas, Menlo, Monaco, source-code-pro, Courier New,
+    monospace;
   font-feature-settings: normal;
   text-align: left;
   white-space: pre;
@@ -74,17 +72,30 @@ pre[class*="language-"] ::selection {
 }
 
 .token.attr-name {
-  color: rgb(173, 219, 103);
+  color: #bee4ff;
   font-style: italic;
 }
 
+.token.script.language-javascript
+  .token.punctuation:not(.script-punctuation):not(:nth-child(2)):not(:last-child) {
+  color: #aebecc;
+}
+
 .token.comment {
-  color: rgb(128, 147, 147);
+  color: #808993;
+}
+
+.token.attr-value {
+  color: #f7d38f;
+}
+
+.token.attr-value .token.punctuation:not(:first-child) {
+  color: #f7d38f;
 }
 
 .token.string,
 .token.url {
-  color: rgb(173, 219, 103);
+  color: #ffbf84;
 }
 
 .token.variable {
@@ -92,18 +103,45 @@ pre[class*="language-"] ::selection {
 }
 
 .token.number {
-  color: rgb(247, 140, 108);
+  color: #53dac8;
+}
+
+.token.spread .token.attr-value {
+  color: #bee4ff;
+}
+
+.token.constant {
+  color: #68cabc;
 }
 
 .token.builtin,
-.token.char,
-.token.constant,
-.token.function {
+.token.char {
   color: rgb(130, 170, 255);
 }
 
+.token.function {
+  color: #f8fbcb;
+}
+
+.token.tag .punctuation {
+  color: #aebecc;
+}
+
+.token.tag .script {
+  color: white;
+}
+
+/* .token.script .token.punctuation:not(.script-punctuation) ~ .punctuation {
+  color: yellow;
+} */
+
 .token.punctuation {
-  color: rgb(199, 146, 234);
+  color: #96b5ca;
+  /* color: #3fa3e6; */
+}
+
+.token.script .token.punctuation:not(.script-punctuation) {
+  color: #078fea;
 }
 
 .token.selector,
@@ -113,17 +151,23 @@ pre[class*="language-"] ::selection {
 }
 
 .token.class-name {
-  color: rgb(255, 203, 139);
+  color: #2bd8d1;
 }
 
-.token.tag,
-.token.operator,
+.token.operator {
+  color: #aebecc;
+}
+
+.token.tag {
+  color: #2c9de8;
+}
+
 .token.keyword {
-  color: #ffa7c4;
+  color: #f59ce1;
 }
 
 .token.boolean {
-  color: rgb(255, 88, 116);
+  color: #188ace;
 }
 
 .token.property {
@@ -153,8 +197,8 @@ pre[data-line] {
   margin-bottom: 1.75rem;
   /* margin-left: -1.3125rem;
   margin-right: -1.3125rem; */
-  border-radius: 10px;
-  background: #011627;
+  border-radius: 6px;
+  background: #222e3a;
   -webkit-overflow-scrolling: touch;
   overflow: auto;
 }

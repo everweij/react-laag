@@ -33,17 +33,11 @@ const Base = styled.button`
 `;
 
 const Button = React.forwardRef(function Button(
-  { className, style, children, onClick, id },
+  { className, style, children, onClick },
   ref
 ) {
   return (
-    <Base
-      id={id}
-      className={className}
-      style={style}
-      ref={ref}
-      onClick={onClick}
-    >
+    <Base className={className} style={style} ref={ref} onClick={onClick}>
       {children}
     </Base>
   );
