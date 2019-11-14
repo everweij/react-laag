@@ -46,7 +46,10 @@ function useOutsideClick(
         callback();
       },
       [callback]
-    )
+    ),
+    true,
+
+    true
   );
 }
 

@@ -9,7 +9,8 @@ export default function useEvent<T extends EventListener>(
   element: EventListenable | EventListenable[] | null,
   event: string | string[],
   callback: T,
-  enabled = true
+  enabled = true,
+  capture = false
 ) {
   return React.useEffect(() => {
     if (!enabled || !element) {
@@ -23,16 +24,16 @@ export default function useEvent<T extends EventListener>(
 
     el.forEach(e => {
       ev.forEach(event => {
-        e.addEventListener(event as any, cb);
+        e.addEventListener(event as any, cb, capture);
       });
     });
 
     return () => {
       el.forEach(e => {
         ev.forEach(event => {
-          e.removeEventListener(event as any, cb);
+          e.removeEventListener(event as any, cb, capture);
         });
       });
     };
-  }, [callback, element, enabled, event]);
+  }, [callback, element, enabled, event, capture]);
 }
