@@ -3,18 +3,22 @@ import * as React from "react";
 type UseHoverProps = {
   delayEnter?: number;
   delayLeave?: number;
+  hideOnScroll?: boolean;
 };
 
 type TimeoutState = "entering" | "leaving" | null;
 
 export default function useHover({
   delayEnter = 0,
-  delayLeave = 0
+  delayLeave = 0,
+  hideOnScroll = true
 }: UseHoverProps = {}) {
   const [show, setShow] = React.useState(false);
   const timeoutRef = React.useRef<number | null>(null);
 
   const timeoutState = React.useRef<TimeoutState>(null);
+
+  const hasTouchMoved = React.useRef<boolean>(false);
 
   function onMouseEnter() {
     // if was leaving, stop leaving
@@ -59,32 +63,58 @@ export default function useHover({
   React.useEffect(() => {
     const to = timeoutRef.current;
 
+    function clear() {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    }
+
     function onScroll() {
+      if (show && hideOnScroll) {
+        clear();
+        setShow(false);
+      }
+    }
+
+    function onTouchEnd() {
       if (show) {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
+        clear();
         setShow(false);
       }
     }
 
     window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("touchend", onTouchEnd, true);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("touchend", onTouchEnd, true);
 
       if (to) {
         clearTimeout(to);
       }
     };
-  }, [show]);
+  }, [show, hideOnScroll]);
 
   return [
     show,
     {
       onMouseEnter,
-      onMouseLeave
+      onMouseLeave,
+      onTouchStart: () => {
+        hasTouchMoved.current = false;
+      },
+      onTouchMove: () => {
+        hasTouchMoved.current = true;
+      },
+      onTouchEnd: () => {
+        if (!hasTouchMoved.current && !show) {
+          setShow(true);
+        }
+
+        hasTouchMoved.current = false;
+      }
     }
-  ] as [boolean, { onMouseEnter: () => void; onMouseLeave: () => void }];
+  ] as const;
 }

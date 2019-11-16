@@ -128,6 +128,7 @@ function ToggleLayer({
         fixed ? triggerRect : layerRect,
         allScrollParents
       );
+
       const full = isLayerCompletelyInvisible(
         fixed ? triggerRect : layerRect,
         allScrollParents
@@ -135,7 +136,9 @@ function ToggleLayer({
 
       // if parent is interested in diseappearance...
       if (hasOnDisappear) {
-        onDisappear!(full ? "full" : "partial");
+        if (partial || full) {
+          onDisappear!(full ? "full" : "partial");
+        }
       }
       // ... else close accordingly
       else {

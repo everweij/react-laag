@@ -175,6 +175,11 @@ export default function NavLeft() {
                 Transition
               </Link>
             </Item>
+            <Item>
+              <Link activeClassName="active" to="/docs/usebreakpoint/">
+                useBreakpoint
+              </Link>
+            </Item>
           </Items>
         </Nav>
       </Base>

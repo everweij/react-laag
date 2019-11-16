@@ -26,7 +26,7 @@ function useOutsideClick(
   refs: Array<React.RefObject<HTMLElement | null | undefined>>,
   callback: () => void
 ) {
-  const [events] = React.useState(["click", "touchstart"]);
+  const [events] = React.useState(["click"]);
 
   useEvent(
     typeof document !== "undefined" ? document : null,

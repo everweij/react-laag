@@ -38,7 +38,9 @@ export default function Docs() {
         href="https://github.com/everweij/react-laag"
         data-show-count="true"
         aria-label="Star everweij/react-laag on GitHub"
-      />
+      >
+        Star
+      </GitHubButton>
 
       <h2>Where is it good for?</h2>
       <p>
