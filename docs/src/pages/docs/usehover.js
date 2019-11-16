@@ -60,6 +60,19 @@ export default function UseHover() {
           Amount of time in ms that should pass while user has left the element
           before the layer hides again .
         </p>
+
+        <PropTitle>hideOnScroll</PropTitle>
+        <div className="type">
+          <span className="entity">boolean</span>
+        </div>
+
+        <div className="label">Default</div>
+        <div style={{ fontSize: 14, color: "black" }}>true</div>
+
+        <p>
+          Determines whether the layer should hide when the user starts
+          scrolling. Default is true.
+        </p>
       </div>
 
       <div className="detail">
