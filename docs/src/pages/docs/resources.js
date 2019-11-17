@@ -28,6 +28,15 @@ export default function Resources() {
             Circular menu's with react-laag and Framer Motion
           </a>
         </li>
+        <li>
+          <a
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://dev.to/everweij/accessible-and-adaptive-select-menu-s-using-react-laag-and-downshift-abn"
+          >
+            Accessible and adaptive select menu's using react-laag and downshift
+          </a>
+        </li>
       </ul>
     </Main>
   );
