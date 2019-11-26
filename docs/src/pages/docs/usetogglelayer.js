@@ -168,7 +168,12 @@ function HookExample() {
   );
 
   // react to events
-  return <div onContextMenu={toggleLayerProps.openFromContextMenuEvent}></div>;
+  return (
+    <>
+      {element}
+      <div onContextMenu={toggleLayerProps.openFromContextMenuEvent}></div>
+    </>
+  );
 }
       `.trim()}
       </Code>
