@@ -201,7 +201,7 @@ export default function useToggleLayer(
   // handle clicks that are not originated from the trigger / layer
   // element
   useOutsideClick(
-    [layerRef],
+    [layerRef, { current: targetElement }],
     React.useCallback(() => {
       if (!isOpen) {
         return;
