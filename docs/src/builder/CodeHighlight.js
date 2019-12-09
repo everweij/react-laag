@@ -172,8 +172,8 @@ export default function CodeHightlight({ state }) {
         : ""
     }
   >
-    {({ innerRef, toggle }) => (
-      <button ref={innerRef} className="toggle-btn" onClick={toggle}>
+    {({ triggerRef, toggle }) => (
+      <button ref={triggerRef} className="toggle-btn" onClick={toggle}>
         Toggle
       </button>
     )}

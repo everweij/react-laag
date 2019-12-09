@@ -78,7 +78,12 @@ function ToggleLayer({
   const isOpen = isSet(isOpenExternal) ? isOpenExternal! : isOpenInternal;
 
   const handlePositioning = React.useCallback(() => {
-    const triggerRect = triggerElement!.getBoundingClientRect();
+    if (!triggerElement) {
+      throw new Error(
+        "Could not find a valid reference of the trigger element. See https://www.react-laag.com/docs/togglelayer/#children for more info."
+      );
+    }
+    const triggerRect = triggerElement.getBoundingClientRect();
 
     const result = getPositioning({
       triggerRect,
