@@ -57,6 +57,7 @@ function ToggleLayer({
   closeOnDisappear,
   fixed,
   container,
+  environment = typeof window !== "undefined" ? window : undefined,
   ...props
 }: Props) {
   /**
@@ -66,7 +67,7 @@ function ToggleLayer({
   const [
     triggerRef,
     { relativeParentElement, triggerElement, scrollParents }
-  ] = useElementState(container, fixed);
+  ] = useElementState(container, fixed, environment!);
 
   const { styles, setStyles, lastStyles, resetLastStyles } = useStyleState(
     placement.anchor || defaultPlacement.anchor
@@ -91,7 +92,8 @@ function ToggleLayer({
       placement,
       relativeParentElement,
       scrollParents,
-      fixed
+      fixed,
+      environment
     });
 
     if (!result) {
@@ -126,7 +128,7 @@ function ToggleLayer({
     if (hasOnDisappear || shouldCloseOnDisappear) {
       const allScrollParents = [
         ...scrollParents.map(parent => parent.getBoundingClientRect()),
-        getWindowClientRect()
+        getWindowClientRect(environment)
       ];
 
       const partial = !doesEntireLayerFitWithinScrollParents(
@@ -171,7 +173,8 @@ function ToggleLayer({
     layerRef,
     triggerElement,
     isOpen,
-    handlePositioning
+    handlePositioning,
+    environment
   );
 
   // On every render, check a few things...
@@ -209,10 +212,10 @@ function ToggleLayer({
   });
 
   // calculate new layer style when window size changes
-  useOnWindowResize(handlePositioning, isOpen);
+  useOnWindowResize(handlePositioning, environment, isOpen);
 
   // calculate new layer style when user scrolls
-  useOnScroll(scrollParents, handlePositioning, isOpen);
+  useOnScroll(scrollParents, handlePositioning, environment, isOpen);
 
   // handle clicks that are not originated from the trigger / layer
   // element

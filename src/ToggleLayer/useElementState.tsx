@@ -11,23 +11,24 @@ type UseElementState = {
 
 export default function useElementState(
   container: Container | undefined,
-  fixed: boolean | undefined
+  fixed: boolean | undefined,
+  environment?: Window
 ) {
   return useElementRef<UseElementState>(
     { triggerElement: null, relativeParentElement: null, scrollParents: [] },
     React.useCallback((triggerElement: HTMLElement) => {
-      const scrollParents = findScrollContainers(triggerElement);
+      const scrollParents = findScrollContainers(triggerElement, environment);
 
       const relativeParentElement = scrollParents[0] || document.body;
 
       if (relativeParentElement === document.body) {
         document.body.style.position = "relative";
-      } else if (process.env.NODE_ENV === "development") {
+      } else if (process.env.NODE_ENV === "development" && environment) {
         // Check if we should warn the user about 'position: relative; stuff...'
         const containerElement =
           typeof container === "function" ? container() : container;
 
-        const position = window.getComputedStyle(relativeParentElement)
+        const position = environment.getComputedStyle(relativeParentElement)
           .position;
         const shouldWarnAboutPositionStyle =
           position !== "relative" &&

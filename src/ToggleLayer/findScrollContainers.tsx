@@ -1,9 +1,10 @@
 export default function findScrollContainers(
-  element: HTMLElement | null
+  element: HTMLElement | null,
+  environment?: Window
 ): HTMLElement[] {
   const result: HTMLElement[] = [];
 
-  if (!element) {
+  if (!element || !environment) {
     return result;
   }
 
@@ -11,7 +12,9 @@ export default function findScrollContainers(
     return result;
   }
 
-  const { overflow, overflowX, overflowY } = window.getComputedStyle(element);
+  const { overflow, overflowX, overflowY } = environment.getComputedStyle(
+    element
+  );
 
   if (
     [overflow, overflowX, overflowY].some(
@@ -21,5 +24,8 @@ export default function findScrollContainers(
     result.push(element);
   }
 
-  return [...result, ...findScrollContainers(element.parentElement)];
+  return [
+    ...result,
+    ...findScrollContainers(element.parentElement, environment)
+  ];
 }

@@ -6,16 +6,17 @@ export default function useTrackElementResize(
   layerRef: React.RefObject<HTMLElement>,
   triggerElement: HTMLElement | null,
   isOpen: boolean,
-  callback: () => void
+  callback: () => void,
+  environment?: Window
 ) {
   const callbackRef = React.useRef(callback);
   callbackRef.current = callback;
 
   const ResizeObserver =
     injectedResizeObserver ||
-    (typeof window === "undefined"
+    (typeof environment === "undefined"
       ? class ResizeObserver {}
-      : (window as any).ResizeObserver);
+      : (environment as any).ResizeObserver);
 
   if (!ResizeObserver) {
     throw new Error(

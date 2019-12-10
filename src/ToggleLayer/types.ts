@@ -93,4 +93,5 @@ export type ToggleLayerOptions = {
   ResizeObserver?: any;
   fixed?: boolean;
   container?: Container;
+  environment?: Window;
 };

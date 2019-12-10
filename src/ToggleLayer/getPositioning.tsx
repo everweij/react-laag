@@ -40,6 +40,7 @@ type CalculateStyleProps = {
   scrollParents: HTMLElement[];
   placement: Placement;
   fixed: boolean | undefined;
+  environment?: Window;
 };
 
 export default function getPositioning({
@@ -48,6 +49,7 @@ export default function getPositioning({
   relativeParentElement,
   scrollParents,
   placement = {},
+  environment,
   fixed
 }: CalculateStyleProps) {
   /**
@@ -68,7 +70,7 @@ export default function getPositioning({
   // gather all scroll parents (including the window ClientRect)
   // in order to check for collisions
   const scrollParentRects = fixed
-    ? [getWindowClientRect()]
+    ? [getWindowClientRect(environment)]
     : [
         ...scrollParents.map(parent =>
           compensateScrollbars(
@@ -77,7 +79,7 @@ export default function getPositioning({
             parent.clientHeight
           )
         ),
-        getWindowClientRect()
+        getWindowClientRect(environment)
       ];
 
   const options = {
@@ -118,7 +120,7 @@ export default function getPositioning({
 
     // use `window.getComputedProperty` for width / height in order
     // to handle things like scale-transforms
-    ...getContentBox(layerElement!)
+    ...getContentBox(layerElement!, environment)
   };
 
   const rects = {

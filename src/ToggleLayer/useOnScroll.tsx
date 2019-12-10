@@ -5,10 +5,12 @@ import useEvent from "./useEvent";
 function useOnScroll(
   elements: HTMLElement[],
   onScroll: (event: Event) => void,
+  environment?: Window,
   trackScroll = true
 ) {
   const memoElements = React.useMemo(
-    () => (typeof window !== "undefined" ? [window, ...elements] : []),
+    () =>
+      typeof environment !== "undefined" ? [environment, ...elements] : [],
     [elements]
   );
   useEvent(memoElements, "scroll", onScroll, trackScroll);

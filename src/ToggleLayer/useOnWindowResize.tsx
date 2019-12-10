@@ -2,10 +2,11 @@ import useEvent from "./useEvent";
 
 function useOnWindowResize(
   onResize: (event: Event) => void,
+  environment?: Window,
   trackResize = true
 ) {
   useEvent(
-    typeof window !== "undefined" ? window : null,
+    typeof environment !== "undefined" ? environment : null,
     "resize",
     onResize,
     trackResize

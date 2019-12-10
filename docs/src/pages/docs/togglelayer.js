@@ -610,6 +610,24 @@ const [isOpen, setOpen] = React.useState();
 </div>
         `.trim()}
       </Code>
+
+      <PropTitle style={{ marginTop: 56 }} icon experimental>
+        environment
+      </PropTitle>
+      <div className="label">Type</div>
+      <div className="type">
+        <span className="entity">Window</span>
+      </div>
+      <div className="label">Default</div>
+      <div style={{ marginBottom: 20 }}>
+        <code>window</code>
+      </div>
+
+      <p>
+        This prop is only useful if you're rendering react-laag within a
+        different window context from where your JavaScript is running; for
+        example, an iframe or a shadow-root.
+      </p>
     </Main>
   );
 }

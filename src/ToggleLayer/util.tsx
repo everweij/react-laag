@@ -40,14 +40,14 @@ export function shouldUpdateStyles(
 }
 
 // creates a ClientRect-like object from the viewport's dimensions
-export function getWindowClientRect(): ClientRect {
+export function getWindowClientRect(environment?: Window): ClientRect {
   return {
     top: 0,
     left: 0,
-    right: window.innerWidth,
-    bottom: window.innerHeight,
-    height: window.innerHeight,
-    width: window.innerWidth
+    right: environment ? environment.innerWidth : 0,
+    bottom: environment ? environment.innerHeight : 0,
+    height: environment ? environment.innerHeight : 0,
+    width: environment ? environment.innerWidth : 0
   };
 }
 
@@ -56,7 +56,11 @@ const convertFloat = (value: string) => parseFloat(value.replace("px", ""));
 // get the outer width / height of an element
 // We effectively want the same width / height that `getBoundingClientRect()`
 // gives, minus optional `scale` transforms
-export function getContentBox(element: HTMLElement) {
+export function getContentBox(element: HTMLElement, environment?: Window) {
+  if (!environment) {
+    return { width: 0, height: 0 };
+  }
+
   const {
     width,
     height,
@@ -69,7 +73,7 @@ export function getContentBox(element: HTMLElement) {
     paddingRight,
     paddingTop,
     paddingBottom
-  } = window.getComputedStyle(element);
+  } = environment.getComputedStyle(element);
 
   return {
     width:
