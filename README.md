@@ -22,7 +22,7 @@ Visit the website for more examples and docs
 - [x] Build your own tooltips / dropdown-menu's / pop-overs / etc...
 - [x] Not opinionated regarding styling or animations
 - [x] Highly customizable
-- [x] Only ~5kb minified and gzipped
+- [x] Small footprint (tree-shakable)
 - [x] Zero dependencies
 - [x] Built with typescript / ships with typescript definitions
 - [x] Integrates well with other libraries
