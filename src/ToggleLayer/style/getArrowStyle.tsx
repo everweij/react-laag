@@ -5,11 +5,19 @@ export default function getArrowStyle(
   trigger: ClientRect,
   layerSide: LayerSide
 ): React.CSSProperties {
+  const triggerIsBiggerThanLayer =
+    ((layerSide === "top" || layerSide === "bottom") &&
+      trigger.width > layer.width) ||
+    ((layerSide === "left" || layerSide === "right") &&
+      trigger.height > layer.height);
+
   if (layerSide === "bottom") {
     return {
       bottom: "100%",
       top: null,
-      left: trigger.left + trigger.width / 2 - layer.left,
+      left: triggerIsBiggerThanLayer
+        ? "50%"
+        : trigger.left + trigger.width / 2 - layer.left,
       right: null
     } as any;
   }
@@ -17,7 +25,9 @@ export default function getArrowStyle(
     return {
       right: "100%",
       left: null,
-      top: trigger.top + trigger.height / 2 - layer.top,
+      top: triggerIsBiggerThanLayer
+        ? "50%"
+        : trigger.top + trigger.height / 2 - layer.top,
       bottom: null
     } as any;
   }
@@ -25,7 +35,9 @@ export default function getArrowStyle(
     return {
       top: "100%",
       bottom: null,
-      left: trigger.left + trigger.width / 2 - layer.left,
+      left: triggerIsBiggerThanLayer
+        ? "50%"
+        : trigger.left + trigger.width / 2 - layer.left,
       right: null
     } as any;
   }
@@ -33,7 +45,9 @@ export default function getArrowStyle(
   return {
     left: "100%",
     right: null,
-    top: trigger.top + trigger.height / 2 - layer.top,
+    top: triggerIsBiggerThanLayer
+      ? "50%"
+      : trigger.top + trigger.height / 2 - layer.top,
     bottom: null
   } as any;
 }
