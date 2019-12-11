@@ -1,4 +1,11 @@
-import { AnchorEnum, Direction, Primary, Side, LayerSide } from "./types";
+import {
+  AnchorEnum,
+  Direction,
+  Primary,
+  Side,
+  LayerSide,
+  Rects
+} from "./types";
 
 export const Anchor: Record<Exclude<AnchorEnum, "CENTER">, AnchorEnum> = {
   BOTTOM_LEFT: "BOTTOM_LEFT",
@@ -64,9 +71,13 @@ function getPrimaryByIndex(
 function getSecondaryByIndex(
   index: number,
   preferedPrimary: Primary,
-  preferedSecondary: Side
+  preferedSecondary: Side,
+  rects: Rects
 ): Side {
   const prefferedIsY = primaryIsY(preferedPrimary);
+
+  const triggerHasBiggerHeight = rects.trigger.height > rects.layer.height;
+  const triggerHasBiggerWidth = rects.trigger.width > rects.layer.width;
 
   switch (index) {
     case 9:
@@ -102,19 +113,27 @@ function getSecondaryByIndex(
     case 3:
     case 6: {
       if (prefferedIsY) {
-        return preferedPrimary === "BOTTOM" ? "TOP" : "BOTTOM";
+        return preferedPrimary === "BOTTOM" && !triggerHasBiggerHeight
+          ? "TOP"
+          : "BOTTOM";
       }
 
-      return preferedPrimary === "LEFT" ? "RIGHT" : "LEFT";
+      return preferedPrimary === "LEFT" && !triggerHasBiggerWidth
+        ? "RIGHT"
+        : "LEFT";
     }
 
     case 5:
     case 8: {
       if (prefferedIsY) {
-        return preferedPrimary === "BOTTOM" ? "BOTTOM" : "TOP";
+        return preferedPrimary === "BOTTOM" && !triggerHasBiggerHeight
+          ? "BOTTOM"
+          : "TOP";
       }
 
-      return preferedPrimary === "LEFT" ? "LEFT" : "RIGHT";
+      return preferedPrimary === "LEFT" && !triggerHasBiggerWidth
+        ? "LEFT"
+        : "RIGHT";
     }
   }
 
@@ -152,7 +171,8 @@ export function getAnchorPriority(
   preferedAnchor: AnchorEnum,
   possibleAnchors: AnchorEnum[],
   preferedX: "LEFT" | "RIGHT",
-  preferedY: "TOP" | "BOTTOM"
+  preferedY: "TOP" | "BOTTOM",
+  rects: Rects
 ) {
   const { primary, secondary } =
     preferedAnchor !== "CENTER"
@@ -168,7 +188,7 @@ export function getAnchorPriority(
       primary,
       preferedX,
       preferedY
-    )}_${getSecondaryByIndex(index, primary, secondary)}` as AnchorEnum;
+    )}_${getSecondaryByIndex(index, primary, secondary, rects)}` as AnchorEnum;
   }).filter(anchor => possibleAnchors.indexOf(anchor) > -1);
 
   // include prefered anchor if not included in possibleAnchors

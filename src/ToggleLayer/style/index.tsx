@@ -53,7 +53,8 @@ export default function getAbsoluteStyle({
     preferedAnchor,
     possibleAnchors,
     preferedX,
-    preferedY
+    preferedY,
+    rects
   );
 
   // on `autoAdjust` find best suitable anchor based on

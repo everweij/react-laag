@@ -1,4 +1,10 @@
-import { Rects, AnchorEnum, OffsetSide, LayerDimensions } from "../types";
+import {
+  Rects,
+  AnchorEnum,
+  OffsetSide,
+  LayerDimensions,
+  LayerSide
+} from "../types";
 import getLayerRectByAnchor from "./getLayerRectByAnchor";
 
 const ALL_OFFSET_SIDES: OffsetSide[] = ["bottom", "top", "left", "right"];
@@ -140,5 +146,18 @@ export function getLayerOffsetsToScrollParentsByAnchor(
       layerDimensions: null
     }),
     rects.scrollParents
+  );
+}
+
+export function triggerIsBiggerThanLayer(
+  layerSide: LayerSide,
+  layer: ClientRect,
+  trigger: ClientRect
+): boolean {
+  return (
+    ((layerSide === "top" || layerSide === "bottom") &&
+      trigger.width > layer.width) ||
+    ((layerSide === "left" || layerSide === "right") &&
+      trigger.height > layer.height)
   );
 }

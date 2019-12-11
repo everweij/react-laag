@@ -3,12 +3,14 @@ import {
   getLayerOffsetsToScrollParentsByAnchor,
   getNegativeOffsetSides,
   doesAnchorFitWithinScrollParents,
-  reduceOffsets
+  reduceOffsets,
+  triggerIsBiggerThanLayer
 } from "../rect";
 import {
   splitAnchor,
   getPrimaryDirection,
-  getSecondaryAnchorOptionsByPrimary
+  getSecondaryAnchorOptionsByPrimary,
+  getLayerSideByAnchor
 } from "../anchor";
 
 // finds out which side of the layer will be affected
@@ -126,10 +128,32 @@ export default function findSecondaryOffset(
   // ensure `secondaryOffset` is always negative or 0
   let secondaryOffset = Math.min(-currentOffsets[affectedSide], 0);
 
-  // when current anchor is center, make `secondaryOffset` positive
-  // when affectedSide is top or right
+  const triggerIsBigger = triggerIsBiggerThanLayer(
+    getLayerSideByAnchor(anchor),
+    rects.layer,
+    rects.trigger
+  );
+
   const isCenter = anchor.includes("_CENTER");
-  if (isCenter && (affectedSide === "top" || affectedSide === "left")) {
+  const isLeft = anchor.includes("_LEFT");
+  const isTop = anchor.includes("_TOP");
+
+  // when trigger is bigger, make `secondaryOffset` positive
+  // conditionally
+  if (
+    triggerIsBigger &&
+    ((isLeft && affectedSide === "right") ||
+      affectedSide === "left" ||
+      (isTop && affectedSide === "bottom") ||
+      affectedSide === "top")
+  ) {
+    secondaryOffset = -secondaryOffset;
+  } else if (
+    // when current anchor is center, make `secondaryOffset` positive
+    // when affectedSide is top or right
+    !triggerIsBigger &&
+    (isCenter && (affectedSide === "top" || affectedSide === "left"))
+  ) {
     secondaryOffset = -secondaryOffset;
   }
 
