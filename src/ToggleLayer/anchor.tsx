@@ -113,12 +113,20 @@ function getSecondaryByIndex(
     case 3:
     case 6: {
       if (prefferedIsY) {
-        return preferedPrimary === "BOTTOM" && !triggerHasBiggerHeight
+        return preferedPrimary === "BOTTOM"
+          ? triggerHasBiggerHeight
+            ? "BOTTOM"
+            : "TOP"
+          : triggerHasBiggerHeight
           ? "TOP"
           : "BOTTOM";
       }
 
-      return preferedPrimary === "LEFT" && !triggerHasBiggerWidth
+      return preferedPrimary === "LEFT"
+        ? triggerHasBiggerWidth
+          ? "LEFT"
+          : "RIGHT"
+        : triggerHasBiggerWidth
         ? "RIGHT"
         : "LEFT";
     }
@@ -126,12 +134,20 @@ function getSecondaryByIndex(
     case 5:
     case 8: {
       if (prefferedIsY) {
-        return preferedPrimary === "BOTTOM" && !triggerHasBiggerHeight
+        return preferedPrimary === "BOTTOM"
+          ? triggerHasBiggerHeight
+            ? "TOP"
+            : "BOTTOM"
+          : triggerHasBiggerHeight
           ? "BOTTOM"
           : "TOP";
       }
 
-      return preferedPrimary === "LEFT" && !triggerHasBiggerWidth
+      return preferedPrimary === "LEFT"
+        ? triggerHasBiggerWidth
+          ? "RIGHT"
+          : "LEFT"
+        : triggerHasBiggerWidth
         ? "LEFT"
         : "RIGHT";
     }
