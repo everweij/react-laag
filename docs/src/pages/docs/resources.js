@@ -25,7 +25,7 @@ export default function Resources() {
             target="_blank"
             href="https://www.erikverweij.dev/blog/circular-menus-with-react-laag-framer-motion/"
           >
-            Circular menu's with react-laag and Framer Motion
+            Circular menus with react-laag and Framer Motion
           </a>
         </li>
         <li>
@@ -34,7 +34,7 @@ export default function Resources() {
             target="_blank"
             href="https://dev.to/everweij/accessible-and-adaptive-select-menu-s-using-react-laag-and-downshift-abn"
           >
-            Accessible and adaptive select menu's using react-laag and downshift
+            Accessible and adaptive select menus using react-laag and downshift
           </a>
         </li>
       </ul>

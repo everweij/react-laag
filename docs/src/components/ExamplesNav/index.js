@@ -133,7 +133,7 @@ export default function NavLeft() {
             </Item>
             <Item>
               <Link activeClassName="active" to="/examples/contextmenu/">
-                Nested context menu's
+                Nested context menus
               </Link>
             </Item>
             <Item>

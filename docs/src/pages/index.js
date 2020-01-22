@@ -70,7 +70,7 @@ export default () => {
         <img alt="react-laag logo" src={logo} />
         <Title style={{ marginTop: 8, marginBottom: 48 }}>react-laag</Title>
         <h2 style={{ marginBottom: 16 }}>
-          Primitives to build things like tooltips, dropdown menu's and
+          Primitives to build things like tooltips, dropdown menus and
           pop-overs
         </h2>
         <Motto>
