@@ -25,7 +25,7 @@ export default function UseToggleLayer() {
         source to tie the layer to). In such cases it is recommended to use{" "}
         <code>{`useToggleLayer()`}</code>.<br />
         <br />
-        Common use cases: <i>context-menu's</i>, <i>text-selection</i>.
+        Common use cases: <i>context-menus</i>, <i>text-selection</i>.
       </p>
 
       <div className="label">Type</div>

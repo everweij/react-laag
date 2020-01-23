@@ -9,10 +9,10 @@ const path = require("path");
 module.exports = {
   siteMetadata: {
     titlePostfix:
-      "- react-laag | Primitives to build things like tooltips, dropdown menu's and popovers in React",
+      "- react-laag | Primitives to build things like tooltips, dropdown menus and popovers in React",
     author: "react-laag",
     description:
-      "Primitives to build things like tooltips, dropdown menu's and popovers",
+      "Primitives to build things like tooltips, dropdown menus and popovers",
     siteUrl: "https://www.react-laag.com",
     keywords: ["react", "layer", "tooltip", "popover", "dropdown", "menu"],
     image: "/logo.png"

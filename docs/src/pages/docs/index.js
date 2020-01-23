@@ -45,7 +45,7 @@ export default function Docs() {
       <h2>Where is it good for?</h2>
       <p>
         react-laag exposes primitives to build things like tooltips, dropdown
-        menu's and pop-overs in React. Basically any kind of layer that can be
+        menus and pop-overs in React. Basically any kind of layer that can be
         toggled. The keyword here is <b>primitive</b>. It's <i>not</i> a library
         with components that can be instantly used in your app, but more in the
         spirit of tools like <i>react-beautiful-dnd</i> and <i>downshift</i>,

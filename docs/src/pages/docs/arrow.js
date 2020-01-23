@@ -14,7 +14,7 @@ export default function Arrow() {
       <p>
         <code>{`<Arrow />`}</code> is a utility component that is useful if you
         want to add an arrow to your layer. This is a common practice for
-        especially tooltips, as well as menu's. The <code>{`<Arrow />`}</code>{" "}
+        especially tooltips, as well as menus. The <code>{`<Arrow />`}</code>{" "}
         component composes a svg dynamically based on a couple of props you
         provide. The goal is to add arrow functionality in a declarative way,
         without the need to do any arrow specific calculations.
