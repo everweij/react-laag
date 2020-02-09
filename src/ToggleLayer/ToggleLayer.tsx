@@ -6,7 +6,7 @@ import {
   DisappearType
 } from "./types";
 
-import useOutsideClick from "./useOutsideClick";
+import useOutsideClick, { OutsideClickGroupProvider } from "./useOutsideClick";
 import useOnScroll from "./useOnScroll";
 import useOnWindowResize from "./useOnWindowResize";
 import useTrackElementResize from "./useTrackElementResize";
@@ -14,6 +14,7 @@ import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 import useStyleState from "./useStyleState";
 import getPositioning, { defaultPlacement } from "./getPositioning";
 import useElementState from "./useElementState";
+import useIsOpen from "./useIsOpen";
 
 import {
   EMPTY_STYLE,
@@ -76,7 +77,8 @@ function ToggleLayer({
   const layerRef = React.useRef<HTMLElement | null>(null);
 
   const [isOpenInternal, setOpenInternal] = React.useState(false);
-  const isOpen = isSet(isOpenExternal) ? isOpenExternal! : isOpenInternal;
+
+  const isOpen = useIsOpen(isOpenInternal, isOpenExternal);
 
   const handlePositioning = React.useCallback(() => {
     if (!triggerElement) {
@@ -217,10 +219,17 @@ function ToggleLayer({
   // calculate new layer style when user scrolls
   useOnScroll(scrollParents, handlePositioning, environment, isOpen);
 
+  const outsideClickRefs = React.useRef(
+    new Set<React.RefObject<HTMLElement | null | undefined>>([
+      layerRef,
+      triggerRef
+    ])
+  );
+
   // handle clicks that are not originated from the trigger / layer
   // element
   useOutsideClick(
-    [{ current: triggerElement }, layerRef],
+    outsideClickRefs,
     React.useCallback(() => {
       if (!isOpen) {
         return;
@@ -276,49 +285,52 @@ function ToggleLayer({
         layerSide: isOpen ? styles.layerSide : null
       })}
 
-      {relativeParentElement &&
-        createPortal(
-          renderLayer({
-            layerProps: {
-              ref: element => {
-                if (element) {
-                  // observe the layer for resizing
-                  // it's ok to observe the same element multiple times
-                  // since multiple observes of same element are ignored
-                  resizeObserver.observe(element!);
-                }
+      {relativeParentElement && (
+        <OutsideClickGroupProvider refs={outsideClickRefs}>
+          {createPortal(
+            renderLayer({
+              layerProps: {
+                ref: element => {
+                  if (element) {
+                    // observe the layer for resizing
+                    // it's ok to observe the same element multiple times
+                    // since multiple observes of same element are ignored
+                    resizeObserver.observe(element!);
+                  }
 
-                layerRef.current = element;
+                  layerRef.current = element;
+                },
+                style: {
+                  ...(isSet(onStyle) ? EMPTY_STYLE : styles.layer),
+                  position: fixed ? "fixed" : "absolute",
+                  willChange: "top, bottom, left, right, width, height"
+                }
               },
-              style: {
-                ...(isSet(onStyle) ? EMPTY_STYLE : styles.layer),
-                position: fixed ? "fixed" : "absolute",
-                willChange: "top, bottom, left, right, width, height"
+              arrowStyle: {
+                ...(isSet(onStyle) ? EMPTY_STYLE : styles.arrow),
+                position: "absolute",
+                willChange: "top, bottom, left, right"
+              },
+              isOpen,
+              layerSide: styles.layerSide,
+              triggerRect: triggerElement
+                ? triggerElement.getBoundingClientRect()
+                : null,
+              close: () => {
+                /* istanbul ignore next */
+                if (isSet(isOpenExternal)) {
+                  throw new Error(
+                    "You cannot call `close()` while using the `isOpen` prop"
+                  );
+                }
+                /* istanbul ignore next */
+                setOpenInternal(false);
               }
-            },
-            arrowStyle: {
-              ...(isSet(onStyle) ? EMPTY_STYLE : styles.arrow),
-              position: "absolute",
-              willChange: "top, bottom, left, right"
-            },
-            isOpen,
-            layerSide: styles.layerSide,
-            triggerRect: triggerElement
-              ? triggerElement.getBoundingClientRect()
-              : null,
-            close: () => {
-              /* istanbul ignore next */
-              if (isSet(isOpenExternal)) {
-                throw new Error(
-                  "You cannot call `close()` while using the `isOpen` prop"
-                );
-              }
-              /* istanbul ignore next */
-              setOpenInternal(false);
-            }
-          }),
-          containerElement || relativeParentElement
-        )}
+            }),
+            containerElement || relativeParentElement
+          )}
+        </OutsideClickGroupProvider>
+      )}
     </>
   );
 }

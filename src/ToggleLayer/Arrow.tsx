@@ -152,6 +152,7 @@ export default function Arrow({
           layerSide === "left" || layerSide === "right" ? "Y" : "X"
         }(-50%)`
       }}
+      data-arrow="true"
       width={layerSide === "left" || layerSide === "right" ? sizeA : sizeB}
       viewBox={getViewBox(sizeA, sizeB, layerSide, borderWidth)}
     >

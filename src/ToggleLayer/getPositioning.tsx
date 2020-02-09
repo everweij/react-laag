@@ -1,5 +1,11 @@
-import { Placement, ResultingStyles } from "./types";
-import { getWindowClientRect, getContentBox, EMPTY_STYLE, isSet } from "./util";
+import { Placement, ResultingStyles, Rects } from "./types";
+import {
+  getWindowClientRect,
+  getContentBox,
+  EMPTY_STYLE,
+  isSet,
+  clientRectToObject
+} from "./util";
 import { POSSIBLE_ANCHORS, getLayerSideByAnchor } from "./anchor";
 import getAbsoluteStyle, { getArrowStyle } from "./style";
 
@@ -21,6 +27,24 @@ function compensateScrollbars(
   };
 }
 
+function getArrowRect(
+  layerElement: HTMLElement,
+  arrowOffset: number
+): ClientRect {
+  const arrowElement = layerElement.querySelector("[data-arrow]");
+  if (!arrowElement) {
+    return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
+  }
+
+  const rect = arrowElement.getBoundingClientRect();
+
+  return {
+    ...clientRectToObject(rect),
+    width: rect.width + arrowOffset * 2,
+    height: rect.height + arrowOffset * 2
+  };
+}
+
 export const defaultPlacement: Required<Placement> = {
   autoAdjust: false,
   snapToAnchor: false,
@@ -30,7 +54,8 @@ export const defaultPlacement: Required<Placement> = {
   preferX: "RIGHT",
   preferY: "BOTTOM",
   scrollOffset: 10,
-  triggerOffset: 0
+  triggerOffset: 0,
+  arrowOffset: 0
 };
 
 type CalculateStyleProps = {
@@ -123,11 +148,15 @@ export default function getPositioning({
     ...getContentBox(layerElement!, environment)
   };
 
-  const rects = {
+  const rects: Rects = {
     layer,
     relativeParent: relativeParentElement!.getBoundingClientRect(),
     scrollParents: scrollParentRects,
-    trigger: triggerRect
+    trigger: triggerRect,
+    arrow: getArrowRect(
+      layerElement,
+      placement.arrowOffset || defaultPlacement.arrowOffset
+    )
   };
 
   const { layerRect, layerStyle, anchor } = getAbsoluteStyle({
@@ -149,7 +178,7 @@ export default function getPositioning({
   const arrowStyle =
     anchor === "CENTER"
       ? EMPTY_STYLE
-      : getArrowStyle(layerRect, triggerRect, layerSide);
+      : getArrowStyle(layerRect, triggerRect, layerSide, rects.arrow);
 
   const styles: ResultingStyles = {
     layer: layerStyle,

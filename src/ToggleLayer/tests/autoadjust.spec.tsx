@@ -251,7 +251,7 @@ describe("Auto Adjust", () => {
 
     await nextFrame();
 
-    expect(layer.style.top).toEqual("900px");
+    expect(layer.style.top).toEqual("840px");
     expect(layer.style.left).toEqual(`1050px`);
   });
 

@@ -119,3 +119,10 @@ export function getElementFromAnchorNode(anchorNode: Node): HTMLElement | null {
 
   return currentElement;
 }
+
+export function minMax(
+  value: number,
+  { min, max }: { min: number; max: number }
+): number {
+  return value < min ? min : value > max ? max : value;
+}

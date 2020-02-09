@@ -1,24 +1,60 @@
 import * as React from "react";
 
-type UseHoverProps = {
+export interface Config {
   delayEnter?: number;
   delayLeave?: number;
   hideOnScroll?: boolean;
+}
+
+interface CallbackConfig extends Config {
+  onShow: () => void;
+  onHide?: () => void;
+}
+
+type HoverProps = {
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onTouchStart: () => void;
+  onTouchMove: () => void;
+  onTouchEnd: () => void;
 };
 
 type TimeoutState = "entering" | "leaving" | null;
 
-export default function useHover({
-  delayEnter = 0,
-  delayLeave = 0,
-  hideOnScroll = true
-}: UseHoverProps = {}) {
+function useHover(config?: Config): readonly [boolean, HoverProps];
+function useHover(config?: CallbackConfig): HoverProps;
+function useHover(config?: any): any {
+  const {
+    delayEnter = 0,
+    delayLeave = 0,
+    hideOnScroll = true,
+    onShow,
+    onHide
+  } = (config || {}) as CallbackConfig;
+
   const [show, setShow] = React.useState(false);
   const timeoutRef = React.useRef<number | null>(null);
 
   const timeoutState = React.useRef<TimeoutState>(null);
 
   const hasTouchMoved = React.useRef<boolean>(false);
+
+  function handleShowHide(show: boolean) {
+    if (show) {
+      if (onShow) {
+        onShow();
+      }
+
+      setShow(true);
+      return;
+    }
+
+    if (onHide) {
+      onHide();
+    }
+
+    setShow(false);
+  }
 
   function onMouseEnter() {
     // if was leaving, stop leaving
@@ -34,7 +70,7 @@ export default function useHover({
 
     timeoutState.current = "entering";
     timeoutRef.current = setTimeout(() => {
-      setShow(true);
+      handleShowHide(true);
       timeoutRef.current = null;
       timeoutState.current = null;
     }, delayEnter) as any;
@@ -54,7 +90,7 @@ export default function useHover({
 
     timeoutState.current = "leaving";
     timeoutRef.current = setTimeout(() => {
-      setShow(false);
+      handleShowHide(false);
       timeoutRef.current = null;
     }, delayLeave) as any;
   }
@@ -73,14 +109,14 @@ export default function useHover({
     function onScroll() {
       if (show && hideOnScroll) {
         clear();
-        setShow(false);
+        handleShowHide(false);
       }
     }
 
     function onTouchEnd() {
       if (show) {
         clear();
-        setShow(false);
+        handleShowHide(false);
       }
     }
 
@@ -97,24 +133,30 @@ export default function useHover({
     };
   }, [show, hideOnScroll]);
 
-  return [
-    show,
-    {
-      onMouseEnter,
-      onMouseLeave,
-      onTouchStart: () => {
-        hasTouchMoved.current = false;
-      },
-      onTouchMove: () => {
-        hasTouchMoved.current = true;
-      },
-      onTouchEnd: () => {
-        if (!hasTouchMoved.current && !show) {
-          setShow(true);
-        }
-
-        hasTouchMoved.current = false;
+  const hoverProps: HoverProps = {
+    onMouseEnter,
+    onMouseLeave,
+    onTouchStart: () => {
+      hasTouchMoved.current = false;
+    },
+    onTouchMove: () => {
+      hasTouchMoved.current = true;
+    },
+    onTouchEnd: () => {
+      if (!hasTouchMoved.current && !show) {
+        handleShowHide(true);
       }
+
+      hasTouchMoved.current = false;
     }
-  ] as const;
+  };
+
+  // @ts-ignore
+  if (onShow) {
+    return hoverProps;
+  }
+
+  return [show, hoverProps] as const;
 }
+
+export default useHover;

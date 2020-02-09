@@ -105,6 +105,16 @@ export default function UseToggleLayer() {
           Utility method that shows the layer with a mouse event as its source.
         </p>
 
+        <PropTitle>openFromRef</PropTitle>
+        <div className="type">
+          (<span className="arg">ref</span>:{" "}
+          <span className="entity">React.RefObject</span>): void
+        </div>
+        <p>
+          Utility method that shows the layer with a ref (containing a reference
+          to a <span className="entity">HTMLElement</span>) as its source.
+        </p>
+
         <PropTitle>openFromContextMenuEvent</PropTitle>
         <div className="type">
           (<span className="arg">event</span>:{" "}

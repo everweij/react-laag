@@ -2,6 +2,10 @@ import React from "react";
 
 import useEvent from "./useEvent";
 
+export const OutsideClickContext = React.createContext({} as (
+  layer: React.RefObject<HTMLElement | null | undefined>
+) => void);
+
 function isChildOf(parent: HTMLElement, target: HTMLElement) {
   if (parent === target) {
     return true;
@@ -22,18 +26,67 @@ function isChildOf(parent: HTMLElement, target: HTMLElement) {
   return false;
 }
 
+type OutsideClickGroupProviderProps = {
+  refs: React.MutableRefObject<
+    Set<React.RefObject<HTMLElement | null | undefined>>
+  >;
+  children: any;
+};
+
+export function OutsideClickGroupProvider({
+  refs,
+  children
+}: OutsideClickGroupProviderProps) {
+  const isPartOfGroup =
+    typeof React.useContext(OutsideClickContext) === "function";
+
+  if (isPartOfGroup) {
+    return children;
+  }
+
+  return (
+    <OutsideClickContext.Provider
+      value={React.useCallback(layerRef => {
+        refs.current.add(layerRef);
+      }, [])}
+    >
+      {children}
+    </OutsideClickContext.Provider>
+  );
+}
+
+function useRegisterGroup(
+  refs: React.MutableRefObject<
+    Set<React.RefObject<HTMLElement | null | undefined>>
+  >
+) {
+  const registerRefToGroup = React.useContext(OutsideClickContext);
+
+  React.useEffect(() => {
+    const [layerRef] = refs.current.values();
+
+    if (typeof registerRefToGroup === "function" && layerRef) {
+      registerRefToGroup(layerRef);
+    }
+  }, [registerRefToGroup, refs]);
+}
+
 function useOutsideClick(
-  refs: Array<React.RefObject<HTMLElement | null | undefined>>,
+  refs: React.MutableRefObject<
+    Set<React.RefObject<HTMLElement | null | undefined>>
+  >,
   callback: () => void
 ) {
   const [events] = React.useState(["click"]);
+
+  useRegisterGroup(refs);
 
   useEvent(
     typeof document !== "undefined" ? document : null,
     events,
     React.useCallback(
       (evt: any) => {
-        for (const ref of refs) {
+        for (const ref of refs.current) {
           if (!ref.current) {
             continue;
           }

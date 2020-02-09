@@ -426,6 +426,18 @@ const [isOpen, setOpen] = React.useState();
           scroll-containers (incl. viewport)
         </p>
 
+        <PropTitle>arrowOffset</PropTitle>
+        <div className="type">
+          <span className="entity">number</span>
+        </div>
+        <div className="label">Default</div>
+        <div style={{ fontSize: 14, color: "black" }}>0</div>
+        <p style={{ marginTop: 12 }}>
+          Determines the minimum margin in pixels between the arrow and the
+          layers edges. Useful when you need to respect the layers
+          border-radius.
+        </p>
+
         <PropTitle>layerDimensions</PropTitle>
         <div className="type">
           {"{"}

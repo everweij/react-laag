@@ -21,7 +21,7 @@ import useTrackElementResize from "./useTrackElementResize";
 import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 import useOnWindowResize from "./useOnWindowResize";
 import useOnScroll from "./useOnScroll";
-import useOutsideClick from "./useOutsideClick";
+import useOutsideClick, { OutsideClickGroupProvider } from "./useOutsideClick";
 
 type OpenProps = {
   clientRect: ClientRect | (() => ClientRect);
@@ -33,6 +33,7 @@ type UseToggleLayerPayload = {
   openFromContextMenuEvent: (event: React.MouseEvent<any, MouseEvent>) => void;
   openFromMouseEvent: (event: React.MouseEvent<any, MouseEvent>) => void;
   openFromSelection: (selection: Selection) => void;
+  openFromRef: (ref: React.MutableRefObject<any>) => void;
   close: () => void;
   isOpen: boolean;
   layerSide: LayerSide | null;
@@ -201,10 +202,14 @@ export default function useToggleLayer(
   // calculate new layer style when user scrolls
   useOnScroll(scrollParents, handlePositioning, environment, isOpen);
 
+  const outsideClickRefs = React.useRef(
+    new Set<React.RefObject<HTMLElement | null | undefined>>([layerRef])
+  );
+
   // handle clicks that are not originated from the trigger / layer
   // element
   useOutsideClick(
-    [layerRef, { current: targetElement }],
+    outsideClickRefs,
     React.useCallback(() => {
       if (!isOpen) {
         return;
@@ -213,7 +218,7 @@ export default function useToggleLayer(
       if (closeOnOutsideClick) {
         close();
       }
-    }, [isOpen, setOpen])
+    }, [isOpen, setOpen, closeOnOutsideClick])
   );
 
   const containerElement =
@@ -259,6 +264,19 @@ export default function useToggleLayer(
       const clientRect = () => currentTarget.getBoundingClientRect();
 
       open({ clientRect, target: currentTarget });
+    },
+
+    openFromRef: (ref: React.MutableRefObject<any>) => {
+      if (!ref.current) {
+        console.error(
+          `Error inside useTooltip(): Expected a valid ref to a trigger element, but got ${typeof ref.current}`
+        );
+        return;
+      }
+      open({
+        target: ref.current,
+        clientRect: ref.current!.getBoundingClientRect()
+      });
     },
 
     openFromSelection: selection => {
@@ -319,5 +337,10 @@ export default function useToggleLayer(
       containerElement || relativeParentElement
     );
 
-  return [element, payload] as [React.ReactElement<any>, UseToggleLayerPayload];
+  return [
+    <OutsideClickGroupProvider refs={outsideClickRefs}>
+      {element}
+    </OutsideClickGroupProvider>,
+    payload
+  ] as [React.ReactElement<any>, UseToggleLayerPayload];
 }

@@ -52,17 +52,12 @@ export default function findSecondaryOffset(
 
   /**
    * A.
-   * Check wether there are other anchors available
-   * If not, skip secondary offset
+   * Check which other anchors available
    */
   const secondaryAnchorOptions = getSecondaryAnchorOptionsByPrimary(
     primary,
     anchorOptions
   );
-
-  if (secondaryAnchorOptions.length === 1) {
-    return 0;
-  }
 
   /**
    * B.
@@ -125,8 +120,7 @@ export default function findSecondaryOffset(
     )
   );
 
-  // ensure `secondaryOffset` is always negative or 0
-  let secondaryOffset = Math.min(-currentOffsets[affectedSide], 0);
+  let secondaryOffset = -currentOffsets[affectedSide];
 
   const triggerIsBigger = triggerIsBiggerThanLayer(
     getLayerSideByAnchor(anchor),

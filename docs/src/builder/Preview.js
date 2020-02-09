@@ -87,7 +87,8 @@ function Preview({ state, style }, ref) {
         preferY: state.preferY,
         snapToAnchor: state.snapToAnchor,
         scrollOffset: state.scrollOffset,
-        triggerOffset: state.triggerOffset
+        triggerOffset: state.triggerOffset,
+        arrowOffset: state.arrowOffset
       }}
     >
       {({ triggerRef, toggle }) => (

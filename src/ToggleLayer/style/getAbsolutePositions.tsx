@@ -1,4 +1,5 @@
 import { Rects, Primary, Side, Direction, AnchorEnum } from "../types";
+import { minMax } from "../util";
 
 import { splitAnchor, getPrimaryDirection } from "../anchor";
 
@@ -39,14 +40,31 @@ function getCenter(
   prop: "top" | "left",
   size: "width" | "height"
 ) {
-  return (
+  return minMax(
     rects.trigger[prop] -
-    rects.relativeParent[prop] +
-    scroll[prop] +
-    rects.trigger[size] / 2 -
-    rects.layer[size] / 2 -
-    offsetSecondary
+      rects.relativeParent[prop] +
+      scroll[prop] +
+      rects.trigger[size] / 2 -
+      rects.layer[size] / 2 -
+      offsetSecondary,
+    getLimits(rects, scroll)[prop]
   );
+}
+
+function getLimits(rects: Rects, scroll: Scroll) {
+  const topBase = rects.trigger.top - rects.relativeParent.top + scroll.top;
+  const leftBase = rects.trigger.left - rects.relativeParent.left + scroll.left;
+
+  return {
+    top: {
+      min: topBase - (rects.layer.height - rects.arrow.height),
+      max: topBase + (rects.trigger.height - rects.arrow.height)
+    },
+    left: {
+      min: leftBase - (rects.layer.width - rects.arrow.width),
+      max: leftBase + (rects.trigger.width - rects.arrow.width)
+    }
+  };
 }
 
 function getSecondaryStyle(
@@ -71,21 +89,25 @@ function getSecondaryStyle(
 
   if (secondary === "TOP" || secondary === "LEFT") {
     return {
-      [prop]:
+      [prop]: minMax(
         rects.trigger[prop] -
-        rects.relativeParent[prop] +
-        scroll[prop] +
-        offsetSecondary
+          rects.relativeParent[prop] +
+          scroll[prop] +
+          offsetSecondary,
+        getLimits(rects, scroll)[prop]
+      )
     };
   }
 
   return {
-    [prop]:
+    [prop]: minMax(
       rects.trigger[prop] +
-      rects.trigger[size] -
-      rects.layer[size] -
-      (rects.relativeParent[prop] - scroll[prop]) -
-      offsetSecondary
+        rects.trigger[size] -
+        rects.layer[size] -
+        (rects.relativeParent[prop] - scroll[prop]) -
+        offsetSecondary,
+      getLimits(rects, scroll)[prop]
+    )
   };
 }
 

@@ -86,20 +86,21 @@ export function getNegativeOffsetSides(parentOffsets: LayerOffsets[]) {
 function getVisibleLayerSurface(layer: ClientRect, parent: ClientRect) {
   const offsets = getLayerOffsetsToParent(layer, parent);
 
-  const visibleRect = ALL_OFFSET_SIDES.filter(side => offsets[side] < 0).reduce(
-    (rect, side) => {
-      const affectedProperty: "width" | "height" =
-        side === "top" || side === "bottom" ? "height" : "width";
+  const { width, height } = ALL_OFFSET_SIDES.filter(
+    side => offsets[side] < 0
+  ).reduce((rect, side) => {
+    const affectedProperty: "width" | "height" =
+      side === "top" || side === "bottom" ? "height" : "width";
 
-      return {
-        ...rect,
-        [affectedProperty]: rect[affectedProperty] + offsets[side]
-      };
-    },
-    layer
-  );
+    return {
+      ...rect,
+      [affectedProperty]: rect[affectedProperty] + offsets[side]
+    };
+  }, layer);
 
-  return visibleRect.width * visibleRect.height;
+  const result = width * height;
+
+  return width < 0 && height < 0 ? -result : result;
 }
 
 export function getVisibleLayerSurfaceWithinScrollParent(
@@ -127,6 +128,7 @@ export function doesAnchorFitWithinScrollParents(
     scrollOffset,
     layerDimensions
   });
+
   return doesEntireLayerFitWithinScrollParents(layerRect, rects.scrollParents);
 }
 

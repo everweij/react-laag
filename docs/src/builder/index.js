@@ -72,6 +72,7 @@ export default function Builder() {
     preferY: "BOTTOM",
     triggerOffset: 10,
     scrollOffset: 10,
+    arrowOffset: 0,
     fixed: false,
     closeOnOutsideClick: false,
     closeOnDisappear: false,

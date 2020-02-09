@@ -163,6 +163,11 @@ export default function NavLeft() {
                 useHover
               </Link>
             </Item>
+            <Item>
+              <Link activeClassName="active" to="/docs/usetooltip/">
+                useTooltip
+              </Link>
+            </Item>
 
             <Item>
               <Link activeClassName="active" to="/docs/arrow/">

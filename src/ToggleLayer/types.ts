@@ -8,6 +8,7 @@ export type Rects = {
   trigger: ClientRect;
   relativeParent: ClientRect;
   layer: ClientRect;
+  arrow: ClientRect;
   scrollParents: ClientRect[];
 };
 
@@ -61,6 +62,7 @@ export type Placement = {
   anchor?: AnchorEnum;
   triggerOffset?: number;
   scrollOffset?: number;
+  arrowOffset?: number;
   possibleAnchors?: AnchorEnum[];
   autoAdjust?: boolean;
   snapToAnchor?: boolean;

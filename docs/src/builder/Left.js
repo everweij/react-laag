@@ -188,6 +188,17 @@ export default function NavLeft({ state, setState }) {
               setState({ ...state, arrowRoundness: evtToNumber(evt) })
             }
           />
+          <Label>arrowOffset</Label>
+          <input
+            type="range"
+            min={0}
+            max={10}
+            step={0.1}
+            value={state.arrowOffset}
+            onChange={evt =>
+              setState({ ...state, arrowOffset: evtToNumber(evt) })
+            }
+          />
         </Section>
         <Section
           id="placement"
