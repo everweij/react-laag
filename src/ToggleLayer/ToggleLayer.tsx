@@ -67,7 +67,8 @@ function ToggleLayer({
    */
   const [
     triggerRef,
-    { relativeParentElement, triggerElement, scrollParents }
+    { relativeParentElement, triggerElement, scrollParents },
+    normalTriggerRef
   ] = useElementState(container, fixed, environment!);
 
   const { styles, setStyles, lastStyles, resetLastStyles } = useStyleState(
@@ -222,7 +223,7 @@ function ToggleLayer({
   const outsideClickRefs = React.useRef(
     new Set<React.RefObject<HTMLElement | null | undefined>>([
       layerRef,
-      triggerRef
+      normalTriggerRef
     ])
   );
 

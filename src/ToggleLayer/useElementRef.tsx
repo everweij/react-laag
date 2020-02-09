@@ -23,7 +23,11 @@ function useElementRef<T = HTMLElement | null>(
     }
   }, []);
 
-  return [setRef, state] as [any, T];
+  return [setRef, state, lastElement] as [
+    any,
+    T,
+    React.MutableRefObject<HTMLElement | null>
+  ];
 }
 
 export default useElementRef;
