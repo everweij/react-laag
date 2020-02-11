@@ -58,7 +58,8 @@ export default function useToggleLayer(
    */
   const [
     setTargetRef,
-    { relativeParentElement, triggerElement: targetElement, scrollParents }
+    { relativeParentElement, triggerElement: targetElement, scrollParents },
+    normalTriggerRef
   ] = useElementState(container, fixed, environment);
 
   const { styles, setStyles, lastStyles, resetLastStyles } = useStyleState(
@@ -203,7 +204,10 @@ export default function useToggleLayer(
   useOnScroll(scrollParents, handlePositioning, environment, isOpen);
 
   const outsideClickRefs = React.useRef(
-    new Set<React.RefObject<HTMLElement | null | undefined>>([layerRef])
+    new Set<React.RefObject<HTMLElement | null | undefined>>([
+      layerRef,
+      normalTriggerRef
+    ])
   );
 
   // handle clicks that are not originated from the trigger / layer
