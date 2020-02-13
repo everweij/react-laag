@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "gatsby";
 import Main from "../../components/DocsMain";
-import PropTitle from "../../components/PropTitle";
 import Code from "../../components/Code";
 
 import zoom from "../../images/zoom.svg";
