@@ -243,7 +243,7 @@ function ToggleLayer({
       if (closeOnOutsideClick && !isSet(isOpenExternal)) {
         setOpenInternal(false);
       }
-    }, [isOpen, setOpenInternal, isOpenExternal])
+    }, [isOpen, setOpenInternal, isOpenExternal, onOutsideClick])
   );
 
   const containerElement =
