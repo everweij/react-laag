@@ -38,7 +38,7 @@ type RenderChildrenProps = {
   layerSide: LayerSide | null;
 };
 
-export type Props = {
+export type ToggleLayerProps = {
   children: (childrenProps: RenderChildrenProps) => React.ReactNode;
   renderLayer: RenderLayer;
   isOpen?: boolean;
@@ -46,7 +46,7 @@ export type Props = {
   onDisappear?: (type: DisappearType) => void;
 } & ToggleLayerOptions;
 
-function ToggleLayer({
+export const ToggleLayer = ({
   children,
   renderLayer,
   placement = {},
@@ -60,7 +60,7 @@ function ToggleLayer({
   container,
   environment = typeof window !== "undefined" ? window : undefined,
   ...props
-}: Props) {
+}: ToggleLayerProps) => {
   /**
    * Tracks trigger element and keeps it in state together with it's
    * relative/absolute positioned parent

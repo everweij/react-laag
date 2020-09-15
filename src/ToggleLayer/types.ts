@@ -1,9 +1,11 @@
 import { ReactNode } from "react";
 
+export type {ToggleLayerProps} from './ToggleLayer';
+export type {ArrowProps} from './Arrow';
+
 /**
  * Client Rect stuff
  */
-
 export type Rects = {
   trigger: ClientRect;
   relativeParent: ClientRect;

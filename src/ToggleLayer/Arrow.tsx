@@ -116,7 +116,7 @@ function getBorderMaskPath({
   } ${sizeB - borderWidth - borderOffset} V ${borderOffset + borderWidth} Z`;
 }
 
-type ArrowProps = {
+export type ArrowProps = {
   angle?: number; // angle of triangle -> range(10, 80) | default 45
   size?: number; // distance in pixels between point of triangle and layer | default 8
   roundness?: number; // roundness of the point of the arrow -> range(0, 1) | default 0
@@ -127,7 +127,7 @@ type ArrowProps = {
   style?: React.CSSProperties;
 };
 
-export default function Arrow({
+export const Arrow = ({
   size = 8,
   angle = 45,
   borderWidth = 0,
@@ -136,7 +136,7 @@ export default function Arrow({
   backgroundColor = "white",
   layerSide = "top",
   style = {}
-}: ArrowProps) {
+}: ArrowProps) => {
   if (layerSide === "center") {
     return null;
   }
@@ -175,3 +175,5 @@ export default function Arrow({
     </svg>
   );
 }
+
+export default Arrow;
