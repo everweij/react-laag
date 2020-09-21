@@ -17,7 +17,6 @@
     "test:ci": "karma start --single-run",
     "test:debug": "karma start --browsers=ChromeDebugging",
     "build": "yarn run clean && yarn test:ci && rollup -c && node ssr-test && yarn run type-check && yarn run uglify && gzip ./dist/index.es.min.js",
-    "build2": "yarn run clean && rollup -c && node ssr-test && yarn run type-check && yarn run uglify && gzip ./dist/index.es.min.js",
     "start": "rollup -c -w",
     "uglify": "uglifyjs ./dist/index.es.js --compress --mangle -o ./dist/index.es.min.js",
     "prepare": "yarn run build",
