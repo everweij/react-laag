@@ -1,5 +1,3 @@
-import * as types from "./ToggleLayer/types";
-
 export { default as ToggleLayer } from "./ToggleLayer/ToggleLayer";
 export { default as Arrow } from "./ToggleLayer/Arrow";
 export { default as useToggleLayer } from "./ToggleLayer/useToggleLayer";
@@ -19,11 +17,29 @@ export { default as useElementRef } from "./ToggleLayer/useElementRef";
 export { default as useElementState } from "./ToggleLayer/useElementState";
 export { default as useIsomorphicLayoutEffect } from "./ToggleLayer/useIsomorphicLayoutEffect";
 
-export declare type LayerSide = types.LayerSide;
-export declare type RenderLayerProps = types.RenderLayerProps;
-export declare type ToggleLayerOptions = types.ToggleLayerOptions;
-export declare type AnchorEnum = types.AnchorEnum;
-export declare type Direction = types.Direction;
-export declare type Placement = types.Placement;
-export declare type ToggleLayerProps = types.ToggleLayerProps;
-export declare type ArrowProps = types.ArrowProps;
+export type { TransitionProps } from "./Transition";
+export type {
+  HoverOptions,
+  CallbackHoverOptions,
+  HoverProps,
+} from "./useHover";
+export type { TooltipOptions } from "./useTooltip";
+export type {
+  AnchorEnum,
+  ToggleLayerOptions,
+  ArrowProps,
+  ToggleLayerProps,
+  Placement,
+  Direction,
+  LayerSide,
+  RenderLayerProps,
+  DisappearType,
+  LayerDimensions,
+  OnStyle,
+  RenderLayer,
+  PreferedY,
+  PreferedX,
+  OffsetSide,
+  Side,
+  Primary,
+} from "./ToggleLayer/types";
