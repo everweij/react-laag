@@ -17,9 +17,9 @@ coverage/**/*
 .env.test.local
 .env.production.local
 
-# websitee
-docs/.cache/
-docs/public
+# website
+website/.cache/
+website/public
 
 # sandbox
 example
