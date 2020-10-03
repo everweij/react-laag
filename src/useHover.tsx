@@ -1,17 +1,17 @@
 import * as React from "react";
 
-export interface Config {
+export interface HoverOptions {
   delayEnter?: number;
   delayLeave?: number;
   hideOnScroll?: boolean;
 }
 
-interface CallbackConfig extends Config {
+export interface CallbackHoverOptions extends HoverOptions {
   onShow: () => void;
   onHide?: () => void;
 }
 
-type HoverProps = {
+export type HoverProps = {
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onTouchStart: () => void;
@@ -21,8 +21,8 @@ type HoverProps = {
 
 type TimeoutState = "entering" | "leaving" | null;
 
-function useHover(config?: Config): readonly [boolean, HoverProps];
-function useHover(config?: CallbackConfig): HoverProps;
+function useHover(config?: HoverOptions): readonly [boolean, HoverProps];
+function useHover(config?: CallbackHoverOptions): HoverProps;
 function useHover(config?: any): any {
   const {
     delayEnter = 0,
@@ -30,7 +30,7 @@ function useHover(config?: any): any {
     hideOnScroll = true,
     onShow,
     onHide
-  } = (config || {}) as CallbackConfig;
+  } = (config || {}) as CallbackHoverOptions;
 
   const [show, setShow] = React.useState(false);
   const timeoutRef = React.useRef<number | null>(null);

@@ -1,9 +1,9 @@
 import * as React from "react";
-import ToggleLayer, { Props } from "../ToggleLayer";
+import ToggleLayer, { ToggleLayerProps } from "../ToggleLayer";
 import expect from "expect";
 import { RenderResult, fireEvent, act } from "@testing-library/react";
 
-type ToggleLayerProps = Omit<Props, "renderLayer" | "children">;
+type ToggleLayerTestProps = Omit<ToggleLayerProps, "renderLayer" | "children">;
 
 export const TRIGGER_DIMENSIONS = {
   width: 100,
@@ -45,7 +45,7 @@ function getArrowTranslate(layerSide: string) {
   return `translate(${x}, ${y}) rotate(45deg)`;
 }
 
-export function ToggleLayerTest(props: ToggleLayerProps = {}) {
+export function ToggleLayerTest(props: ToggleLayerTestProps = {}) {
   return (
     <div
       style={{

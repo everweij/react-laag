@@ -1,14 +1,14 @@
 import * as React from "react";
 
-import useHover, { Config } from "./useHover";
+import useHover, { HoverOptions } from "./useHover";
 import useToggleLayer from "./ToggleLayer/useToggleLayer";
 import { ToggleLayerOptions, RenderLayer } from "./ToggleLayer/types";
 
-type Options = Config & ToggleLayerOptions;
+export type TooltipOptions = HoverOptions & ToggleLayerOptions;
 
 export default function useTooltip(
   renderLayer: RenderLayer,
-  { delayEnter, delayLeave, hideOnScroll, ...rest }: Options = {}
+  { delayEnter, delayLeave, hideOnScroll, ...rest }: TooltipOptions = {}
 ) {
   const triggerRef = React.useRef<any>();
 

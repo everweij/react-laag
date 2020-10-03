@@ -1,6 +1,6 @@
 import * as React from "react";
 
-type TransitionProps = {
+export type TransitionProps = {
   isOpen: boolean;
   children: (
     isOpen: boolean,
