@@ -1,6 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": "tsx",
-  "exec": "yarn test:debug",
-  "signal": "SIGHUP"
-}

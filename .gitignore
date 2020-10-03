@@ -1,12 +1,10 @@
 
-# See https://help.github.com/ignore-files/ for more about ignoring files.
-
-# dependencies
+*.log
+.DS_Store
 node_modules
-
-# builds
-build
+.cache
 dist
+
 
 # test coverage
 coverage/**/*
@@ -19,13 +17,11 @@ coverage/**/*
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# docs
+# websitee
 docs/.cache/
 docs/public
 
 # sandbox
 example
+
+
