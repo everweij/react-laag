@@ -41,10 +41,7 @@ type RenderChildrenProps = {
 export type ToggleLayerProps = {
   children: (childrenProps: RenderChildrenProps) => React.ReactNode;
   renderLayer: RenderLayer;
-  isOpen?: boolean;
-  onOutsideClick?: () => void;
-  onDisappear?: (type: DisappearType) => void;
-} & ToggleLayerOptions;
+} & Omit<ToggleLayerOptions, "triggerRef">;
 
 export const ToggleLayer = ({
   children,

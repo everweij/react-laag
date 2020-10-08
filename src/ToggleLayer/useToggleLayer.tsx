@@ -22,6 +22,7 @@ import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
 import useOnWindowResize from "./useOnWindowResize";
 import useOnScroll from "./useOnScroll";
 import useOutsideClick, { OutsideClickGroupProvider } from "./useOutsideClick";
+import useIsOpen from "./useIsOpen";
 
 type OpenProps = {
   clientRect: ClientRect | (() => ClientRect);
@@ -43,12 +44,16 @@ export default function useToggleLayer(
   renderLayer: RenderLayer,
   {
     onStyle,
+    isOpen: isOpenExternal,
     closeOnOutsideClick,
+    onOutsideClick,
     closeOnDisappear,
+    onDisappear,
     fixed,
     container,
     placement = {},
     environment = typeof window !== "undefined" ? window : undefined,
+    triggerRef,
     ...props
   }: ToggleLayerOptions = {}
 ) {
@@ -77,11 +82,13 @@ export default function useToggleLayer(
       : triggerRectRef.current!;
   }
 
-  const [isOpen, setOpen] = React.useState(false);
+  const [isOpenInternal, setOpenInternal] = React.useState(false);
 
+  const isOpen = useIsOpen(isOpenInternal, isOpenExternal);
+  
   function close() {
     triggerRectRef.current = null;
-    setOpen(false);
+    setOpenInternal(false);
   }
 
   const handlePositioning = React.useCallback(() => {
@@ -124,10 +131,13 @@ export default function useToggleLayer(
      * B.
      * Manage disappearance
      */
+    
+    const hasOnDisappear = isSet(onDisappear);
+    const shouldCloseOnDisappear = closeOnDisappear && !isSet(isOpenExternal);
 
     // Should we respond to the layer's partial or full disappearance?
     // (trigger's disappearance when `fixed` props is set)
-    if (closeOnDisappear) {
+     if (hasOnDisappear || shouldCloseOnDisappear) {
       const allScrollParents = [
         ...scrollParents.map(parent => parent.getBoundingClientRect()),
         getWindowClientRect(environment)
@@ -137,16 +147,26 @@ export default function useToggleLayer(
         fixed ? triggerRect : layerRect,
         allScrollParents
       );
+
       const full = isLayerCompletelyInvisible(
         fixed ? triggerRect : layerRect,
         allScrollParents
       );
 
-      if (closeOnDisappear === "partial" && partial) {
-        close();
+      // if parent is interested in diseappearance...
+      if (hasOnDisappear) {
+        if (partial || full) {
+          onDisappear!(full ? "full" : "partial");
+        }
       }
-      if (closeOnDisappear === "full" && full) {
-        close();
+      // ... else close accordingly
+      else {
+        if (closeOnDisappear === "partial" && partial) {
+          setOpenInternal(false);
+        }
+        if (closeOnDisappear === "full" && full) {
+          setOpenInternal(false);
+        }
       }
     }
   }, [
@@ -219,10 +239,14 @@ export default function useToggleLayer(
         return;
       }
 
-      if (closeOnOutsideClick) {
-        close();
+      if (onOutsideClick) {
+        onOutsideClick();
       }
-    }, [isOpen, setOpen, closeOnOutsideClick])
+
+      if (closeOnOutsideClick && !isSet(isOpenExternal)) {
+        setOpenInternal(false);
+      }
+    }, [isOpen, setOpenInternal, isOpenExternal, onOutsideClick, closeOnOutsideClick])
   );
 
   const containerElement =
@@ -231,11 +255,11 @@ export default function useToggleLayer(
   function open({ clientRect, target }: OpenProps) {
     triggerRectRef.current = clientRect;
 
-    if (isOpen && target === targetElement) {
+    if (isOpenInternal && target === targetElement) {
       handlePositioning();
     } else {
       setTargetRef(target);
-      setOpen(true);
+      setOpenInternal(true);
     }
   }
 
@@ -277,10 +301,8 @@ export default function useToggleLayer(
         );
         return;
       }
-      open({
-        target: ref.current,
-        clientRect: ref.current!.getBoundingClientRect()
-      });
+      const clientRect = () => ref.current!.getBoundingClientRect();
+      open({ clientRect, target: ref.current });
     },
 
     openFromSelection: selection => {
@@ -335,11 +357,18 @@ export default function useToggleLayer(
         layerSide: styles.layerSide,
         triggerRect: getTriggerRect(),
         close: () => {
-          close();
+          /* istanbul ignore next */
+          setOpenInternal(false);
         }
       }),
       containerElement || relativeParentElement
     );
+  
+  React.useEffect(() => {
+    if(triggerRef && isSet(triggerRef) && isOpenExternal){
+      payload.openFromRef(triggerRef);
+    }
+  }, [triggerRef, isOpenExternal])
 
   return [
     <OutsideClickGroupProvider refs={outsideClickRefs}>

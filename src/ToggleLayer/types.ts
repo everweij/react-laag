@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
-export type {ToggleLayerProps} from './ToggleLayer';
-export type {ArrowProps} from './Arrow';
+export type { ToggleLayerProps } from './ToggleLayer';
+export type { ArrowProps } from './Arrow';
 
 /**
  * Client Rect stuff
@@ -92,10 +92,14 @@ export type Container = HTMLElement | (() => HTMLElement);
 export type ToggleLayerOptions = {
   placement?: Placement;
   onStyle?: OnStyle;
+  isOpen?: boolean;
   closeOnOutsideClick?: boolean;
   closeOnDisappear?: DisappearType;
+  onOutsideClick?: () => void;
+  onDisappear?: (type: DisappearType) => void;
   ResizeObserver?: any;
   fixed?: boolean;
   container?: Container;
   environment?: Window;
+  triggerRef?: React.MutableRefObject<any>;
 };
