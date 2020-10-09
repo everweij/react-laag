@@ -3,7 +3,6 @@ import {
   LayerSide,
   RenderLayer,
   ToggleLayerOptions,
-  DisappearType
 } from "./types";
 
 import useOutsideClick, { OutsideClickGroupProvider } from "./useOutsideClick";
