@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: `react-use-layer`,
+    title: `react-laag`,
     description: `Hook for positioning tooltips & popovers`,
     author: `Erik Verweij`
   },

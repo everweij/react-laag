@@ -46,7 +46,7 @@ type UseTrackBoundsReturnValue = {
 };
 
 function createReferenceError(subject: string) {
-  return `react-use-layer: Could not find a valid reference for the ${subject} element. There might be 2 causes:
+  return `react-laag: Could not find a valid reference for the ${subject} element. There might be 2 causes:
    - Make sure that the 'ref' is set correctly on the ${subject} element when isOpen: true. Also make sure your component forwards the ref with "forwardRef()".
    - Make sure that you are actually rendering the ${subject} when the isOpen prop is set to true`;
 }
@@ -89,7 +89,7 @@ export function useTrackBounds({
   React.useEffect(() => {
     warning(
       ResizeObserver,
-      `This browser does not support ResizeObserver out of the box. We recommend to add a polyfill in order to utilize the full capabilities of react-use-layer. See: https://link`
+      `This browser does not support ResizeObserver out of the box. We recommend to add a polyfill in order to utilize the full capabilities of react-laag. See: https://link`
     );
   }, [ResizeObserver]);
 
@@ -286,7 +286,7 @@ export function useTrackBounds({
 
           warning(
             closestScrollContainerHasCorrectStyling,
-            `react-use-layer: Set the 'position' style of the nearest scroll-container to 'relative', 'absolute' or 'fixed', or set the 'overflowContainer' prop to true. This is needed in order to position the layer properly. Currently the scroll-container is positioned: "${position}". For now, "position: relative;" is added for you, but this behavior might be removed in the future. Visit https://react-laag.com/docs/#position-relative for more info.`
+            `react-laag: Set the 'position' style of the nearest scroll-container to 'relative', 'absolute' or 'fixed', or set the 'overflowContainer' prop to true. This is needed in order to position the layer properly. Currently the scroll-container is positioned: "${position}". For now, "position: relative;" is added for you, but this behavior might be removed in the future. Visit https://react-laag.com/docs/#position-relative for more info.`
           );
         }
 

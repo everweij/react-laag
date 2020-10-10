@@ -32,7 +32,7 @@ function createCode(
 ) {
   let code = `
     import * as React from "react";
-    import { useLayer, Arrow } from "react-use-layer";
+    import { useLayer, Arrow } from "react-laag";
     import { Button, Menu } from "./ui";
 
     function Example() {

@@ -123,10 +123,10 @@ const IndexPage = () => {
       <Landing>
         <IntroContent>
           <Logo style={{ transform: "rotate(27deg)" }} />
-          <Title>react-use-layer</Title>
+          <Title>react-laag</Title>
           <Tagline>Hook for positioning tooltips & popovers</Tagline>
           {!hideInstallBox && (
-            <InstallBox>npm install -S react-use-layer</InstallBox>
+            <InstallBox>npm install -S react-laag</InstallBox>
           )}
           <Buttons>
             <PrimaryButton>Examples</PrimaryButton>

@@ -41,7 +41,7 @@ export function useHover({
 }: UseHoverOptions = {}): readonly [boolean, UseHoverProps] {
   const [show, setShow] = React.useState(false);
 
-  const timeout = React.useRef<number | null>(null);
+  const timeout = React.useRef<NodeJS.Timeout | null>(null);
 
   const status = React.useRef<Status>(Status.IDLE);
 

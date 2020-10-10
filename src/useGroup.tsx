@@ -131,7 +131,7 @@ export function useGroup({ isOpen, onOutsideClick, onParentClose }: UseGroup) {
       closeSlave: () => {
         warning(
           onParentClose,
-          `react-use-layer: You are using useLayer() in a nested setting but forgot to set the 'onParentClose()' callback in the options. This could lead to unexpected behavior.`
+          `react-laag: You are using useLayer() in a nested setting but forgot to set the 'onParentClose()' callback in the options. This could lead to unexpected behavior.`
         );
 
         if (onParentClose) {
