@@ -86,7 +86,12 @@ function createCode(
 
       return (
         <>
-          <Button {...triggerProps}>Trigger</Button>
+          <Button
+            {...triggerProps}
+            onClick={() => setOpen(!isOpen)}
+          >
+            Trigger
+          </Button>
           {isOpen && renderLayer(
             <Menu {...layerProps} style={{ ...layerProps.style, width: ${
               layerSettings.width
@@ -122,7 +127,7 @@ export default function Code({ layerSettings, options }: CodeProps) {
   const code = prettier(createCode(options, layerSettings), {
     tabWidth: 2,
     parser: "babel",
-    printWidth: 65,
+    printWidth: 70,
     trailingComma: "none",
     plugins: [parserBabylon]
   });

@@ -174,20 +174,9 @@ pre[data-line] {
 }
 
 .code-highlight {
-  /* margin-bottom: 1.75rem; */
-  /* margin-left: -1.3125rem;
-  margin-right: -1.3125rem; */
-  /* border-radius: 4px; */
-  /* background: #222e3a; */
   -webkit-overflow-scrolling: touch;
   overflow: auto;
 }
-
-/* @media (max-width: 672px) {
-  .code-highlight {
-    border-radius: 0;
-  }
-} */
 
 .code-highlight pre[class*="language-"] {
   float: left;

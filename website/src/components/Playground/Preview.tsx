@@ -214,11 +214,7 @@ function Preview({
   layerSettings,
   onLayerSettingsChange
 }: Props) {
-  const [isOpen, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    setOpen(true);
-  }, []);
+  const [isOpen, setOpen] = React.useState(true);
 
   const { layerProps, triggerProps, renderLayer, arrowProps } = useLayer({
     isOpen,

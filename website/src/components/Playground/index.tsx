@@ -27,6 +27,7 @@ const Layout = styled.div`
 
 const OptionsContainer = styled.div`
   width: 260px;
+  min-width: 260px;
   min-height: 600px;
   height: 100vh;
   position: sticky;
@@ -84,14 +85,13 @@ const ScrollBox = styled.div`
 const CodeContainer = styled.div`
   flex: 1;
   max-width: 800px;
-  min-width: 600px;
+  min-width: 700px;
   height: 100vh;
   min-height: 600px;
   background-color: ${colors["bg-code"]};
   position: sticky;
   padding: 32px;
   top: 0;
-  -webkit-font-smoothing: none;
   overflow: auto;
 `;
 
@@ -121,7 +121,7 @@ function Playground() {
     arrowRoundness: 0
   });
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     scrollBoxRef.current.scrollTop =
       SCROLL_BOX_INNER_SIZE / 2 - SCROLL_BOX_SIZE / 2 + BUTTON_SIZE.height / 2;
     scrollBoxRef.current.scrollLeft =

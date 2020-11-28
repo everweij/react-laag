@@ -119,15 +119,13 @@ const IndexPage = () => {
 
   return (
     <>
-      <SEO title="Home" />
+      <SEO />
       <Landing>
         <IntroContent>
           <Logo style={{ transform: "rotate(27deg)" }} />
           <Title>react-laag</Title>
           <Tagline>Hook for positioning tooltips & popovers</Tagline>
-          {!hideInstallBox && (
-            <InstallBox>npm install -S react-laag</InstallBox>
-          )}
+          {!hideInstallBox && <InstallBox>npm install react-laag</InstallBox>}
           <Buttons>
             <PrimaryButton>Examples</PrimaryButton>
             <SecondaryButton>Documentation</SecondaryButton>

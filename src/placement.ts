@@ -1,286 +1,313 @@
-import { Placement, Direction, Side, SizeProperty, CssSide } from "./types";
+import { BoundSideType, SideType, BoundSide, BoundSideProp } from "./Sides";
+import { PlacementType } from "./PlacementType";
+import { SubjectsBounds } from "./SubjectsBounds";
+import { PositionConfig, Offsets } from "./types";
+import { Bounds, IBounds } from "./Bounds";
+import { BoundsOffsets } from "./BoundsOffsets";
+import { limit } from "./util";
 
-export type PlacementProperties = {
-  opposite: {
-    primary: Side;
-    secondary: Side;
-  };
-  primary: Side;
-  secondary: Side;
-  direction: Direction;
-  sizeProperty: SizeProperty;
-  oppositeSizeProperty: SizeProperty;
-  cssProperties: {
-    primary: CssSide;
-    secondary: CssSide;
-  };
-};
+/**
+ * Class for various calculations based on a placement-type. I.e 'top-left';
+ */
+export class Placement {
+  protected subjectsBounds!: SubjectsBounds;
+  private _cachedLayerBounds: Bounds | null = null;
+  private _cachedContainerOffsets: BoundsOffsets | null = null;
 
-const VERTICAL_PROPERTIES = {
-  direction: Direction.VERTICAL,
-  sizeProperty: SizeProperty.height,
-  oppositeSizeProperty: SizeProperty.width,
-  cssProperties: {
-    primary: "top" as CssSide,
-    secondary: "left" as CssSide
+  constructor(
+    public readonly primary: SideType,
+    public readonly secondary: SideType,
+    subjectBounds: SubjectsBounds,
+    layerDimensions: PositionConfig["layerDimensions"],
+    private readonly offsets: Offsets
+  ) {
+    this.setSubjectsBounds(subjectBounds, layerDimensions);
   }
-};
 
-const HORIZONTAL_PROPERTIES = {
-  direction: Direction.HORIZONTAL,
-  sizeProperty: SizeProperty.width,
-  oppositeSizeProperty: SizeProperty.height,
-  cssProperties: {
-    primary: "left" as CssSide,
-    secondary: "top" as CssSide
+  /**
+   * Set subjectsBounds that are specific for this placement
+   * @param subjectBounds original SubjectBounds instance
+   * @param layerDimensions possible config prodvided by the user
+   */
+  private setSubjectsBounds(
+    subjectBounds: SubjectsBounds,
+    layerDimensions: PositionConfig["layerDimensions"]
+  ): void {
+    // if user did not provide any layerDimensions config...
+    if (!layerDimensions) {
+      this.subjectsBounds = subjectBounds;
+      return;
+    }
+
+    // get anticipated layer-dimensions provided by the user
+    const dimensions =
+      // if the user passed a callback, call it with the layerSide corresponding to
+      // the placement
+      typeof layerDimensions === "function"
+        ? layerDimensions(this.primary.prop)
+        : layerDimensions;
+
+    // create new SubjectsBounds instance by merging our newly create layer-bounds
+    this.subjectsBounds = subjectBounds.merge({
+      layer: {
+        ...subjectBounds.layer,
+        ...dimensions
+      }
+    });
   }
-};
 
-const OPPOSITE_SIDES: Record<Side, Side> = {
-  [Side.top]: Side.bottom,
-  [Side.bottom]: Side.top,
-  [Side.left]: Side.right,
-  [Side.right]: Side.left,
-  [Side.center]: Side.center
-};
-
-const PLACEMENT_PROPERTIES: Record<Placement, PlacementProperties> = {
-  [Placement["bottom-center"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.bottom],
-      secondary: OPPOSITE_SIDES[Side.center]
-    },
-    primary: Side.bottom,
-    secondary: Side.center,
-    ...VERTICAL_PROPERTIES
-  },
-  [Placement["bottom-start"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.bottom],
-      secondary: OPPOSITE_SIDES[Side.left]
-    },
-    primary: Side.bottom,
-    secondary: Side.left,
-    ...VERTICAL_PROPERTIES
-  },
-  [Placement["bottom-end"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.bottom],
-      secondary: OPPOSITE_SIDES[Side.right]
-    },
-    primary: Side.bottom,
-    secondary: Side.right,
-    ...VERTICAL_PROPERTIES
-  },
-  [Placement["left-end"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.left],
-      secondary: OPPOSITE_SIDES[Side.bottom]
-    },
-    primary: Side.left,
-    secondary: Side.bottom,
-    ...HORIZONTAL_PROPERTIES
-  },
-  [Placement["left-center"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.left],
-      secondary: OPPOSITE_SIDES[Side.center]
-    },
-    primary: Side.left,
-    secondary: Side.center,
-    ...HORIZONTAL_PROPERTIES
-  },
-  [Placement["left-start"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.left],
-      secondary: OPPOSITE_SIDES[Side.top]
-    },
-    primary: Side.left,
-    secondary: Side.top,
-    ...HORIZONTAL_PROPERTIES
-  },
-  [Placement["right-end"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.right],
-      secondary: OPPOSITE_SIDES[Side.bottom]
-    },
-    primary: Side.right,
-    secondary: Side.bottom,
-    ...HORIZONTAL_PROPERTIES
-  },
-  [Placement["right-center"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.right],
-      secondary: OPPOSITE_SIDES[Side.center]
-    },
-    primary: Side.right,
-    secondary: Side.center,
-    ...HORIZONTAL_PROPERTIES
-  },
-  [Placement["right-start"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.right],
-      secondary: OPPOSITE_SIDES[Side.top]
-    },
-    primary: Side.right,
-    secondary: Side.top,
-    ...HORIZONTAL_PROPERTIES
-  },
-  [Placement["top-center"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.top],
-      secondary: OPPOSITE_SIDES[Side.center]
-    },
-    primary: Side.top,
-    secondary: Side.center,
-    ...VERTICAL_PROPERTIES
-  },
-  [Placement["top-start"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.top],
-      secondary: OPPOSITE_SIDES[Side.left]
-    },
-    primary: Side.top,
-    secondary: Side.left,
-    ...VERTICAL_PROPERTIES
-  },
-  [Placement["top-end"]]: {
-    opposite: {
-      primary: OPPOSITE_SIDES[Side.top],
-      secondary: OPPOSITE_SIDES[Side.right]
-    },
-    primary: Side.top,
-    secondary: Side.right,
-    ...VERTICAL_PROPERTIES
-  },
-  [Placement["center"]]: {
-    opposite: {
-      primary: Side.center,
-      secondary: Side.center
-    },
-    primary: Side.center,
-    secondary: Side.center,
-    ...VERTICAL_PROPERTIES
-  }
-};
-
-export const ALL_PLACEMENTS = Object.keys(Placement).filter(
-  key => typeof key !== "number" && isNaN(key as any)
-) as (keyof typeof Placement)[];
-
-function createPlacement(primary: Side, secondary: Side): Placement {
-  return Placement[
-    `${Side[primary]}-${
-      Side.center === secondary
+  /**
+   * Returns the string respresentation of this placement (ie. 'top-start')
+   */
+  public get type(): PlacementType {
+    return `${this.primary.prop}-${
+      this.secondary.prop === "center"
         ? "center"
-        : [Side.left, Side.top].includes(secondary)
-        ? "start"
-        : "end"
-    }` as keyof typeof Placement
-  ];
-}
-
-export function getPlacementProperties(
-  placement: Placement
-): PlacementProperties {
-  return PLACEMENT_PROPERTIES[placement];
-}
-
-export function getListOfPlacementsByPriority(
-  preferedPlacement: Placement,
-  possiblePlacements: Placement[],
-  preferedHorizontalSide: Side.left | Side.right,
-  preferedVerticalSide: Side.top | Side.bottom,
-  triggerHasBiggerHeight: boolean,
-  triggerHasBiggerWidth: boolean
-): Placement[] {
-  if (preferedPlacement === Placement.center) {
-    return [
-      Placement.center,
-      ...getListOfPlacementsByPriority(
-        createPlacement(
-          preferedVerticalSide,
-          preferedHorizontalSide
-        ) as Placement,
-        possiblePlacements,
-        preferedHorizontalSide,
-        preferedVerticalSide,
-        triggerHasBiggerHeight,
-        triggerHasBiggerWidth
-      )
-    ];
+        : ["bottom", "right"].includes(this.secondary.prop)
+        ? "end"
+        : "start"
+    }` as PlacementType;
   }
 
-  const { primary, secondary, direction, opposite } = PLACEMENT_PROPERTIES[
-    preferedPlacement
-  ];
+  /**
+   * Calculates the actual boundaries based on the placement
+   * @param secondaryOffset optional offset on the secondary-side
+   */
+  public getLayerBounds(secondaryOffset = 0): Bounds {
+    // return cached version if possible
+    if (this._cachedLayerBounds && secondaryOffset === 0) {
+      return this._cachedLayerBounds;
+    }
 
-  const preferredSide =
-    direction === Direction.VERTICAL
-      ? preferedHorizontalSide
-      : preferedVerticalSide;
+    const { primary, secondary, subjectsBounds } = this;
+    const { trigger, layer, arrow } = subjectsBounds;
+    const {
+      isHorizontal,
+      oppositeCssProp,
+      oppositeSizeProp,
+      prop,
+      opposite
+    } = primary as BoundSideType;
 
-  const triggerIsBigger =
-    (direction === Direction.VERTICAL && triggerHasBiggerHeight) ||
-    (direction === Direction.HORIZONTAL && triggerHasBiggerWidth);
+    const result = Bounds.empty() as IBounds;
 
-  let list: Placement[] = [];
-  list[0] = preferedPlacement;
-  list[1] = createPlacement(
-    primary,
-    secondary === Side.center ? preferredSide : Side.center
-  );
-  list[2] = createPlacement(
-    primary,
-    opposite.secondary === Side.center
-      ? OPPOSITE_SIDES[preferredSide]
-      : opposite.secondary
-  );
-  list[3] = createPlacement(
-    preferredSide,
-    triggerIsBigger ? primary : opposite.primary
-  );
-  list[4] = createPlacement(preferredSide, Side.center);
-  list[5] = createPlacement(
-    preferredSide,
-    triggerIsBigger ? opposite.primary : primary
-  );
-  list[6] = createPlacement(
-    OPPOSITE_SIDES[preferredSide],
-    triggerIsBigger ? primary : opposite.primary
-  );
-  list[7] = createPlacement(OPPOSITE_SIDES[preferredSide], Side.center);
-  list[8] = createPlacement(
-    OPPOSITE_SIDES[preferredSide],
-    triggerIsBigger ? opposite.primary : primary
-  );
-  list[9] = createPlacement(opposite.primary, secondary);
-  list[10] = createPlacement(
-    opposite.primary,
-    secondary === Side.center ? preferredSide : Side.center
-  );
-  list[11] = createPlacement(
-    opposite.primary,
-    opposite.secondary === Side.center
-      ? OPPOSITE_SIDES[preferredSide]
-      : opposite.secondary
-  );
+    // let's take the placement 'top-start' as an example...
+    // the offsets are the following:
+    // trigger -> 8px
+    // container -> 10px;
+    // arrow -> 2px;
 
-  list = list.filter(placement => possiblePlacements.includes(placement));
+    // PRIMARY STUFF
 
-  // include prefered placement if not included in possiblePlacements
-  if (!list.includes(preferedPlacement)) {
-    list = [preferedPlacement, ...list];
+    // bottom = trigger.top + 8;
+    result[opposite.prop] =
+      trigger[prop] - primary.factor(this.offsets.trigger);
+
+    // top = bottom - layer.height
+    result[prop] =
+      result[opposite.prop] - primary.factor(layer[primary.sizeProp]);
+
+    // SECONDARY STUFF
+
+    // arrowOffsetBase = 4
+    const arrowOffsetBase = this.offsets.arrow * 2;
+
+    // limitMin = trigger.left - (layer.width - arrow.width) + 4
+    let limitMin =
+      trigger[oppositeCssProp] -
+      (layer[oppositeSizeProp] - arrow[oppositeSizeProp]) +
+      arrowOffsetBase;
+    // limitMax = trigger.left + (trigger.width - arrow.width) - 4
+    let limitMax =
+      trigger[oppositeCssProp] +
+      (trigger[oppositeSizeProp] - arrow[oppositeSizeProp]) -
+      arrowOffsetBase;
+
+    if (!secondary.isPush) {
+      // if secondary is bottom or right -> add the width or height of the layer
+      limitMin += layer[oppositeSizeProp];
+      limitMax += layer[oppositeSizeProp];
+    }
+
+    if (secondary.isCenter) {
+      const propertyA = (isHorizontal ? BoundSide.top : BoundSide.left).prop;
+      const propertyB = (isHorizontal ? BoundSide.bottom : BoundSide.right)
+        .prop;
+
+      // left = limit(
+      //   trigger.left + trigger.width / 2 - layer.width / 2 + secondaryOffset,
+      //   limitMin,
+      //   limitMax
+      // )
+      result[propertyA] = limit(
+        trigger[propertyA] +
+          trigger[oppositeSizeProp] / 2 -
+          layer[oppositeSizeProp] / 2 +
+          secondaryOffset,
+        limitMin,
+        limitMax
+      );
+
+      // right = left + layer.width
+      result[propertyB] = result[propertyA] + layer[oppositeSizeProp];
+    } else {
+      const sec = secondary as BoundSideType;
+
+      const triggerValue = trigger[sec.prop];
+
+      // Under some conditions, when the layer is not able to align with the trigger
+      // due to arrow-size and arrow-offsets, we need to compensate.
+      // Otherwise, the secondary-offset will have no impact
+      const arrowCompensation =
+        triggerValue < limitMin
+          ? limitMin - triggerValue
+          : triggerValue > limitMax
+          ? limitMax - triggerValue
+          : 0;
+
+      // left = limit(
+      //   trigger.left + secondaryOffset + arrowCompensation,
+      //   limitMin,
+      //   limitMax
+      // )
+      result[sec.prop] = limit(
+        triggerValue + secondaryOffset + arrowCompensation,
+        limitMin,
+        limitMax
+      );
+
+      // right = left + layer.width
+      result[sec.opposite.prop] =
+        result[sec.prop] + secondary.factor(layer[oppositeSizeProp]);
+    }
+
+    // set the correct dimensions
+    result.width = result.right - result.left;
+    result.height = result.bottom - result.top;
+
+    // create new bounds object
+    const layerBounds = Bounds.create(result);
+
+    if (secondaryOffset === 0) {
+      this._cachedLayerBounds = layerBounds;
+    }
+
+    return layerBounds;
   }
 
-  return list;
+  /**
+   * Checks whether the trigger is bigger on the opposite side
+   * ie. placement "top-start" -> has trigger a bigger width?
+   */
+  public get triggerIsBigger() {
+    const { isHorizontal } = this.secondary;
+    const {
+      triggerHasBiggerWidth,
+      triggerHasBiggerHeight
+    } = this.subjectsBounds;
+
+    return (
+      (isHorizontal && triggerHasBiggerWidth) ||
+      (!isHorizontal && triggerHasBiggerHeight)
+    );
+  }
+
+  /**
+   * Checks whether the placement fits within all it's container (including container-offset)
+   */
+  public get fitsContainer(): boolean {
+    return this.getContainerOffsets().allSidesArePositive;
+  }
+
+  /**
+   * Returns the surface in square pixels of the visible part of the layer
+   */
+  public get visibleSurface(): number {
+    const layerBounds = this.getLayerBounds();
+    const containerOffsets = this.getContainerOffsets(layerBounds);
+
+    const substract = containerOffsets.negativeSides;
+    for (const side in substract) {
+      // @ts-ignore
+      substract[side] = -substract[side]; // make positive for substraction;
+    }
+
+    return layerBounds.substract(substract).surface;
+  }
+
+  /**
+   * Returns a BoundSide by looking at the most negative offset that is the opposite direction
+   */
+  public get secondaryOffsetSide(): BoundSideType | null {
+    // Given placement 'top-start' and containerOffsets { left: -20, top: -10, right: -10, bottom: 200 }...
+    // the only negative offsets on the opposite side are { left: -20, right: -10 }
+    // since we have to return only 1 side, we pick the most negative, which is 'left'
+
+    const containerOffsets = this.getContainerOffsets();
+
+    const [mostNegativeSide] =
+      Object.entries(containerOffsets.negativeSides)
+        .map(
+          ([side, value]) => [BoundSide[side as BoundSideProp], value] as const
+        )
+        .filter(([side]) => this.primary.isOppositeDirection(side))
+        .sort(([, a], [, b]) => b! - a!)?.[0] ?? [];
+
+    return mostNegativeSide || null;
+  }
+
+  /**
+   * returns getLayerBounds(), including container-offsets
+   */
+  private getLayerCollisionBounds(): Bounds {
+    const { container } = this.offsets;
+
+    return this.getLayerBounds()
+      .mapSides((side, value) => (value -= side.factor(container)))
+      .merge(({ width, height }) => ({
+        width: width + container * 2,
+        height: height + container * 2
+      }));
+  }
+
+  /**
+   * Returns a BoundsOffsets instance containing merged offsets to containers with the most
+   * negative scenario
+   */
+  public getContainerOffsets(layerBounds?: Bounds): BoundsOffsets {
+    if (this._cachedContainerOffsets && !layerBounds) {
+      return this._cachedContainerOffsets;
+    }
+
+    const subjectBounds = this.subjectsBounds.merge({
+      layer: layerBounds || this.getLayerCollisionBounds()
+    });
+
+    const offsets = BoundsOffsets.mergeSmallestSides(
+      subjectBounds.layerOffsetsToScrollContainers
+    );
+
+    if (!layerBounds) {
+      this._cachedContainerOffsets = offsets;
+    }
+
+    return offsets;
+  }
 }
 
-export function getPlacementsOfSameSide(
-  primarySide: Side,
-  placements: Placement[]
-) {
-  return placements.filter(
-    placement => getPlacementProperties(placement).primary === primarySide
-  );
+export class PlacementCenter extends Placement {
+  getLayerBounds(): Bounds {
+    const { trigger, layer } = this.subjectsBounds;
+
+    const result = Bounds.empty() as IBounds;
+
+    result.top = trigger.top + trigger.height / 2 - layer.height / 2;
+    result.bottom = result.top + layer.height;
+    result.left = trigger.left + trigger.width / 2 - layer.width / 2;
+    result.right = result.left + layer.width;
+    result.width = result.right - result.left;
+    result.height = result.bottom - result.top;
+
+    return result as Bounds;
+  }
 }

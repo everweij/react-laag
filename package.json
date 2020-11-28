@@ -10,13 +10,12 @@
     "start": "tsdx watch",
     "build": "tsdx build --format esm,cjs",
     "lint": "tsdx lint",
-    "prettier": "prettier --write ./src",
+    "prettier": "prettier --write {.,sandbox,website,tests,src}/**/*{js,ts,tsx,json,html}",
     "prepare": "tsdx build",
-    "storybook": "start-storybook -p 9000",
-    "build-storybook": "build-storybook",
     "ssr-test": "node ssr-test.js",
-    "test": "test-it --test-setup-files ./test-setup.ts && yarn ssr-test",
-    "test:watch": "test-it --test-setup-files ./test-setup.ts --watch"
+    "test": "test-it './tests/**/*.spec.(ts|tsx)' --test-setup-files ./test-setup.ts",
+    "test:watch": "yarn test --watch",
+    "sandbox": "parcel ./sandbox/index.html"
   },
   "peerDependencies": {
     "react": ">=16",
@@ -24,7 +23,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "prettier --write ./src && tsdx lint"
+      "pre-commit": "prettier --write {.,sandbox,website,tests,src}/**/*{js,ts,tsx,json,html} && tsdx lint"
     }
   },
   "prettier": {
@@ -45,7 +44,9 @@
     "@testing-library/react": "^11.0.4",
     "@types/react": "^16.9.51",
     "@types/react-dom": "^16.9.8",
+    "copy-text-to-clipboard": "^2.2.0",
     "husky": "^4.3.0",
+    "parcel-bundler": "^1.12.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-is": "^16.13.1",

@@ -1,9 +1,18 @@
-import * as React from "react";
+import {
+  ReactNode,
+  createContext,
+  MutableRefObject,
+  useCallback,
+  useRef,
+  useContext,
+  useEffect,
+  createElement
+} from "react";
 import warning from "tiny-warning";
 
 type Registration = {
   shouldCloseWhenClickedOutside: (event: MouseEvent) => boolean;
-  closeSlave: () => void;
+  closeChild: () => void;
 };
 
 type Registrations = Set<Registration>;
@@ -12,11 +21,11 @@ type RegisterFn = (registration: Registration) => () => void;
 
 type GroupContextType = {} | RegisterFn;
 
-const GroupContext = React.createContext({} as GroupContextType);
+const GroupContext = createContext({} as GroupContextType);
 
 type GroupProviderProps = {
-  children: React.ReactNode;
-  registrations: React.MutableRefObject<Registrations>;
+  children: ReactNode;
+  registrations: MutableRefObject<Registrations>;
 };
 
 // Provider that wraps arround the layer in order to provide other useLayers
@@ -26,7 +35,7 @@ type GroupProviderProps = {
 export function GroupProvider({ children, registrations }: GroupProviderProps) {
   // registration function that is used as 'context payload' for child layers
   // to call. It returns a function to unregister.
-  const handleRegister = React.useCallback(
+  const handleRegister = useCallback(
     function register(registration: Registration) {
       registrations.current.add(registration);
 
@@ -35,16 +44,16 @@ export function GroupProvider({ children, registrations }: GroupProviderProps) {
     [registrations]
   );
 
-  return (
-    <GroupContext.Provider value={handleRegister}>
-      {children}
-    </GroupContext.Provider>
+  return createElement(
+    GroupContext.Provider,
+    { value: handleRegister },
+    children
   );
 }
 
 // asks child layers if they would close given the documents click event
 // if there's one that signals not to close, return early (false)
-function getShouldCloseAccordingToSlaves(
+function getShouldCloseAccordingToChildren(
   registrations: Registrations,
   event: MouseEvent
 ) {
@@ -80,19 +89,19 @@ type UseGroup = {
 export function useGroup({ isOpen, onOutsideClick, onParentClose }: UseGroup) {
   // store references to the dom-elements
   // we need these to later determine wether the clicked outside or not
-  const trigger = React.useRef<HTMLElement>(null!);
-  const layer = React.useRef<HTMLElement>(null!);
+  const trigger = useRef<HTMLElement>(null!);
+  const layer = useRef<HTMLElement>(null!);
 
   // a Set which keeps track of callbacks given by the child layers through context
-  const registrations = React.useRef<Registrations>(new Set());
+  const registrations = useRef<Registrations>(new Set());
 
   // if this instance is a child itself, we should use this function to register
   // some callbacks to the parent
-  const possibleRegisterFn = React.useContext(GroupContext);
+  const possibleRegisterFn = useContext(GroupContext);
 
   // recursively checks whether to close or not. This mechanism has some similarities
   // with event bubbling.
-  const shouldCloseWhenClickedOutside = React.useCallback(
+  const shouldCloseWhenClickedOutside = useCallback(
     function shouldCloseWhenClickedOutside(event: MouseEvent) {
       const target = event.target as HTMLElement;
 
@@ -100,26 +109,26 @@ export function useGroup({ isOpen, onOutsideClick, onParentClose }: UseGroup) {
         trigger.current && trigger.current.contains(target);
       const clickedOnLayer = layer.current && layer.current.contains(target);
 
-      const shouldCloseAccordingToSlaves = getShouldCloseAccordingToSlaves(
+      const shouldCloseAccordingToChildren = getShouldCloseAccordingToChildren(
         registrations.current,
         event
       );
 
       // when clicked on own layer, but the child would have closed ->
       // let child close
-      if (clickedOnLayer && shouldCloseAccordingToSlaves) {
-        registrations.current.forEach(({ closeSlave }) => closeSlave());
+      if (clickedOnLayer && shouldCloseAccordingToChildren) {
+        registrations.current.forEach(({ closeChild }) => closeChild());
       }
 
       return (
-        !clickedOnTrigger && !clickedOnLayer && shouldCloseAccordingToSlaves
+        !clickedOnTrigger && !clickedOnLayer && shouldCloseAccordingToChildren
       );
     },
     [trigger, layer, registrations]
   );
 
   // registration stuff
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof possibleRegisterFn !== "function") {
       return;
     }
@@ -128,7 +137,7 @@ export function useGroup({ isOpen, onOutsideClick, onParentClose }: UseGroup) {
     // on cleanup
     return possibleRegisterFn({
       shouldCloseWhenClickedOutside,
-      closeSlave: () => {
+      closeChild: () => {
         warning(
           onParentClose,
           `react-laag: You are using useLayer() in a nested setting but forgot to set the 'onParentClose()' callback in the options. This could lead to unexpected behavior.`
@@ -147,9 +156,9 @@ export function useGroup({ isOpen, onOutsideClick, onParentClose }: UseGroup) {
   ]);
 
   // document click handling
-  React.useEffect(() => {
-    const isSlave = typeof possibleRegisterFn === "function";
-    const shouldNotListen = !isOpen || !onOutsideClick || isSlave;
+  useEffect(() => {
+    const isChild = typeof possibleRegisterFn === "function";
+    const shouldNotListen = !isOpen || !onOutsideClick || isChild;
     if (shouldNotListen) {
       return;
     }
@@ -170,9 +179,9 @@ export function useGroup({ isOpen, onOutsideClick, onParentClose }: UseGroup) {
   ]);
 
   // When this 'useLayer' gets closed -> tell child layers to close as well
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isOpen) {
-      registrations.current.forEach(({ closeSlave }) => closeSlave());
+      registrations.current.forEach(({ closeChild }) => closeChild());
     }
   }, [isOpen]);
 

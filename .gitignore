@@ -3,11 +3,6 @@
 .DS_Store
 node_modules
 .cache
-dist
-
-
-# test coverage
-coverage/**/*
 
 # misc
 .DS_Store
@@ -21,7 +16,9 @@ coverage/**/*
 website/.cache/
 website/public
 
-# sandbox
-example
+# yarn
+yarn-error.log
+.yarn-integrity
 
-
+# build artifacts
+dist

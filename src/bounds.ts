@@ -1,356 +1,257 @@
-import {
-  SubjectsBounds,
-  Bounds,
-  MutableBounds,
-  Offsets,
-  Placement,
-  BoundSide,
-  Side,
-  Direction,
-  OffsetType,
-  Borders
-} from "./types";
-import { getPlacementProperties } from "./placement";
-import { getPixelValue, limit } from "./util";
+import { BoundSide, BoundSideProp, BoundSideType } from "./Sides";
+import { BoundsOffsets } from "./BoundsOffsets";
+import { getPixelValue } from "./util";
 
-export const BOUND_SIDES: BoundSide[] = [
-  BoundSide.top,
-  BoundSide.left,
-  BoundSide.bottom,
-  BoundSide.right
-];
+/**
+ * Utility function that returns sum of various computed styles
+ * @param propertyValues list of computed styles (ie. '12px')
+ */
+function sumOfPropertyValues(...propertyValues: string[]) {
+  return propertyValues.reduce(
+    (sum, propertyValue) =>
+      sum + (propertyValue ? getPixelValue(propertyValue!) : 0),
+    0
+  );
+}
 
-// converts a ClientRect (or DOMRect) to a plain js-object
-// This is necessary in order to do stuff like:
-// const merged = { ...clientRect, width: 100 };
-export function clientRectToBounds({
+export interface IBounds {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
+}
+
+function boundsToObject({
   top,
   left,
   right,
   bottom,
   width,
   height
-}: ClientRect): Bounds {
-  return {
-    top,
-    left,
-    right,
-    bottom,
-    width,
-    height
-  };
+}: IBounds): IBounds {
+  return { top, left, right, bottom, width, height };
 }
 
-export function createEmptyBounds(): MutableBounds {
-  return {
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: 0,
-    height: 0
-  };
-}
+const EMPTY: IBounds = {
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  width: 0,
+  height: 0
+};
 
-// creates a ClientRect-like object from the viewport's dimensions
-export function getWindowBounds(environment?: Window): Bounds {
-  const { innerWidth = 0, innerHeight = 0 } = environment || {};
+/**
+ * A class containing the positional properties of the native DOM's ClientRect
+ * (`element.getBoundingClientRect()`), together with some utility methods
+ */
+export class Bounds implements IBounds {
+  top!: number;
+  left!: number;
+  right!: number;
+  bottom!: number;
+  width!: number;
+  height!: number;
 
-  return {
-    ...createEmptyBounds(),
-    right: innerWidth,
-    width: innerWidth,
-    bottom: innerHeight,
-    height: innerHeight
-  };
-}
-
-// returns a Bounds object with the scrollbars substracted
-export function subtractScrollbars(
-  bounds: Bounds,
-  clientWidth: number,
-  clientHeight: number
-) {
-  const { width, height, right, bottom } = bounds;
-
-  const scrollbarWidth = width - clientWidth;
-  const scrollbarHeight = height - clientHeight;
-
-  return {
-    ...bounds,
-    width: width - scrollbarWidth,
-    right: right - scrollbarWidth,
-    height: height - scrollbarHeight,
-    bottom: bottom - scrollbarHeight
-  };
-}
-
-export function getBorderOffsets(
-  element: HTMLElement,
-  environment: Window
-): Borders {
-  const { borderLeftWidth, borderTopWidth } = environment.getComputedStyle(
-    element
-  );
-
-  return {
-    left: getPixelValue(borderLeftWidth) || 0,
-    top: getPixelValue(borderTopWidth) || 0
-  };
-}
-
-// When calculating the position of the layer for instance, we don't
-// want the layers transform properties to intervene, like animating
-// `translate` or `scale`.
-export function getBoundsWithoutTransform(
-  element: HTMLElement,
-  environment: Window
-): Bounds {
-  const bounds = clientRectToBounds(element.getBoundingClientRect());
-
-  const {
-    width,
-    height,
-    boxSizing,
-    borderLeft,
-    borderRight,
-    borderTop,
-    borderBottom,
-    paddingLeft,
-    paddingRight,
-    paddingTop,
-    paddingBottom
-  } = environment.getComputedStyle(element);
-
-  function sumOfPropertyValues(...propertyValues: string[]) {
-    return propertyValues.reduce(
-      (sum, propertyValue) =>
-        sum + (propertyValue ? getPixelValue(propertyValue!) : 0),
-      0
-    );
+  /**
+   * Creates a new Bounds class
+   * @param bounds An object that adheres to the `IBounds` interface
+   */
+  static create(bounds: IBounds): Bounds {
+    return new Bounds(bounds);
   }
 
-  return {
-    ...bounds,
-    width:
-      boxSizing === "border-box"
-        ? getPixelValue(width!)
-        : sumOfPropertyValues(
-            width,
-            borderLeft,
-            borderRight,
-            paddingLeft,
-            paddingRight
-          ),
-    height:
-      boxSizing === "border-box"
-        ? getPixelValue(height!)
-        : sumOfPropertyValues(
-            height,
-            borderTop,
-            borderBottom,
-            paddingTop,
-            paddingBottom
-          )
-  };
-}
+  /**
+   * Creates a new Bounds class from a DOM-element
+   * @param element reference to the DOM-element
+   * @param options optional options object
+   */
+  static fromElement(
+    element: HTMLElement,
+    options: {
+      /** should transforms like 'scale' taken into account? Defaults to `true` */
+      withTransform?: boolean;
+      /** reference to the window-object (needed when working with iframes for instance). Defaults to `window` */
+      environment?: Window;
+      /** should the elements scrollbars be included? Defaults to `true` */
+      withScrollbars?: boolean;
+    } = {}
+  ): Bounds {
+    const {
+      withTransform = true,
+      environment = window,
+      withScrollbars = true
+    } = options;
 
-// determines of we should add or subtract a value depending on
-// the side
-function addOrSubstract(value: number, side: Side): number {
-  return value * ([Side.right, Side.bottom].includes(side) ? 1 : -1);
-}
+    const plain: IBounds = boundsToObject(element.getBoundingClientRect());
 
-// converts Side enum to boundary key
-function getBoundSideProperty(side: Side): BoundSide {
-  return BoundSide[Side[side] as BoundSide];
-}
+    let bounds: Bounds = new Bounds(plain);
 
-// This function is used to anticipate the bounds of the layer
-// given a certain placement
-export function getBoundsOfLayerByPlacement(
-  placement: Placement,
-  subjectsBounds: SubjectsBounds,
-  offsets: Offsets
-): Bounds {
-  const { TRIGGER, LAYER, ARROW } = subjectsBounds;
+    if (!withTransform) {
+      const {
+        width,
+        height,
+        boxSizing,
+        borderLeft,
+        borderRight,
+        borderTop,
+        borderBottom,
+        paddingLeft,
+        paddingRight,
+        paddingTop,
+        paddingBottom
+      } = environment.getComputedStyle(element);
 
-  const {
-    primary,
-    secondary,
-    opposite,
-    direction,
-    sizeProperty,
-    oppositeSizeProperty,
-    cssProperties
-  } = getPlacementProperties(placement);
+      const boxWidth =
+        boxSizing === "border-box"
+          ? getPixelValue(width!)
+          : sumOfPropertyValues(
+              width,
+              borderLeft,
+              borderRight,
+              paddingLeft,
+              paddingRight
+            );
 
-  const result = createEmptyBounds();
+      const boxHeight =
+        boxSizing === "border-box"
+          ? getPixelValue(height!)
+          : sumOfPropertyValues(
+              height,
+              borderTop,
+              borderBottom,
+              paddingTop,
+              paddingBottom
+            );
 
-  // treat `Placement.center` differently
-  if (placement === Placement.center) {
-    result.top = TRIGGER.top + TRIGGER.height / 2 - LAYER.height / 2;
-    result.bottom = result.top + LAYER.height;
-    result.left = TRIGGER.left + TRIGGER.width / 2 - LAYER.width / 2;
-    result.right = result.left + LAYER.width;
-  }
-  // "Default" scenario
-  // Let's take the "top-start" placement as an example
-  else {
-    // Translates to:
-    // result.bottom = TRIGGER.top + offsets.trigger
-
-    result[getBoundSideProperty(opposite.primary)] =
-      TRIGGER[getBoundSideProperty(primary)] +
-      addOrSubstract(offsets[OffsetType.trigger], primary);
-
-    // Translates to:
-    // result.top = result.bottom - LAYER.height
-    result[getBoundSideProperty(primary)] =
-      result[getBoundSideProperty(opposite.primary)] +
-      addOrSubstract(LAYER[sizeProperty], primary);
-
-    const arrowOffsetBase = offsets[OffsetType.arrow] * 2;
-
-    let limitMin =
-      TRIGGER[cssProperties.secondary] -
-      (LAYER[oppositeSizeProperty] - ARROW[oppositeSizeProperty]) +
-      arrowOffsetBase;
-    let limitMax =
-      TRIGGER[cssProperties.secondary] +
-      (TRIGGER[oppositeSizeProperty] - ARROW[oppositeSizeProperty]) -
-      arrowOffsetBase;
-    if ([Side.right, Side.bottom].includes(secondary)) {
-      limitMin += LAYER[oppositeSizeProperty];
-      limitMax += LAYER[oppositeSizeProperty];
+      bounds = new Bounds({
+        ...bounds,
+        width: boxWidth,
+        height: boxHeight
+      });
     }
 
-    if (secondary === Side.center) {
-      const propertyA =
-        direction === Direction.VERTICAL ? BoundSide.left : BoundSide.top;
-      const propertyB =
-        direction === Direction.VERTICAL ? BoundSide.right : BoundSide.bottom;
-
-      result[propertyA] = limit(
-        TRIGGER[propertyA] +
-          TRIGGER[oppositeSizeProperty] / 2 -
-          LAYER[oppositeSizeProperty] / 2 +
-          offsets[OffsetType.secondary],
-        limitMin,
-        limitMax
-      );
-      result[propertyB] = result[propertyA] + LAYER[oppositeSizeProperty];
-    } else {
-      // Translates to:
-      // result.left = trigger.left - offsets.secondary
-      result[getBoundSideProperty(secondary)] = limit(
-        TRIGGER[getBoundSideProperty(secondary)] +
-          offsets[OffsetType.secondary],
-        limitMin,
-        limitMax
-      );
-
-      // Translates to:
-      // result.right = result.left + LAYER.width
-      result[getBoundSideProperty(opposite.secondary)] =
-        result[getBoundSideProperty(secondary)] +
-        addOrSubstract(LAYER[oppositeSizeProperty], secondary) * -1;
+    if (!withScrollbars) {
+      const scrollbarWidth = bounds.width - element.clientWidth;
+      const scrollbarHeight = bounds.height - element.clientHeight;
+      return bounds.substract({
+        right: scrollbarWidth,
+        bottom: scrollbarHeight
+      });
     }
+
+    return bounds;
   }
 
-  // Set the resulting width and height
-  result.width = result.right - result.left;
-  result.height = result.bottom - result.top;
-
-  return result;
-}
-
-// returns getBoundsOfLayerByPlacement(), including container offsets
-export function getCollisionBoundsOfLayerByPlacement(
-  placement: Placement,
-  subjectsBounds: SubjectsBounds,
-  offsets: Offsets
-): Bounds {
-  const layerBounds = getBoundsOfLayerByPlacement(
-    placement,
-    subjectsBounds,
-    offsets
-  ) as MutableBounds;
-
-  // Add container offsets for each side
-  for (const side of BOUND_SIDES) {
-    layerBounds[side] += addOrSubstract(
-      offsets[OffsetType.container],
-      Side[BoundSide[side]]
-    );
+  /**
+   * Creates an empty Bounds class
+   */
+  static empty(): Bounds {
+    return new Bounds();
   }
 
-  layerBounds.width = layerBounds.width + offsets[OffsetType.container] * 2;
-  layerBounds.height = layerBounds.height + offsets[OffsetType.container] * 2;
+  /**
+   * Creates a Bounds class from the window's dimensions
+   * @param environment reference to the window-object (needed when working with iframes for instance). Defaults to `window`
+   */
+  static fromWindow(environment?: Window): Bounds {
+    const { innerWidth: width = 0, innerHeight: height = 0 } =
+      environment || {};
+    return new Bounds({ width, height, right: width, bottom: height });
+  }
 
-  return layerBounds;
-}
+  protected constructor(bounds: Partial<IBounds> = {}) {
+    return Object.assign(this, EMPTY, bounds);
+  }
 
-export function getDistanceBetweenBounds(
-  parent: Bounds,
-  child: Bounds
-): Bounds {
-  return {
-    top: child.top - parent.top,
-    bottom: parent.bottom - child.bottom,
-    left: child.left - parent.left,
-    right: parent.right - child.right,
-    height: parent.height - child.height,
-    width: parent.width - child.width
-  };
-}
+  /**
+   * Returns the square surface of the bounds in pixels
+   */
+  get surface(): number {
+    return this.width * this.height;
+  }
 
-// returns the visible surface of the layer by calculating the impact
-// of sides which have a negative distance between the layer and
-// scroll-container
-export function getVisibleLayerSurface(layer: Bounds, container: Bounds) {
-  const boundsDiffs = getDistanceBetweenBounds(container, layer);
+  /**
+   * Returns a plain object containing only positional properties
+   */
+  toObject(): IBounds {
+    return boundsToObject(this);
+  }
 
-  const negativeSides = BOUND_SIDES.filter(side => boundsDiffs[side] < 0);
+  /**
+   * Returns a new Bounds instance by merging two bounds
+   * @param bounds partial bounds which should be merged
+   */
+  merge(bounds: Partial<IBounds>): Bounds;
+  /**
+   * Returns a new Bounds instance by merging two bounds
+   * @param mergeFn callback which takes the current bounds and returns new merged bounds
+   */
+  merge(mergeFn: (current: IBounds) => Partial<IBounds>): Bounds;
+  merge(partialBoundsOrMergeFn: unknown): Bounds {
+    const current = this.toObject();
+    return new Bounds({
+      ...current,
+      ...(typeof partialBoundsOrMergeFn === "function"
+        ? partialBoundsOrMergeFn(current)
+        : partialBoundsOrMergeFn)
+    });
+  }
 
-  let width = layer.width;
-  let height = layer.height;
+  /**
+   * Return a new Bounds instance by subtracting each property of the provided IBounds object
+   * @param bounds partial IBounds object to substract with
+   */
+  substract(bounds: Partial<IBounds>): Bounds {
+    const result = this.toObject();
 
-  // for each negative side, substract it from the current width or height
-  for (const negativeSide of negativeSides) {
-    if ([BoundSide.top, BoundSide.bottom].includes(negativeSide)) {
-      height += boundsDiffs[negativeSide];
-    } else {
-      width += boundsDiffs[negativeSide];
+    const entries = Object.entries(bounds) as [keyof IBounds, number][];
+
+    for (const [prop, value] of entries) {
+      if (prop in BoundSide) {
+        // if `prop` is one of 'top', 'left', 'bottom' or 'right'...
+        const boundSide = BoundSide[prop as BoundSideProp];
+        // decide if we should add or substract
+        result[prop] += boundSide.factor(value);
+        // make sure that the size-properties are also updated
+        result[boundSide.isHorizontal ? "width" : "height"] -= value;
+      } else {
+        // prop is 'width' or 'height'
+        result[prop] -= value || 0;
+      }
     }
+
+    return new Bounds(result);
   }
 
-  // since negative * negative makes positive, we must make the surface negative
-  // when both sides (completely) are invisible
-  const isInvisible = width < 0 && height < 0;
-  const surface = width * height * (isInvisible ? -1 : 1);
-  return surface;
-}
+  /**
+   * Returns a new BoundsOffsets instance by determining the distance for each bound-side:
+   * (child -> parent)
+   * @param child child bounds instance
+   */
+  offsetsTo(child: Bounds): BoundsOffsets {
+    return new BoundsOffsets({
+      top: child.top - this.top,
+      bottom: this.bottom - child.bottom,
+      left: child.left - this.left,
+      right: this.right - child.right
+    });
+  }
 
-// utility function that merges multiple bounds into one boundary
-// with the help of a callback function
-// i.e.:
-// combineMultipleBoundsIntoOne(
-//   [boundA, boundB],
-//   (valueA, valueB) => Math.min(valueA, valueB)
-// );
-export function combineMultipleBoundsIntoOne(
-  multipleBounds: Bounds[],
-  mergeFn: (valueA: number, valueB: number) => number
-): Bounds {
-  const [firstBounds, ...otherBounds] = multipleBounds;
-  const result = { ...firstBounds };
-
-  for (const currentBounds of otherBounds) {
-    for (const side of BOUND_SIDES) {
-      result[side] = mergeFn(result[side], currentBounds[side]);
+  /**
+   * Return a new Bounds instance by mapping over each bound-side
+   * @param mapper callback that takes a boundSide + value in pixels, returning a new value for that side
+   */
+  mapSides(
+    mapper: (boundSide: BoundSideType, value: number) => number
+  ): Bounds {
+    const result = this.toObject();
+    const boundSides = Object.values(BoundSide) as BoundSideType[];
+    for (const boundSide of boundSides) {
+      result[boundSide.prop] = mapper(boundSide, result[boundSide.prop]);
     }
+    return new Bounds(result);
   }
-
-  return result;
 }

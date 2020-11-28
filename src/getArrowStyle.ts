@@ -1,30 +1,32 @@
-import { Side, BoundSide } from "./types";
 import { limit } from "./util";
-import { SubjectsBounds, SizeProperty } from "./types";
+import { SubjectsBounds } from "./SubjectsBounds";
+import { Placement } from "./Placement";
 
 // how much pixels is the center of layer removed from edge of trigger?
 function getNegativeOffsetBetweenLayerCenterAndTrigger(
-  { ARROW, LAYER, TRIGGER }: SubjectsBounds,
-  arrowOffset: number,
-  isHorizontal: boolean
+  subjectsBounds: SubjectsBounds,
+  placement: Placement,
+  arrowOffset: number
 ) {
-  const sizeProperty = isHorizontal ? SizeProperty.width : SizeProperty.height;
+  const { layer, trigger, arrow } = subjectsBounds;
 
-  const [sideA, sideB] = isHorizontal
-    ? ([BoundSide.left, BoundSide.right] as const)
-    : ([BoundSide.top, BoundSide.bottom] as const);
+  const sizeProperty = placement.primary.oppositeSizeProp;
+
+  const [sideA, sideB] = !placement.primary.isHorizontal
+    ? (["left", "right"] as const)
+    : (["top", "bottom"] as const);
 
   const offsetA =
-    LAYER[sideA] +
-    LAYER[sizeProperty] / 2 -
-    TRIGGER[sideA] -
-    ARROW[sizeProperty] / 2 -
+    layer[sideA] +
+    layer[sizeProperty] / 2 -
+    trigger[sideA] -
+    arrow[sizeProperty] / 2 -
     arrowOffset;
   const offsetB =
-    LAYER[sideB] -
-    LAYER[sizeProperty] / 2 -
-    TRIGGER[sideB] +
-    ARROW[sizeProperty] / 2 +
+    layer[sideB] -
+    layer[sizeProperty] / 2 -
+    trigger[sideB] +
+    arrow[sizeProperty] / 2 +
     arrowOffset;
 
   return (offsetA < 0 ? -offsetA : 0) + (offsetB > 0 ? -offsetB : 0);
@@ -41,39 +43,33 @@ const STYLE_BASE: React.CSSProperties = {
 
 export function getArrowStyle(
   subjectsBounds: SubjectsBounds,
-  layerSide: Side,
+  placement: Placement,
   arrowOffset: number
 ): React.CSSProperties {
-  if (layerSide === Side.center) {
+  if (placement.primary.isCenter) {
     return STYLE_BASE;
   }
 
-  const { LAYER, TRIGGER, ARROW } = subjectsBounds;
+  const { layer, trigger, arrow } = subjectsBounds;
 
-  const sizeProperty = [Side.left, Side.right].includes(layerSide)
-    ? SizeProperty.height
-    : SizeProperty.width;
+  const sizeProperty = placement.primary.oppositeSizeProp;
+  const triggerIsBigger = trigger[sizeProperty] > layer[sizeProperty];
 
-  const triggerIsBigger =
-    subjectsBounds.TRIGGER[sizeProperty] > subjectsBounds.LAYER[sizeProperty];
-
-  const min = arrowOffset + ARROW[sizeProperty] / 2;
-  const max = LAYER[sizeProperty] - ARROW[sizeProperty] / 2 - arrowOffset;
-
-  const isHorizontal = [Side.top, Side.bottom].includes(layerSide);
-
-  const primarySide = BoundSide[Side[layerSide] as BoundSide];
-  const secondarySide = isHorizontal ? BoundSide.left : BoundSide.top;
+  const min = arrowOffset + arrow[sizeProperty] / 2;
+  const max = layer[sizeProperty] - arrow[sizeProperty] / 2 - arrowOffset;
 
   const negativeOffset = getNegativeOffsetBetweenLayerCenterAndTrigger(
     subjectsBounds,
-    arrowOffset,
-    isHorizontal
+    placement,
+    arrowOffset
   );
 
+  const primarySide = placement.primary.prop;
+  const secondarySide = placement.primary.oppositeCssProp;
+
   const secondaryValue = triggerIsBigger
-    ? LAYER[sizeProperty] / 2 + negativeOffset
-    : TRIGGER[secondarySide] + TRIGGER[sizeProperty] / 2 - LAYER[secondarySide];
+    ? layer[sizeProperty] / 2 + negativeOffset
+    : trigger[secondarySide] + trigger[sizeProperty] / 2 - layer[secondarySide];
 
   return {
     ...STYLE_BASE,

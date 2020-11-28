@@ -18,14 +18,14 @@ export type UseHoverOptions = {
   hideOnScroll?: boolean;
 };
 
-type Callback = () => void;
+export type PlainCallback = (...args: any[]) => void;
 
 export type UseHoverProps = {
-  onMouseEnter: Callback;
-  onMouseLeave: Callback;
-  onTouchStart: Callback;
-  onTouchMove: Callback;
-  onTouchEnd: Callback;
+  onMouseEnter: PlainCallback;
+  onMouseLeave: PlainCallback;
+  onTouchStart: PlainCallback;
+  onTouchMove: PlainCallback;
+  onTouchEnd: PlainCallback;
 };
 
 enum Status {

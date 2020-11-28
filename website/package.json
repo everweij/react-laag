@@ -1,9 +1,9 @@
 {
-  "name": "gatsby-starter-default",
+  "name": "react-laag-website",
   "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
+  "description": "Official website of react-laag to demostrate its capabilities and some docs",
   "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "author": "Erik Verweij",
   "dependencies": {
     "copy-text-to-clipboard": "^2.2.0",
     "framer-motion": "^1.11.0",
@@ -32,7 +32,7 @@
     "@types/prettier": "^2.0.1"
   },
   "keywords": [
-    "gatsby"
+    "react-laag"
   ],
   "license": "MIT",
   "scripts": {
@@ -41,15 +41,7 @@
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
-  },
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
+    "clean": "gatsby clean"
   },
   "browserslist": [
     ">0.25%",

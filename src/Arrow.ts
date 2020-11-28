@@ -1,65 +1,57 @@
-import * as React from "react";
-import { LayerSide, BoundSide } from "./types";
+import { createElement, forwardRef } from "react";
+import { BoundSide, BoundSideType } from "./Sides";
+import { LayerSide } from "./types";
+
+const LEFT = "left";
+const TOP = "top";
+const BOTTOM = "bottom";
+const RIGHT = "right";
 
 function getWidthBasedOnAngle(angle: number, size: number) {
   return Math.tan(angle * (Math.PI / 180)) * size;
 }
 
-function sideIsHorizontal(side: BoundSide): boolean {
-  return [BoundSide.left, BoundSide.right].includes(side);
-}
-
 function getViewBox(
   sizeA: number,
   sizeB: number,
-  side: BoundSide,
+  side: BoundSideType,
   borderWidth: number
 ) {
-  const map: Record<BoundSide, string> = {
-    [BoundSide.bottom]: `0 ${-borderWidth} ${sizeB} ${sizeA}`,
-    [BoundSide.top]: `0 0 ${sizeB} ${sizeA + borderWidth}`,
-    [BoundSide.right]: `${-borderWidth} 0 ${sizeA} ${sizeB}`,
-    [BoundSide.left]: `0 0 ${sizeA + borderWidth} ${sizeB}`
+  const map = {
+    [BOTTOM]: `0 ${-borderWidth} ${sizeB} ${sizeA}`,
+    [TOP]: `0 0 ${sizeB} ${sizeA + borderWidth}`,
+    [RIGHT]: `${-borderWidth} 0 ${sizeA} ${sizeB}`,
+    [LEFT]: `0 0 ${sizeA + borderWidth} ${sizeB}`
   };
 
-  return map[side];
+  return map[side.prop];
 }
 
 function getTrianglePath(
   sizeA: number,
   sizeB: number,
-  side: BoundSide,
+  side: BoundSideType,
   roundness: number,
   angle: number
 ) {
   const relativeRoundness = (roundness / 10) * sizeA * 2;
 
-  const isHorizontal = sideIsHorizontal(side);
-
   const A = {
-    [BoundSide.bottom]: [0, sizeA],
-    [BoundSide.top]: [0, 0],
-    [BoundSide.right]: [sizeA, sizeB],
-    [BoundSide.left]: [0, sizeB]
-  }[side].join(" ");
+    [BOTTOM]: [0, sizeA],
+    [TOP]: [0, 0],
+    [RIGHT]: [sizeA, sizeB],
+    [LEFT]: [0, sizeB]
+  }[side.prop].join(" ");
 
-  const B = isHorizontal ? `V 0` : `H ${sizeB}`;
+  const B = side.isHorizontal ? `V 0` : `H ${sizeB}`;
 
   const cPoint = sizeB / 2;
   const c1A = sizeB / 2 + getWidthBasedOnAngle(angle, sizeA / 8);
   const c1B = sizeA / 8;
 
   const C = {
-    [BoundSide.bottom]: [
-      "C",
-      c1A,
-      c1B,
-      cPoint + relativeRoundness,
-      0,
-      cPoint,
-      0
-    ],
-    [BoundSide.top]: [
+    [BOTTOM]: ["C", c1A, c1B, cPoint + relativeRoundness, 0, cPoint, 0],
+    [TOP]: [
       "C",
       c1A,
       sizeA - c1B,
@@ -68,16 +60,8 @@ function getTrianglePath(
       cPoint,
       sizeA
     ],
-    [BoundSide.right]: [
-      "C",
-      c1B,
-      sizeB - c1A,
-      0,
-      cPoint - relativeRoundness,
-      0,
-      cPoint
-    ],
-    [BoundSide.left]: [
+    [RIGHT]: ["C", c1B, sizeB - c1A, 0, cPoint - relativeRoundness, 0, cPoint],
+    [LEFT]: [
       "C",
       sizeA - c1B,
       sizeB - c1A,
@@ -86,30 +70,16 @@ function getTrianglePath(
       sizeA,
       cPoint
     ]
-  }[side].join(" ");
+  }[side.prop].join(" ");
 
   const d1A = sizeB / 2 - getWidthBasedOnAngle(angle, sizeA / 8);
   const d1B = sizeA / 8;
 
   const D = {
-    [BoundSide.bottom]: ["C", cPoint - relativeRoundness, 0, d1A, d1B, A],
-    [BoundSide.top]: [
-      "C",
-      cPoint - relativeRoundness,
-      sizeA,
-      d1A,
-      sizeA - d1B,
-      A
-    ],
-    [BoundSide.right]: [
-      "C",
-      0,
-      cPoint + relativeRoundness,
-      d1B,
-      sizeB - d1A,
-      A
-    ],
-    [BoundSide.left]: [
+    [BOTTOM]: ["C", cPoint - relativeRoundness, 0, d1A, d1B, A],
+    [TOP]: ["C", cPoint - relativeRoundness, sizeA, d1A, sizeA - d1B, A],
+    [RIGHT]: ["C", 0, cPoint + relativeRoundness, d1B, sizeB - d1A, A],
+    [LEFT]: [
       "C",
       sizeA,
       cPoint + relativeRoundness,
@@ -117,7 +87,7 @@ function getTrianglePath(
       sizeB - d1A,
       A
     ]
-  }[side].join(" ");
+  }[side.prop].join(" ");
 
   return ["M", A, B, C, D].join(" ");
 }
@@ -126,16 +96,14 @@ function getBorderMaskPath(
   sizeA: number,
   sizeB: number,
   borderWidth: number,
-  side: BoundSide,
+  side: BoundSideType,
   angle: number
 ) {
   const borderOffset = getWidthBasedOnAngle(angle, borderWidth);
 
-  const [A, B] = [BoundSide.right, BoundSide.bottom].includes(side)
-    ? [sizeA, sizeA - borderWidth]
-    : [0, borderWidth];
+  const [A, B] = !side.isPush ? [sizeA, sizeA - borderWidth] : [0, borderWidth];
 
-  if (sideIsHorizontal(side)) {
+  if (side.isHorizontal) {
     return [
       "M",
       A,
@@ -205,7 +173,7 @@ export type ArrowProps = React.ComponentPropsWithoutRef<"svg"> & {
   layerSide?: LayerSide;
 };
 
-export const Arrow = React.forwardRef<SVGSVGElement, ArrowProps>(function Arrow(
+export const Arrow = forwardRef<SVGSVGElement, ArrowProps>(function Arrow(
   {
     size = 8,
     angle = 45,
@@ -224,32 +192,31 @@ export const Arrow = React.forwardRef<SVGSVGElement, ArrowProps>(function Arrow(
   }
 
   const side = BoundSide[layerSide];
-  const isHorizontal = sideIsHorizontal(side);
   const sizeA = size;
   const sizeB = getWidthBasedOnAngle(angle, size) * 2;
 
-  return (
-    <svg
-      ref={ref}
-      {...rest}
-      style={{
+  return createElement(
+    "svg",
+    {
+      ref,
+      ...rest,
+      style: {
         ...style,
-        transform: `translate${isHorizontal ? "Y" : "X"}(-50%)`
-      }}
-      width={isHorizontal ? sizeA : sizeB}
-      height={isHorizontal ? sizeB : sizeA}
-      viewBox={getViewBox(sizeA, sizeB, side, borderWidth)}
-    >
-      <path
-        fill={backgroundColor}
-        strokeWidth={borderWidth}
-        stroke={borderColor}
-        d={getTrianglePath(sizeA, sizeB, side, roundness, angle)}
-      />
-      <path
-        fill={backgroundColor}
-        d={getBorderMaskPath(sizeA, sizeB, borderWidth, side, angle)}
-      />
-    </svg>
+        transform: `translate${side.isHorizontal ? "Y" : "X"}(-50%)`
+      },
+      width: side.isHorizontal ? sizeA : sizeB,
+      height: side.isHorizontal ? sizeB : sizeA,
+      viewBox: getViewBox(sizeA, sizeB, side, borderWidth)
+    },
+    createElement("path", {
+      fill: backgroundColor,
+      strokeWidth: borderWidth,
+      stroke: borderColor,
+      d: getTrianglePath(sizeA, sizeB, side, roundness, angle)
+    }),
+    createElement("path", {
+      fill: backgroundColor,
+      d: getBorderMaskPath(sizeA, sizeB, borderWidth, side, angle)
+    })
   );
 });

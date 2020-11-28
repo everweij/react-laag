@@ -1,14 +1,23 @@
-export { useLayer, DEFAULT_OPTIONS } from "./useLayer";
-export { UseLayerProps } from "./useLayer";
-export { Arrow } from "./Arrow";
-export { ArrowProps } from "./Arrow";
-export { useHover } from "./useHover";
-export { UseHoverProps, UseHoverOptions } from "./useHover";
+export {
+  useLayer,
+  DEFAULT_OPTIONS,
+  UseLayerProps,
+  LayerProps,
+  TriggerProps,
+  UseLayerArrowProps
+} from "./useLayer";
+export { Arrow, ArrowProps } from "./Arrow";
+export {
+  useHover,
+  UseHoverProps,
+  UseHoverOptions,
+  PlainCallback
+} from "./useHover";
 export {
   LayerSide,
-  Bounds,
   DisappearType,
-  PlacementKey as Placement,
   ResizeObserverClass,
-  Options
+  Options as UseLayerOptions
 } from "./types";
+export { PLACEMENT_TYPES, PlacementType as Placement } from "./PlacementType";
+export { mergeRefs } from "./util";

@@ -1,43 +1,50 @@
-import * as React from "react";
+import {
+  useCallback,
+  useState,
+  useRef,
+  createElement,
+  ReactNode,
+  ReactPortal,
+  MutableRefObject
+} from "react";
 import { createPortal } from "react-dom";
 
 import {
-  Placement,
-  RefCallback,
-  SubjectsBounds,
   Options,
-  Scroll,
-  Side,
   LayerSide,
   Styles,
-  Borders
+  ScrollOffsets,
+  BorderOffsets,
+  PositionConfig,
+  RefCallback
 } from "./types";
-import { useTrackBounds } from "./useTrackBounds";
+import { useTrackElements, OnChangeElements } from "./useTrackElements";
 import { useGroup, GroupProvider } from "./useGroup";
-import {
-  useDidValueChange,
-  shouldUpdateStyles,
-  isSet,
-  mergeRefs
-} from "./util";
-import { ALL_PLACEMENTS, getPlacementProperties } from "./placement";
-import { position } from "./position";
+import { PlacementType, PLACEMENT_TYPES } from "./PlacementType";
+import { Placements } from "./Placements";
+import { SubjectsBounds } from "./SubjectsBounds";
+import { useDidStateChange } from "./hooks";
+import { isSet, mergeRefs } from "./util";
+
+export type LayerProps = { ref: RefCallback; style: Styles["layer"] };
+export type TriggerProps = { ref: RefCallback };
+export type UseLayerArrowProps = {
+  ref: MutableRefObject<any> | RefCallback;
+  layerSide: LayerSide;
+  style: Styles["arrow"];
+};
 
 export type UseLayerProps = {
-  renderLayer: (children: React.ReactNode) => React.ReactPortal | null;
-  triggerProps: { ref: RefCallback };
-  layerProps: { ref: RefCallback; style: React.CSSProperties };
-  arrowProps: {
-    ref: React.MutableRefObject<any>;
-    layerSide: LayerSide;
-    style: React.CSSProperties;
-  };
+  renderLayer: (children: ReactNode) => ReactPortal | null;
+  triggerProps: TriggerProps;
+  layerProps: LayerProps;
+  arrowProps: UseLayerArrowProps;
   layerSide: LayerSide;
   triggerBounds: ClientRect | null;
 };
 
 type State = {
-  layerSide: Side;
+  layerSide: LayerSide;
   styles: Styles;
 };
 
@@ -57,17 +64,11 @@ export const DEFAULT_OPTIONS: Required<Omit<
   triggerOffset: 0,
   overflowContainer: true,
   placement: "top-center",
-  possiblePlacements: ALL_PLACEMENTS,
+  possiblePlacements: (PLACEMENT_TYPES as unknown) as PlacementType[],
   preferX: "right",
   preferY: "bottom",
   snap: false
 };
-
-/**
- * TODO:
- * - Cross-browser testing
- * - create and add es5 build to rollup
- */
 
 export function useLayer({
   isOpen = false,
@@ -89,8 +90,8 @@ export function useLayer({
   onParentClose
 }: Options): UseLayerProps {
   // initialize styles
-  const [state, setState] = React.useState<State>({
-    layerSide: getPlacementProperties(Placement[placement]).primary,
+  const [state, setState] = useState<State>(() => ({
+    layerSide: Placements.getSidesFromPlacementType(placement)[0].prop,
     styles: {
       layer: {
         position: overflowContainer ? "fixed" : "absolute",
@@ -103,27 +104,36 @@ export function useLayer({
         left: 0
       }
     }
-  });
+  }));
 
-  const triggerBoundsRef = React.useRef<HTMLElement>(null!);
+  const triggerBoundsRef = useRef<HTMLElement>(null!);
 
   // check whether a re-render was caused by us updating the style
   // this prevents an infinite loop of updates
-  const [rerenderCausedByStyleUpdate, lastState] = useDidValueChange(
-    state,
-    !isOpen
-  );
+  const rerenderCausedByStyleUpdate = useDidStateChange(state, isOpen);
 
   // Most important function regarding positioning
-  // It receives boundaries collected by `useTrackBounds`, does some calculations,
-  // sets new styles when needed, and handles when a layer has disappeared.
-  const handlePositionChange = React.useCallback(
-    function handlePositionChange(
-      subjectsBounds: SubjectsBounds,
-      scroll: Scroll,
-      borders: Borders
+  // It receives boundaries collected by `useTrackElements`, does some calculations,
+  // sets new styles, and handles when a layer has disappeared.
+  const handlePositioning = useCallback(
+    function handlePositioning(
+      { arrow, layer, scrollContainers, trigger }: OnChangeElements,
+      scrollOffsets: ScrollOffsets,
+      borderOffsets: BorderOffsets
     ) {
-      const { styles, layerSide, hasDisappeared } = position({
+      const parent = scrollContainers[0] || document.body;
+
+      const subjectsBounds = SubjectsBounds.create(
+        environment!,
+        layer,
+        trigger,
+        parent,
+        arrow,
+        scrollContainers,
+        overflowContainer
+      );
+
+      const config: PositionConfig = {
         placement,
         possiblePlacements,
         auto,
@@ -134,38 +144,37 @@ export function useLayer({
         preferX,
         preferY,
         snap,
-        subjectsBounds,
-        overflowContainer,
-        scroll,
-        borders
-      });
+        overflowContainer
+      };
 
-      // only update when styles have actually changed
-      if (shouldUpdateStyles(lastState.current?.styles ?? null, styles)) {
-        setState({
-          layerSide,
-          styles
-        });
-      }
+      const { hasDisappeared, layerSide, styles } = Placements.create(
+        subjectsBounds,
+        config
+      ).result(scrollOffsets, borderOffsets);
+
+      setState({
+        layerSide,
+        styles
+      });
 
       if (isSet(hasDisappeared) && isSet(onDisappear)) {
         onDisappear(hasDisappeared);
       }
     },
     [
+      arrowOffset,
+      auto,
+      containerOffset,
+      environment,
+      layerDimensions,
+      onDisappear,
+      overflowContainer,
       placement,
       possiblePlacements,
-      auto,
-      layerDimensions,
-      arrowOffset,
-      containerOffset,
-      triggerOffset,
       preferX,
       preferY,
       snap,
-      overflowContainer,
-      lastState,
-      onDisappear
+      triggerOffset
     ]
   );
 
@@ -174,13 +183,13 @@ export function useLayer({
     layerRef,
     arrowRef,
     closestScrollContainer
-  } = useTrackBounds({
+  } = useTrackElements({
     ResizeObserverPolyfill,
     environment,
     enabled: isOpen,
     ignoreUpdate: rerenderCausedByStyleUpdate,
-    fixedMode: overflowContainer,
-    onBoundsChange: handlePositionChange
+    overflowContainer,
+    onChange: handlePositioning
   });
 
   const { closeOnOutsideClickRefs, registrations } = useGroup({
@@ -188,8 +197,6 @@ export function useLayer({
     onOutsideClick,
     onParentClose
   });
-
-  const layerSide = Side[state.layerSide] as LayerSide;
 
   const props: UseLayerProps = {
     triggerProps: {
@@ -206,21 +213,19 @@ export function useLayer({
     arrowProps: {
       ref: arrowRef,
       style: state.styles.arrow,
-      layerSide
+      layerSide: state.layerSide
     },
-    layerSide,
-    triggerBounds:
-      isOpen && triggerBoundsRef.current
-        ? triggerBoundsRef.current.getBoundingClientRect()
-        : null,
+    layerSide: state.layerSide,
+    triggerBounds: isOpen
+      ? triggerBoundsRef.current?.getBoundingClientRect()
+      : null,
     renderLayer: children =>
       typeof document !== "undefined"
         ? createPortal(
-            <GroupProvider registrations={registrations}>
-              {children}
-            </GroupProvider>,
+            createElement(GroupProvider, { registrations, children }),
+
             overflowContainer || !closestScrollContainer
-              ? document.body
+              ? document.body // @TODO -> mount this in a dedicated container
               : closestScrollContainer
           )
         : null

@@ -1,55 +1,92 @@
-import * as React from "react";
+import { useCallback, useRef, useEffect } from "react";
 import warning from "tiny-warning";
-import { ResizeObserverClass, SubjectsBounds, Scroll, Borders } from "./types";
+import { ResizeObserverClass, ScrollOffsets, BorderOffsets } from "./types";
 import {
-  clientRectToBounds,
-  getWindowBounds,
-  subtractScrollbars,
-  createEmptyBounds,
-  getBoundsWithoutTransform,
-  getBorderOffsets
-} from "./bounds";
-
-import {
-  findScrollContainers,
-  getResizeObserver,
-  useMutableState,
-  useRefChange,
-  useSubscriptions,
+  useTrackRef,
+  useMutableStore,
+  useEventSubscriptions,
   useIsomorphicLayoutEffect
-} from "./util";
+} from "./hooks";
+import { getPixelValue } from "./util";
 
-type ElementState = {
-  scrollContainers: HTMLElement[];
-  triggerElement: HTMLElement | null;
-  layerElement: HTMLElement | null;
-};
+/**
+ * Utility to get the correct ResizeObserver class
+ */
+export function getResizeObserver(
+  environment: Window | undefined,
+  polyfill: ResizeObserverClass | undefined
+): ResizeObserverClass | undefined {
+  if (typeof environment === "undefined") {
+    return undefined;
+  }
 
-export type UseTrackBoundsProps = {
-  enabled: boolean;
-  ignoreUpdate: boolean;
-  onBoundsChange: (
-    subjectsBounds: SubjectsBounds,
-    scroll: Scroll,
-    borders: Borders
-  ) => void;
-  environment: Window | undefined;
-  ResizeObserverPolyfill: ResizeObserverClass | undefined;
-  fixedMode: boolean;
-};
+  return polyfill || (environment as any).ResizeObserver;
+}
 
-type UseTrackBoundsReturnValue = {
-  triggerRef: (element: HTMLElement | null) => void;
-  layerRef: (element: HTMLElement | null) => void;
-  arrowRef: React.MutableRefObject<HTMLElement | null>;
-  closestScrollContainer: HTMLElement | null;
-};
+/**
+ * Utility function that given a element traverses up in the html-hierarchy
+ * to find and return all ancestors that have scroll behavior
+ */
+export function findScrollContainers(
+  element: HTMLElement | null,
+  environment?: Window
+): HTMLElement[] {
+  const result: HTMLElement[] = [];
+
+  if (!element || !environment || element === document.body) {
+    return result;
+  }
+
+  const { overflow, overflowX, overflowY } = environment.getComputedStyle(
+    element
+  );
+
+  if (
+    [overflow, overflowX, overflowY].some(prop =>
+      ["auto", "scroll"].includes(prop)
+    )
+  ) {
+    result.push(element);
+  }
+
+  return [
+    ...result,
+    ...findScrollContainers(element.parentElement, environment)
+  ];
+}
 
 function createReferenceError(subject: string) {
   return `react-laag: Could not find a valid reference for the ${subject} element. There might be 2 causes:
    - Make sure that the 'ref' is set correctly on the ${subject} element when isOpen: true. Also make sure your component forwards the ref with "forwardRef()".
    - Make sure that you are actually rendering the ${subject} when the isOpen prop is set to true`;
 }
+
+export type OnChangeElements = {
+  layer: HTMLElement;
+  trigger: HTMLElement;
+  arrow: HTMLElement | null;
+  scrollContainers: HTMLElement[];
+};
+
+export type UseTrackElementsProps = {
+  enabled: boolean;
+  ignoreUpdate: boolean;
+  onChange: (
+    elements: OnChangeElements,
+    scrollOffsets: ScrollOffsets,
+    borderOffsets: BorderOffsets
+  ) => void;
+  environment: Window | undefined;
+  ResizeObserverPolyfill: ResizeObserverClass | undefined;
+  overflowContainer: boolean;
+};
+
+type UseTrackElementsReturnValue = {
+  triggerRef: (element: HTMLElement | null) => void;
+  layerRef: (element: HTMLElement | null) => void;
+  arrowRef: React.MutableRefObject<HTMLElement | null>;
+  closestScrollContainer: HTMLElement | null;
+};
 
 /**
  * This hook has the responsibility to track the bounds of:
@@ -67,26 +104,26 @@ function createReferenceError(subject: string) {
  * - when the trigger, layer or document body changes in size
  * - when the user scrolls the page, or any of the scroll containers
  */
-export function useTrackBounds({
+export function useTrackElements({
   // should we track the bounds?
   enabled,
   // should we call the callback after render?
   ignoreUpdate,
   // call this callback when the bounds have changed
-  onBoundsChange,
+  onChange,
   // optional environment (i.e. when using iframes)
   environment,
   // optionally inject a polyfill when the browser does not support it
   // out of the box
   ResizeObserverPolyfill,
-  // behavior will alter slightly when `fixedMode` is enabled
-  fixedMode
-}: UseTrackBoundsProps): UseTrackBoundsReturnValue {
+  // behavior will alter slightly when `overflowContainer` is enabled
+  overflowContainer
+}: UseTrackElementsProps): UseTrackElementsReturnValue {
   // get the correct reference to the ResizeObserver class
   const ResizeObserver = getResizeObserver(environment, ResizeObserverPolyfill);
 
   // warn the user when no valid ResizeObserver class could be found
-  React.useEffect(() => {
+  useEffect(() => {
     warning(
       ResizeObserver,
       `This browser does not support ResizeObserver out of the box. We recommend to add a polyfill in order to utilize the full capabilities of react-laag. See: https://link`
@@ -94,89 +131,80 @@ export function useTrackBounds({
   }, [ResizeObserver]);
 
   // keep reference of the optional arrow-component
-  const arrowRef = React.useRef<HTMLElement | null>(null);
+  const arrowRef = useRef<HTMLElement | null>(null);
 
   // Keep track of mutable element related state
   // It is generally better to use React.useState, but unfortunately that causes to many re-renders
-  const [getElementState, setElementState] = useMutableState<ElementState>({
+  const [get, set] = useMutableStore<{
+    scrollContainers: HTMLElement[];
+    trigger: HTMLElement | null;
+    layer: HTMLElement | null;
+  }>({
     scrollContainers: [],
-    triggerElement: null,
-    layerElement: null
+    trigger: null,
+    layer: null
   });
 
   // utility to keep track of the scroll and resize listeners and how to unsubscribe them
   const {
-    hasSubscriptions,
-    addSubscription,
-    removeAllSubscriptions
-  } = useSubscriptions();
+    hasEventSubscriptions,
+    addEventSubscription,
+    removeAllEventSubscriptions
+  } = useEventSubscriptions();
 
   // All scroll and resize changes eventually end up here, where the collection of bounds (subjectsBounds) is
   // constructed in order to notifiy the `onBoundsChange` callback
-  const prepareOnBoundsChange = React.useCallback(
-    function prepareOnBoundsChange() {
-      const {
-        layerElement,
-        triggerElement,
-        scrollContainers
-      } = getElementState();
+  const handleChange = useCallback(
+    function handleChange() {
+      const { layer, trigger, scrollContainers } = get();
       const closestScrollContainer = scrollContainers[0] || document.body;
 
-      if (!layerElement) {
+      if (!layer) {
         throw new Error(createReferenceError("layer"));
       }
-      if (!triggerElement) {
+      if (!trigger) {
         throw new Error(createReferenceError("trigger"));
       }
-      const subjectsBounds: SubjectsBounds = {
-        LAYER: getBoundsWithoutTransform(layerElement, environment!),
-        TRIGGER: clientRectToBounds(triggerElement.getBoundingClientRect()),
-        ARROW: arrowRef.current
-          ? clientRectToBounds(arrowRef.current.getBoundingClientRect())
-          : createEmptyBounds(),
-        PARENT: clientRectToBounds(
-          closestScrollContainer.getBoundingClientRect()
-        ),
-        WINDOW: getWindowBounds(environment),
-        SCROLL_CONTAINERS: scrollContainers.map(container =>
-          subtractScrollbars(
-            clientRectToBounds(container.getBoundingClientRect()),
-            container.clientWidth,
-            container.clientHeight
-          )
-        )
-      };
 
       const { scrollLeft, scrollTop } = closestScrollContainer;
+      const scrollOffsets: ScrollOffsets = {
+        top: scrollTop,
+        left: scrollLeft
+      };
 
-      onBoundsChange(
-        subjectsBounds,
-        closestScrollContainer === document.body
-          ? { top: 0, left: 0 }
-          : {
-              top: scrollTop,
-              left: scrollLeft
-            },
-        getBorderOffsets(closestScrollContainer, environment!)
+      const { borderLeftWidth, borderTopWidth } = environment!.getComputedStyle(
+        closestScrollContainer
+      );
+
+      const borderOffsets: BorderOffsets = {
+        left: getPixelValue(borderLeftWidth) || 0,
+        top: getPixelValue(borderTopWidth) || 0
+      };
+
+      onChange(
+        {
+          layer,
+          trigger,
+          scrollContainers,
+          arrow: arrowRef.current
+        },
+        scrollOffsets,
+        borderOffsets
       );
     },
-    [getElementState, onBoundsChange, environment, arrowRef]
+    [get, onChange, environment, arrowRef]
   );
 
   // responsible for adding the scroll and resize listeners to the correct
   // html elements
-  const addEventListeners = React.useCallback(
+  const addEventListeners = useCallback(
     function addEventListeners() {
-      const {
-        triggerElement,
-        layerElement,
-        scrollContainers
-      } = getElementState();
+      const { trigger, layer, scrollContainers } = get();
 
-      if (!layerElement) {
+      if (!layer) {
         throw new Error(createReferenceError("layer"));
       }
-      if (!triggerElement) {
+      if (!trigger) {
         throw new Error(createReferenceError("trigger"));
       }
 
@@ -187,16 +215,16 @@ export function useTrackBounds({
             ignoredInitialCall = true;
             return;
           }
-          prepareOnBoundsChange();
+          handleChange();
         };
 
         const observer = new ResizeObserver(observerCallback);
-        for (const element of [triggerElement, layerElement, document.body]) {
+        for (const element of [trigger, layer, document.body]) {
           observer.observe(element);
         }
 
-        addSubscription(() => {
-          for (const element of [triggerElement, layerElement, document.body]) {
+        addEventSubscription(() => {
+          for (const element of [trigger, layer, document.body]) {
             observer.unobserve(element);
           }
           observer.disconnect();
@@ -205,66 +233,54 @@ export function useTrackBounds({
 
       const listenForScrollElements = [environment!, ...scrollContainers];
       for (const element of listenForScrollElements) {
-        element.addEventListener("scroll", prepareOnBoundsChange);
+        element.addEventListener("scroll", handleChange);
 
-        addSubscription(() =>
-          element.removeEventListener("scroll", prepareOnBoundsChange)
+        addEventSubscription(() =>
+          element.removeEventListener("scroll", handleChange)
         );
       }
     },
-    [
-      getElementState,
-      addSubscription,
-      prepareOnBoundsChange,
-      environment,
-      ResizeObserver
-    ]
+    [get, addEventSubscription, handleChange, environment, ResizeObserver]
   );
 
   // when either the reference to the trigger or layer element changes
   // we should reset the event listeners and trigger a `onBoundsChange`
-  const resetWhenReferenceChangedWhileTracking = React.useCallback(
+  const resetWhenReferenceChangedWhileTracking = useCallback(
     (previous: HTMLElement | null, next: HTMLElement) => {
       if (enabled && previous && previous !== next) {
-        removeAllSubscriptions();
+        removeAllEventSubscriptions();
         addEventListeners();
-        prepareOnBoundsChange();
+        handleChange();
       }
     },
-    [removeAllSubscriptions, addEventListeners, prepareOnBoundsChange, enabled]
+    [removeAllEventSubscriptions, addEventListeners, handleChange, enabled]
   );
 
   // Logic when reference to layer changes
-  const [layerRef] = useRefChange(
-    React.useCallback(
-      nextLayerElement => {
-        const { layerElement: previousLayerElement } = getElementState();
+  const layerRef = useTrackRef(
+    useCallback(
+      layer => {
+        const { layer: previousLayer } = get();
 
         // store new reference
-        setElementState(state => ({
+        set(state => ({
           ...state,
-          layerElement: nextLayerElement
+          layer
         }));
 
         // check if we should reset the event listeners
-        resetWhenReferenceChangedWhileTracking(
-          previousLayerElement,
-          nextLayerElement
-        );
+        resetWhenReferenceChangedWhileTracking(previousLayer, layer);
       },
-      [getElementState, setElementState, resetWhenReferenceChangedWhileTracking]
+      [get, set, resetWhenReferenceChangedWhileTracking]
     )
   );
 
   // Logic when reference to trigger changes
-  const [triggerRef] = useRefChange(
-    React.useCallback(
-      nextTriggerElement => {
+  const triggerRef = useTrackRef(
+    useCallback(
+      trigger => {
         // collect list of scroll containers
-        const scrollContainers = findScrollContainers(
-          nextTriggerElement,
-          environment
-        );
+        const scrollContainers = findScrollContainers(trigger, environment);
 
         const closestScrollContainer = scrollContainers[0] || document.body;
 
@@ -278,7 +294,8 @@ export function useTrackBounds({
             .position;
 
           const closestScrollContainerHasCorrectStyling =
-            ["relative", "absolute", "fixed"].includes(position) || fixedMode;
+            ["relative", "absolute", "fixed"].includes(position) ||
+            overflowContainer;
 
           if (!closestScrollContainerHasCorrectStyling) {
             closestScrollContainer.style.position = "relative";
@@ -290,25 +307,22 @@ export function useTrackBounds({
           );
         }
 
-        const { triggerElement: previousTriggerElement } = getElementState();
+        const { trigger: previousTrigger } = get();
 
         // store new references
-        setElementState(state => ({
+        set(state => ({
           ...state,
-          triggerElement: nextTriggerElement,
+          trigger,
           scrollContainers
         }));
 
         // check if we should reset the event listeners
-        resetWhenReferenceChangedWhileTracking(
-          previousTriggerElement,
-          nextTriggerElement
-        );
+        resetWhenReferenceChangedWhileTracking(previousTrigger, trigger);
       },
       [
-        getElementState,
-        setElementState,
-        fixedMode,
+        get,
+        set,
+        overflowContainer,
         environment,
         resetWhenReferenceChangedWhileTracking
       ]
@@ -318,30 +332,28 @@ export function useTrackBounds({
   useIsomorphicLayoutEffect(() => {
     if (enabled) {
       // add event listeners if necessary
-      if (!hasSubscriptions()) {
+      if (!hasEventSubscriptions()) {
         addEventListeners();
       }
     }
 
     return () => {
-      if (hasSubscriptions()) {
-        removeAllSubscriptions();
+      if (hasEventSubscriptions()) {
+        removeAllEventSubscriptions();
       }
     };
   }, [
     enabled,
-    hasSubscriptions,
+    hasEventSubscriptions,
     addEventListeners,
-    removeAllSubscriptions,
-    getElementState,
-    setElementState
+    removeAllEventSubscriptions
   ]);
 
   // run this effect after every render
   useIsomorphicLayoutEffect(() => {
-    // eventually call `onBoundsChange` with updated bounds
+    // eventually call `handleChange` with latest elements-refs
     if (enabled && !ignoreUpdate) {
-      prepareOnBoundsChange();
+      handleChange();
     }
   });
 
@@ -349,6 +361,6 @@ export function useTrackBounds({
     triggerRef,
     layerRef,
     arrowRef,
-    closestScrollContainer: getElementState().scrollContainers[0] || null
+    closestScrollContainer: get().scrollContainers[0] || null
   };
 }
