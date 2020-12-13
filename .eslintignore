@@ -5,3 +5,7 @@ externs.js
 ssr-test.js
 dist
 node_modules
+storybook-static
+
+# eslint has somehow trouble with ts enums
+useHover.ts
