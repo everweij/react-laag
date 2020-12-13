@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <style>
+      :root {
+        --max-height: 900px;
+      }
+
+      html {
+        font-family: sans-serif;
+      }
+
+      html,
+      body {
+        margin: 0;
+      }
+
+      label {
+        display: block;
+        margin-top: 12px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      h3 {
+        margin: 0;
+      }
+
+      #root {
+        max-height: var(--max-height);
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="./main.tsx"></script>
+  </body>
+</html>

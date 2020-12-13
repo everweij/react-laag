@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "license": "MIT",
+  "name": "react-laag",
+  "author": "Erik Verweij",
+  "module": "dist/react-laag.esm.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build --format esm,cjs && yarn ssr-test && yarn size",
+    "prepare": "yarn build",
+    "ssr-test": "node ssr-test.js",
+    "test": "test-it './tests/**/*.spec.(ts|tsx)' --test-setup-files ./test-setup.ts",
+    "test:watch": "yarn test --watch",
+    "sandbox": "parcel ./sandbox/index.html",
+    "size": "size-limit"
+  },
+  "size-limit": [
+    {
+      "path": "dist/react-laag.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/react-laag.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@ampproject/rollup-plugin-closure-compiler": "^0.26.0",
+    "@size-limit/preset-small-lib": "^4.9.0",
+    "@test-it/cli": "0.6.4",
+    "@test-it/core": "^0.6.6",
+    "@testing-library/react": "^11.2.2",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "copy-text-to-clipboard": "^2.2.0",
+    "husky": "^4.3.0",
+    "parcel-bundler": "^1.12.4",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-is": "^17.0.1",
+    "size-limit": "^4.9.0",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.0.3",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "tiny-warning": "^1.0.3"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
+  }
+}

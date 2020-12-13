@@ -1,0 +1,184 @@
+p + div.code-highlight {
+  margin-top: 32px;
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+  font-size: 13px !important;
+  color: white !important;
+  background: none;
+  font-family: Consolas, Menlo, Monaco, source-code-pro, Courier New, monospace;
+  font-feature-settings: normal;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  margin-bottom: 0;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+
+  margin-top: 0px;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  overflow: auto;
+  padding: 1.3125rem !important;
+}
+
+pre[class*="language-"]::-moz-selection {
+  /* Firefox */
+  background: hsl(207, 4%, 16%);
+}
+
+pre[class*="language-"]::selection {
+  /* Safari */
+  background: hsl(207, 4%, 16%);
+}
+
+/* Text Selection colour */
+pre[class*="language-"]::-moz-selection,
+pre[class*="language-"] ::-moz-selection {
+  text-shadow: none;
+  background: hsla(0, 0%, 100%, 0.15);
+}
+
+pre[class*="language-"]::selection,
+pre[class*="language-"] ::selection {
+  text-shadow: none;
+  background: hsla(0, 0%, 100%, 0.15);
+}
+
+.token.attr-name {
+  color: #fbe0f6;
+  font-style: italic;
+}
+
+.token.script.language-javascript
+  .token.punctuation:not(.script-punctuation):not(:nth-child(2)):not(:last-child) {
+  color: #c3a9ba;
+}
+
+.token.comment {
+  color: rgb(96 220 141 / 59%);
+}
+
+.token.attr-value {
+  color: #f7d38f;
+}
+
+.token.attr-value .token.punctuation:not(:first-child) {
+  color: #f7d38f;
+}
+
+.token.string,
+.token.url {
+  color: #ffbd85;
+}
+
+.token.variable {
+  color: rgb(214, 222, 235);
+}
+
+.token.number {
+  color: #dc85f9;
+}
+
+.token.spread .token.attr-value {
+  color: #e6cce1;
+}
+
+.token.constant {
+  color: #68cabc;
+}
+
+.token.builtin,
+.token.char {
+  color: rgb(130, 170, 255);
+}
+
+.token.function {
+  color: #ffe7a6;
+}
+
+.token.tag .punctuation {
+  color: #ccaec6;
+}
+
+.token.tag .script {
+  color: white;
+}
+
+.token.punctuation {
+  color: #b59aab;
+}
+
+.token.script .token.punctuation:not(.script-punctuation) {
+  color: #fb78cc;
+}
+
+.token.selector,
+.token.doctype {
+  color: rgb(199, 146, 234);
+  font-style: "italic";
+}
+
+.token.class-name {
+  color: #23c7b8;
+}
+
+.token.operator {
+  color: #e4b4d1;
+}
+
+.token.tag {
+  color: #2c9de8;
+}
+
+.token.keyword {
+  color: #ff89d4;
+}
+
+.token.boolean {
+  color: #3299ca;
+}
+
+.token.property {
+  color: rgb(128, 203, 196);
+}
+
+.token.namespace {
+  color: rgb(178, 204, 214);
+}
+
+pre[data-line] {
+  padding: 1em 0 1em 3em;
+  position: relative;
+}
+
+.code-highlight-code-line {
+  background-color: hsla(207, 95%, 15%, 1);
+  display: block;
+  padding-right: 1em;
+  padding-left: 1.25em;
+  border-left: 0.25em solid #ffa7c4;
+}
+
+.code-highlight {
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+}
+
+.code-highlight pre[class*="language-"] {
+  float: left;
+  min-width: 100%;
+}

@@ -1,0 +1,77 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import { Button } from "../../components/Button";
+import { ScrollBox } from "../../components/ScrollBox";
+import { MouseFollow } from "./example";
+
+<Meta title="Mouse Follow" />
+
+# Mouse Follow
+
+This example has a lot in common with the tooltip example. There's one big difference though: this time the tooltip will
+follow the position of the mouse. Why? I guess that's a matter of preference. In some conditions, like a bar-chart for instance,
+you want to see the tooltip where the mouse is, instead of having your eyes search for the edges of the bar.
+
+In this example we're combining a couple of hooks together: `useLayer`, `useHover` and `useMousePositionAsTrigger`.
+
+- `useHover` is used to discover whether the user is hovering the element
+- `useMousePositionAsTrigger` is used to provide info regarding positioning retrieved from mouse-events to `useLayer`
+
+To put it in other words: instead of positioning the tooltip to the boundaries of the trigger, we want to position to the
+boundaries of the mouse-position that is hovering the trigger-element.
+
+<MouseFollow />
+
+## The code
+
+```jsx
+import {
+  useLayer,
+  useMousePositionAsTrigger,
+  useHover,
+  Arrow
+} from "react-laag";
+
+function MouseFollow() {
+  // We use `useHover()` to determine whether we should show the tooltip.
+  const [isOver, hoverProps] = useHover();
+
+  // We only want to extract mouse-position-info when the user `isOver` the box
+  // `handleMouseEvent` gets attached to `onMouseMove` later on
+  // `parentRef` is used to determine the container boundaries because we want
+  // the tooltip to be positioned within the container
+  const { handleMouseEvent, trigger, parentRef } = useMousePositionAsTrigger({
+    enabled: isOver
+  });
+
+  const { renderLayer, layerProps, arrowProps } = useLayer({
+    isOpen: isOver, // only act when the user hovers over the box
+    overflowContainer: false, // keep the tooltip within the container
+    auto: true, // automatically find the best placement
+    snap: true, // stick to the possiblePlacements
+    possiblePlacements: [
+      "top-center",
+      "bottom-center",
+      "left-center",
+      "right-center"
+    ],
+    placement: "top-center", // prefer "top-center" when there's enough space
+    triggerOffset: 8, // keep some distance to the mouse pointer (cursor)
+    containerOffset: 16, // give the tooltip some room to breath relative to the containers edges
+    // Since we want to position the layer relative to the mouse-position, we use the `trigger` props
+    // provided by the `useMousePositionAsTrigger` hook
+    trigger
+  });
+  return (
+    <div ref={parentRef}>
+      <div className="box" {...hoverProps} onMouseMove={handleMouseEvent} />
+      {isOver &&
+        renderLayer(
+          <div className="tooltip" {...layerProps}>
+            I'm a tooltip!
+            <Arrow {...arrowProps} />
+          </div>
+        )}
+    </div>
+  );
+}
+```

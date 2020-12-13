@@ -1,0 +1,285 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import { Button } from "../../components/Button";
+import { ScrollBox } from "../../components/ScrollBox";
+import { CircularMenu } from "./example";
+
+<Meta title="Circular Menu" />
+
+# Circular Menu
+
+This is perhaps the most advanced example.
+In this example we will combine the power of framer-motion (animations) and react-laag (positioning).
+Click the green button and scroll around to see what happens to the menu-items.
+
+<ScrollBox>
+  <CircularMenu />
+</ScrollBox>
+
+## The code
+
+Note: I'm only covering the most critical parts here. If you're curious to the whole source, I recommend you check
+out this example in the GitHub repository.
+
+This is how our component will look from the outside:
+
+```jsx
+<CircularMenu
+  items={[
+    { value: "item1", label: "Item 1", icon: MyAwesomeIcon },
+    { value: "item2", label: "Item 2", icon: MyAwesomeIcon },
+    { value: "item3", label: "Item 3", icon: MyAwesomeIcon }
+  ]}
+  onClick={value => console.log(`You clicked on item '${value}'!`)}
+/>
+```
+
+First let's define some constants:
+
+```jsx
+const BUTTON_SIZE = 56;
+const ITEM_SIZE = 36;
+const CONTAINER_SIZE = ITEM_SIZE * 3.5;
+const RADIUS = CONTAINER_SIZE / 2;
+const MARGIN_RIGHT = 8;
+```
+
+Let's take a look at the core-component:
+
+```jsx
+import { useLayer } from "react-laag";
+import { AnimatePresence } from "framer-motion";
+
+function CircularMenu({ items, onClick, ...rest }) {
+  // Keep track of whether the menu is open or not
+  const [isOpen, setOpen] = React.useState(false);
+
+  // small helper function to close the menu
+  function close() {
+    setOpen(false);
+  }
+
+  // when the user clicks on a menu-item, the entire menu
+  // should close before handing-off the clicked item to the
+  // outside world
+  function handleClick(value) {
+    close();
+    onClick(value);
+  }
+
+  // get the width and height of the layer given the current side the layers
+  // is on with respect to the trigger
+  function getMenuDimensions(layerSide) {
+    const centerSize = CONTAINER_SIZE + ITEM_SIZE;
+
+    const totalWidth =
+      ITEM_SIZE * items.length + (MARGIN_RIGHT * items.length - 1);
+
+    return {
+      width: layerSide === "center" ? centerSize : totalWidth,
+      height: layerSide === "center" ? centerSize : ITEM_SIZE
+    };
+  }
+
+  const { renderLayer, triggerProps, layerProps, layerSide } = useLayer({
+    isOpen, // only position when the menu is open
+    onOutsideClick: close, // close when clicked outside the menu
+    overflowContainer: false, // keep the menu within it's container
+    auto: true, // automatically find the best placement possible
+    snap: true, // stick to the possible-placements (don't position in between)
+    placement: "center", // Yes, it's also possible to place the layer horizontally / vertically centered
+    possiblePlacements: [
+      "top-center",
+      "bottom-center",
+      "left-center",
+      "right-center"
+    ],
+    triggerOffset: ITEM_SIZE / 2, // we want a gap between the menu-items and the button
+    containerOffset: 16, // keep some distance to the containers edges
+
+    // So, what happens here?
+    // In cases where the dimensions of the layer depend on the layer-side
+    // we need to help a little so react-laag can anticipate the layers dimensions when calculating
+    // the positions, without having to do a render first.
+    // In other situations this may also prevent an infinite loop of position updates
+    layerDimensions: getMenuDimensions
+  });
+
+  return (
+    <>
+      {renderLayer(
+        <AnimatePresence>
+          {isOpen && (
+            <div
+              ref={layerProps.ref}
+              className="menu"
+              style={{
+                ...layerProps.style,
+                ...getMenuDimensions(layerSide)
+              }}
+            >
+              {items.map(({ icon, label, value }, index) => (
+                <MenuItem
+                  key={value}
+                  icon={icon}
+                  label={label}
+                  index={index}
+                  nrOfItems={items.length}
+                  layerSide={layerSide}
+                  onClick={() => handleClick(value)}
+                />
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+      )}
+      <button {...rest} {...triggerProps} onClick={() => setOpen(!isOpen)}>
+        X
+      </button>
+    </>
+  );
+}
+```
+
+Alright, that wasn't so exciting, was it?
+Don't worry, here comes the difficult part: the `MenuItem` component.
+
+```jsx
+import { motion, useMotionValue } from "framer-motion";
+
+function MenuItem({ icon, label, index, nrOfItems, layerSide, ...rest }) {
+  // we only want framer-motion auto-layout animations after the component
+  // has mounted (and finished to mount-animation)
+  const didMount = useDidMount();
+
+  // this is the motion-value we need in the three hooks below
+  const value = useMotionValue(0);
+
+  // custom-hook for creating the circle-animation -> when placement === "center"
+  const circleStyle = useCircleMotionStyles(value, index, nrOfItems);
+
+  // custom-hook for creating the bar-animation -> when placement !== "center"
+  const barStyle = useBarMotionStyles(value, index, nrOfItems, layerSide);
+
+  // custom-hook for triggering animation when this component gets mounted or unmounted
+  // Basically it sets the motion-value to 1 on mount, and 0 on unmount
+  const isPresent = usePresenceAnimation(value, {
+    type: "spring",
+    damping: 20,
+    stiffness: 200
+  });
+
+  // We're wrapping our menu-item in a `Tooltip` component we created in another example.
+  // We're also applying a certain type of animation (circle / bar) depending on the
+  // side the layer is currently on
+  return (
+    <Tooltip text={label}>
+      <motion.div
+        {...rest}
+        className="menu-item"
+        style={layerSide === "center" ? circleStyle : barStyle}
+        layout={isPresent && didMount}
+      >
+        {icon}
+      </motion.div>
+    </Tooltip>
+  );
+}
+```
+
+So, what happens inside these custom-hooks, I hear you asking. Well, I will show you, but I warn you, there's a lot of math going on:
+
+```jsx
+import {
+  motion,
+  usePresence,
+  useMotionValue,
+  animate,
+  useTransform
+} from "framer-motion";
+
+// utility function that splits up an animation between 0 and 1 into two parts
+// while maintaining there relative progress
+function splitAnimation({ partA, partB }) {
+  return function split(value: number) {
+    const splitAt = 0.2;
+    if (value < splitAt) {
+      return partA(value / splitAt);
+    }
+
+    return partB((value - splitAt) / (1 - splitAt));
+  };
+}
+
+// this hook takes a motion-value (between 0 - 1), the index of the menu-item
+// and the total number of items.
+// it transforms these parameters into coordinates and scale (x, y, scale)
+function useCircleMotionStyles(value, index, nrOfItems) {
+  const offset = 0.25;
+  const percentage = index / nrOfItems;
+
+  const transformX = splitAnimation({
+    partA: () => 0,
+    partB: progress => {
+      const value = percentage * progress - offset;
+      return RADIUS * Math.cos(Math.PI * value * 2);
+    }
+  });
+  const transformY = splitAnimation({
+    partA: progress => progress * -RADIUS,
+    partB: progress => {
+      const value = percentage * progress - offset;
+      return RADIUS * Math.sin(Math.PI * value * 2);
+    }
+  });
+
+  const x = useTransform(value, transformX);
+  const y = useTransform(value, transformY);
+  const scale = useTransform(value, value => value / 2 + 0.5);
+
+  return { x, y, scale };
+}
+
+// this hook takes a motion-value (between 0 - 1), the index of the menu-item,
+// the total number of items and the current layer-side.
+// it transforms these parameters into horizontal positions (x).
+function useBarMotionStyles(value, index, nrOfItems, layerSide) {
+  const x = useTransform(value, value => {
+    const stepSize = ITEM_SIZE + MARGIN_RIGHT;
+    const maxIndex = nrOfItems - 1;
+
+    if (layerSide === "left") {
+      return value * (index - maxIndex) * stepSize + stepSize * maxIndex;
+    }
+
+    return value * index * stepSize;
+  });
+  return { x, left: 0, opacity: value };
+}
+
+// This hook will trigger an animation on the motion-value depending
+// on the state it is in -> `isPresent`
+function usePresenceAnimation(value, transition) {
+  const [isPresent, safeToRemove] = usePresence();
+
+  React.useLayoutEffect(() => {
+    if (isPresent) {
+      animate(value, 1, transition);
+    } else {
+      animate(value, 0, { ...transition, onComplete: safeToRemove });
+    }
+  }, [isPresent, safeToRemove, value]);
+
+  return isPresent;
+}
+
+// Utility hook that tracks whether the component has mounted or not
+function useDidMount() {
+  const [didMount, setMount] = React.useState(false);
+
+  React.useEffect(() => {
+    setMount(true);
+  }, []);
+
+  return didMount;
+}
+```

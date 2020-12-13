@@ -1,0 +1,55 @@
+@font-face {
+  font-family: "Luckiest Guy";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+  src: url("../website/fonts/luckiest-guy-v10-latin-regular.eot"); /* IE9 Compat Modes */
+  src: local("Luckiest Guy Regular"), local("LuckiestGuy-Regular"),
+    url("../website/fonts/luckiest-guy-v10-latin-regular.eot?#iefix")
+      format("embedded-opentype"),
+    /* IE6-IE8 */ url("../website/fonts/luckiest-guy-v10-latin-regular.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("../website/fonts/luckiest-guy-v10-latin-regular.woff") format("woff"),
+    /* Modern Browsers */
+      url("../website/fonts/luckiest-guy-v10-latin-regular.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("../website/fonts/luckiest-guy-v10-latin-regular.svg#LuckiestGuy")
+      format("svg"); /* Legacy iOS */
+}
+
+html {
+  font-family: "Nunito Sans", -apple-system, ".SFNSText-Regular",
+    "San Francisco", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p.sbdocs {
+  font-size: 16px;
+}
+
+.code-highlight {
+  margin-top: 1rem;
+  background-color: #1b181a;
+  border-radius: 4px;
+}
+
+h1.sbdocs {
+  font-family: Luckiest Guy;
+  background: -webkit-linear-gradient(#f57ecb, #aa3580);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+p.sbdocs > code {
+  background-color: #fdf6fb;
+  border: 1px solid #f6e1ef;
+  color: rgb(88 8 60);
+}
+
+.sbdocs {
+  line-height: 1.5;
+}

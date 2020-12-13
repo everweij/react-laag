@@ -1,0 +1,57 @@
+{
+  "name": "react-laag-website",
+  "private": true,
+  "description": "Official website of react-laag to demostrate its capabilities and docs",
+  "version": "0.1.0",
+  "author": "Erik Verweij",
+  "dependencies": {
+    "copy-text-to-clipboard": "^2.2.0",
+    "framer-motion": "^2.9.4",
+    "gatsby": "^2.27.4",
+    "gatsby-image": "^2.6.0",
+    "gatsby-plugin-favicon": "^3.1.6",
+    "gatsby-plugin-react-helmet": "^3.5.0",
+    "gatsby-plugin-google-analytics": "^2.1.20",
+    "gatsby-plugin-robots-txt": "^1.5.0",
+    "gatsby-plugin-sitemap": "^2.2.16",
+    "normalize.css": "^8.0.1",
+    "prismjs": "^1.22.0",
+    "prop-types": "^15.7.2",
+    "query-string": "^6.13.7",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-helmet": "^6.1.0",
+    "react-laag": "*",
+    "react-use-gesture": "^5.2.4",
+    "styled-components": "^5.2.1",
+    "styled-icons": "^10.22.0"
+  },
+  "devDependencies": {
+    "@types/prettier": "^2.1.5",
+    "@types/prismjs": "^1.16.2",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-helmet": "^6.1.0",
+    "@types/styled-components": "^5.1.4",
+    "babel-plugin-styled-components": "^1.12.0",
+    "gatsby-plugin-styled-components": "^3.5.0",
+    "typescript": "^4.1.2"
+  },
+  "keywords": [
+    "react-laag"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "start": "npm run develop",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean"
+  },
+  "browserslist": [
+    ">0.25%",
+    "not dead",
+    "ie 11",
+    "safari 11"
+  ]
+}

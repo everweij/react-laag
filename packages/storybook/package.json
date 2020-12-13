@@ -1,0 +1,32 @@
+{
+  "name": "react-laag-storybook",
+  "description": "Examples of react-laag use-cases",
+  "author": "Erik Verweij",
+  "version": "1.0.0",
+  "dependencies": {
+    "@babel/core": "^7.12.9",
+    "@storybook/addon-docs": "6.1.10",
+    "@storybook/react": "6.1.10",
+    "framer-motion": "^2.9.4",
+    "react": "^17.0.1",
+    "react-dom": "17.0.1",
+    "react-laag": "*",
+    "styled-components": "^5.2.1",
+    "styled-icons": "^10.22.0",
+    "downshift": "6.0.6"
+  },
+  "devDependencies": {
+    "@storybook/addons": "6.1.10",
+    "@storybook/theming": "6.1.10",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "babel-loader": "^8.2.2",
+    "prismjs": "^1.22.0",
+    "react": "^17.0.1",
+    "typescript": "^4.1.2"
+  },
+  "scripts": {
+    "start": "start-storybook -p 6006 --docs -c .",
+    "build": "build-storybook --docs  -c . --quiet"
+  }
+}

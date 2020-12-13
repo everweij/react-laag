@@ -1,0 +1,98 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import { Button } from "../../components/Button";
+import { TextSelection } from "./example";
+
+<Meta title="Text Selection" />
+
+# Text Selection
+
+This example demonstrates that the trigger doesn't always have to be an element. In the case of text selection we want the
+layer to 'attach' itself to the boundaries given by the selection-api on the window.
+
+Select some text below in order to see how many characters your selection contains:
+
+<Canvas withSource="none">
+  <TextSelection />
+</Canvas>
+
+## The code
+
+### Getting information about our selection
+
+In order to show information about our selection and where to place the layer we need some logic.
+Let's build a hook for this purpose -> `useTextSelection()`.
+
+```jsx
+function useTextSelection() {
+  // we need a reference to the element wrapping the text in order to determine
+  // if the selection is the selection we are after
+  const ref = React.useRef();
+
+  // we store info about the current Range here
+  const [range, setRange] = React.useState(null);
+
+  // In this effect we're registering for the documents "selectionchange" event
+  React.useEffect(() => {
+    function handleChange() {
+      // get selection information from the browser
+      const selection = window.getSelection();
+
+      // we only want to proceed when we have a valid selection
+      if (
+        !selection ||
+        selection.isCollapsed ||
+        !selection.containsNode(ref.current, true)
+      ) {
+        setRange(null);
+        return;
+      }
+
+      setRange(selection.getRangeAt(0));
+    }
+
+    document.addEventListener("selectionchange", handleChange);
+    return () => document.removeEventListener("selectionchange", handleChange);
+  }, []);
+
+  return { range, ref };
+}
+```
+
+### The final component
+
+Ok, so we're creating a pretty dumb component. It takes content via the `children` prop and shows the number
+of chars when the user has selected something.
+
+```jsx
+function SelectionInfo({ children }) {
+  // The hook we've created earlier
+  const { range, ref } = useTextSelection();
+
+  const showSelectionInfo = Boolean(range);
+
+  // The most important part here is the `trigger` option.
+  // Since we don't have any concrete trigger-element, we can tell react-laag
+  // where to position the layer this way.
+  // What's pretty cool is the fact that a Range object has a `getBoundingClientRect()`
+  // as well!
+  const { renderLayer, layerProps, arrowProps } = useLayer({
+    isOpen: showSelectionInfo,
+    trigger: {
+      getBounds: () => range.getBoundingClientRect()
+    }
+  });
+
+  return (
+    <>
+      <div ref={ref}>{children}</div>
+      {showSelectionInfo &&
+        renderLayer(
+          <div className="tooltip" {...layerProps}>
+            {range.toString().replace(/\s/g, "").length} characters
+            <Arrow {...arrowProps} />
+          </div>
+        )}
+    </>
+  );
+}
+```

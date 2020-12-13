@@ -1,0 +1,60 @@
+name: master-workflow
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: restore yarn cache directory
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Build react-laag
+        run: yarn build
+
+      - name: Build website
+        run: "yarn website:build"
+
+      - name: Deploy website
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: packages/website/public
+          remote: /home/webdev/react-laag-docs
+          rmRemote: true
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+
+      - name: Build storybook
+        run: "yarn storybook:build"
+
+      - name: Deploy storybook
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: packages/storybook/storybook-static
+          remote: /home/webdev/storybook-react-laag
+          rmRemote: true
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
