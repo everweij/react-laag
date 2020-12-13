@@ -55,7 +55,7 @@ So, if you're looking for a full-fledged component out-of-the-box, I recommend t
 - [API Docs](#api-docs)
   - [useLayer()](#uselayer)
   - [useHover()](#usehover)
-  - [\<Arrow />](#arrow)
+  - [\<Arrow />](#arrow-)
   - [useMousePositionAsTrigger()](#usemousepositionastrigger)
   - [mergeRefs()](#mergerefs)
 - [Concepts](#concepts)
