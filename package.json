@@ -1,29 +1,11 @@
 {
-  "version": "2.0.0",
+  "private": true,
+  "version": "0.0.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build --format esm,cjs",
-    "lint": "tsdx lint",
-    "prettier": "prettier --write {.,sandbox,website,tests,src}/**/*{js,ts,tsx,json,html}",
-    "prepare": "tsdx build",
-    "ssr-test": "node ssr-test.js",
-    "test": "test-it './tests/**/*.spec.(ts|tsx)' --test-setup-files ./test-setup.ts",
-    "test:watch": "yarn test --watch",
-    "sandbox": "parcel ./sandbox/index.html"
-  },
-  "peerDependencies": {
-    "react": ">=16",
-    "react-dom": ">=16"
-  },
+  "workspaces": ["packages/*"],
   "husky": {
     "hooks": {
-      "pre-commit": "prettier --write {.,sandbox,website,tests,src}/**/*{js,ts,tsx,json,html} && tsdx lint"
+      "pre-commit": "tsdx lint packages --fix"
     }
   },
   "prettier": {
@@ -34,28 +16,38 @@
     "trailingComma": "none",
     "arrowParens": "avoid"
   },
-  "name": "react-laag",
-  "author": "Erik Verweij",
-  "module": "dist/react-laag.esm.js",
-  "devDependencies": {
-    "@ampproject/rollup-plugin-closure-compiler": "^0.26.0",
-    "@test-it/cli": "^0.6.4",
-    "@test-it/core": "^0.6.6",
-    "@testing-library/react": "^11.0.4",
-    "@types/react": "^16.9.51",
-    "@types/react-dom": "^16.9.8",
-    "copy-text-to-clipboard": "^2.2.0",
-    "husky": "^4.3.0",
-    "parcel-bundler": "^1.12.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-is": "^16.13.1",
-    "rollup-plugin-filesize": "^9.0.2",
-    "tsdx": "^0.14.0",
-    "tslib": "^2.0.3",
-    "typescript": "^3.9.7"
+  "scripts": {
+    "lint": "tsdx lint packages --fix",
+    "build": "yarn workspace react-laag build",
+    "release": "yarn workspace react-laag publish",
+    "test": "yarn workspace react-laag test",
+    "test:watch": "yarn workspace react-laag test:watch",
+    "sandbox": "yarn workspace react-laag sandbox",
+    "website": "yarn workspace react-laag-website start",
+    "website:build": "yarn workspace react-laag-website build",
+    "website:serve": "yarn workspace react-laag-website serve",
+    "storybook": "yarn workspace react-laag-storybook start",
+    "storybook:build": "yarn workspace react-laag-storybook build"
   },
-  "dependencies": {
-    "tiny-warning": "^1.0.3"
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.14.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^4.3.0",
+    "tsdx": "^0.14.1"
+  },
+  "resolutions": {
+    "@typescript-eslint/parser": "^4.8.2",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint": "^7.14.0",
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }

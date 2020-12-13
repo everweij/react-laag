@@ -1,0 +1,175 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import { Button } from "../../components/Button";
+import { ScrollBox } from "../../components/ScrollBox";
+import { Example } from "./example";
+
+<Meta title="Nested menu's" />
+
+# Nested Menu's
+
+This example showcases two things:
+
+- using nested layers
+- the ability to position a layer relative to the mouse position
+
+Nested menu's are pretty common in things like editor-views, where a lot of options are available for the user to select.
+Besides, it allows to group related options nicely together.
+
+Although all menu's seem similar, there is a subtle difference in how these menu's get triggered.
+The initial first menu gets trigger with a context-click, and the nested ones afterwards get triggered by hovering.
+Fortunately, we can still reuse a lot of logic
+
+<Example />
+
+## The code
+
+First, we need to describe some form of data-structure which will correspond to the actual menu's.
+So our eventual component receives an array of these items with which we describe how the menu's should be layed out.
+
+```jsx
+const menuItem = {
+  key: 'item-1',
+  text: 'Item 1',
+  onClick: () => /* ? */,
+  items: [
+    { key: 'item-1.1' , text: 'Item 1.1' }
+  ]
+}
+```
+
+We would like to react to click-events. One problem: sometimes we want to close the menu('s) immediately after the
+user has clicked an item, and sometimes not. In order to keep things flexible, we can let the user of this component decide
+what to do:
+
+```jsx
+<ContextMenu
+  items={close => [
+    {
+      key: "item-1",
+      text: "Item 1",
+      onClick: () => {
+        close();
+        console.log("Clicked item 1!");
+      }
+    }
+  ]}
+/>
+```
+
+We're going to use multiple `useLayer` hooks throughout this example, so it's a good idea to store the common options somewhere:
+
+```jsx
+const baseOptions = {
+  overflowContainer: true,
+  auto: true,
+  snap: true,
+  placement: "right-start",
+  possiblePlacements: ["right-start", "left-start"],
+  triggerOffset: 8,
+  containerOffset: 16,
+  arrowOffset: 8
+};
+```
+
+Let's start with the root -> the initial menu:
+
+```jsx
+function ContextMenu({ items, children }) {
+  const {
+    hasMousePosition, // did we get a mouse-position from the event-handler
+    resetMousePosition, // reset the mouse-position to `null`, essentially closing the menu
+    handleMouseEvent, // event-handler we will use below
+    trigger // information regarding positioning we can provide to `useLayer`
+  } = useMousePositionAsTrigger();
+
+  const { renderLayer, layerProps } = useLayer({
+    isOpen: hasMousePosition,
+    onOutsideClick: resetMousePosition,
+    trigger,
+    ...baseOptions // shared common options we defined earlier
+  });
+
+  // two things to notice here:
+  // - we're reacting to context-clicks, but it very well could have been a regular `onClick`
+  // - we're delegating the rendering of the menu items to a helper function
+  return (
+    <div onContextMenu={handleMouseEvent}>
+      {hasMousePosition &&
+        renderLayer(
+          <ul className="menu" {...layerProps}>
+            {renderItems(items(resetMousePosition))}
+          </ul>
+        )}
+      {children}
+    </div>
+  );
+}
+```
+
+So why do we need this `renderItems` helper-function? Well, because we need it in another component as well.
+But first let's take a look at this `renderItems` function:
+
+```jsx
+function renderItems(items) {
+  // for each item...
+  return items.map(item => {
+    // does this item has any nesting going on?
+    if (item.items) {
+      return <NestedMenuItem key={item.key} item={item} />;
+    }
+
+    // return just a 'plain' menu-item
+    return (
+      <li key={item.key} className="menu-item" onClick={item.onClick}>
+        {item.text}
+      </li>
+    );
+  });
+}
+```
+
+Ok, there's one piece of the puzzle left: `NestedMenuItem`:
+
+```jsx
+function NestedMenuItem({ item }) {
+  // We use `useHover()` to determine whether we should show the nested menu.
+  // Notice how we're configuring a small delay on leave.
+  const [isOpen, hoverProps, close] = useHover({
+    delayEnter: 0,
+    delayLeave: 100
+  });
+
+  const { renderLayer, triggerProps, layerProps } = useLayer({
+    ...baseOptions, // the base-options we defined earlier
+    isOpen, // tell whether the user is hovering this item
+
+    // this is an important one: when the root-menu closes, we want all nested
+    // menu's to close as well. Therefore, we can utilize this `onParentClose` props
+    // to instruct `useHover` in this case to force-close possible nested menu's
+    onParentClose: close
+  });
+
+  // Notice how we're reusing `renderItems` -> recursion :)
+  // Also we're not only providing `hoverProps` to the menu-item (trigger), but also
+  // the menu. Maybe this seems weird at first, but it allows us to have multiple menus open
+  // at the same time
+  return (
+    <>
+      <li
+        {...hoverProps}
+        {...triggerProps}
+        className="menu-item"
+        onClick={item.onClick}
+      >
+        {item.text}
+      </li>
+      {isOpen &&
+        renderLayer(
+          <ul {...layerProps} {...hoverProps} className="menu">
+            {renderItems(item.items)}
+          </ul>
+        )}
+    </>
+  );
+}
+```

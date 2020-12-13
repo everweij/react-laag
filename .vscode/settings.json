@@ -2,5 +2,6 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.preferences.importModuleSpecifier": "relative"
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

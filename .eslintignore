@@ -4,4 +4,4 @@ public
 externs.js
 ssr-test.js
 dist
-yarn.lock
+node_modules

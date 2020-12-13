@@ -1,0 +1,116 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import { Tooltip } from "../../components/Tooltip";
+import { Button } from "../../components/Button";
+
+<Meta title="Tooltip" component={Tooltip} />
+
+# Tooltip
+
+A tooltip is perhaps the most often used ui-pattern involving layers.
+react-laag exposes the right building blocks to create the perfect tooltip component for your own use-cases.
+
+Let's create such a tooltip component right now! Basically, we want a `<Tooltip />` component that can wrap all kinds of things, such as plain text or another component.
+We want the tooltip to show when the user hovers over the wrapped content, but only when a certain time has elapsed. So preferably not straight away, because we don't want to introduce chaos when to user is just moving the cursor across the page.
+Next, a bit of fade-in/fade-out animation would be nice.
+
+This is what our `<Tooltip />` component will look like:
+
+```jsx
+<Tooltip text="I'm a tooltip">
+  <Button>Hover me</Button>
+</Tooltip>
+```
+
+This is an example of the `<Tooltip />` component with various wrapped contents in action:
+
+<Canvas withSource="none">
+  <div>
+    A wonderful serenity has taken{" "}
+    <Tooltip text="I'm a tooltip">possession</Tooltip> of my entire soul, like
+    these sweet mornings of spring which I enjoy with my whole heart. I am
+    alone, and feel the charm of existence in this spot, which was{" "}
+    <Tooltip text="I'm a tooltip">created</Tooltip> for the bliss of souls
+    like mine. I am so happy, my dear friend, so{" "}
+    <Tooltip text="I'm a tooltip">absorbed</Tooltip> in the exquisite sense of
+    mere tranquil existence, that I neglect my talents.
+  </div>
+  <div style={{ marginTop: 16}}>
+    <Tooltip text="I'm a tooltip">
+      <Button>Hover me</Button>
+    </Tooltip>
+  </div>
+</Canvas>
+
+## The code
+
+```jsx
+import * as React from "react";
+import { useLayer, useHover, Arrow } from "react-laag";
+import { motion, AnimatePresence } from "framer-motion";
+
+export function Tooltip({ children, text }) {
+  // We use `useHover()` to determine whether we should show the tooltip.
+  // Notice how we're configuring a small delay on enter / leave.
+  const [isOver, hoverProps] = useHover({ delayEnter: 100, delayLeave: 300 });
+
+  // Tell `useLayer()` how we would like to position our tooltip
+  const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
+    isOpen: isOver,
+    placement: "top-center",
+    triggerOffset: 8 // small gap between wrapped content and the tooltip
+  });
+
+  // when children equals text (string | number), we need to wrap it in an
+  // extra span-element in order to attach props
+  let trigger;
+  if (isReactText(children)) {
+    trigger = (
+      <span className="tooltip-text-wrapper" {...triggerProps} {...hoverProps}>
+        {children}
+      </span>
+    );
+  } else {
+    // In case of an react-element, we need to clone it in order to attach our own props
+    trigger = React.cloneElement(children, {
+      ...triggerProps,
+      ...hoverProps
+    });
+  }
+
+  // We're using framer-motion for our enter / exit animations.
+  // This is why we need to wrap our actual tooltip inside `<AnimatePresence />`.
+  // The only thing left is to describe which styles we would like to animate.
+  return (
+    <>
+      {trigger}
+      {renderLayer(
+        <AnimatePresence>
+          {isOver && (
+            <motion.div
+              className="tooltip-box"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.1 }}
+              {...layerProps}
+            >
+              {text}
+              <Arrow
+                {...arrowProps}
+                backgroundColor={BG_COLOR}
+                borderColor={BORDER_COLOR}
+                borderWidth={1}
+                size={6}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </>
+  );
+}
+
+function isReactText(children) {
+  return ["string", "number"].includes(typeof children);
+}
+```

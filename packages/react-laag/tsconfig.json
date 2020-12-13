@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src", "types"],
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "rootDir": "./src",
+    "baseUrl": "./"
+  },
+  "files": ["../../node_modules/@test-it/core/globals.d.ts"]
+}
