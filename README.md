@@ -33,12 +33,10 @@ Try it out for yourself [here](https://www.react-laag.com), or see some examples
 
 ### Features
 
-<ul style="list-style: none; padding: 0;">
- <li><span style="margin-right: 16px">📦</span>Only 7kb minified & gzipped / tree-shakable / no dependencies</li>
- <li><span style="margin-right: 16px">🛠</span>We do the positioning, you do the rest. You maintain full control over the look and feel.</li>
- <li><span style="margin-right: 16px">🚀</span>Optimized for performance / no scroll lag whatsoever</li>
- <li><span style="margin-right: 16px">🏗</span>Comes with sensible defaults out of the box, but you can tweak things to your liking</li>
-</ul>
+- 📦 Only 7kb minified & gzipped / tree-shakable / no dependencies
+- 🛠 We do the positioning, you do the rest. You maintain full control over the look and feel.
+- 🚀 Optimized for performance / no scroll lag whatsoever
+- 🏗 Comes with sensible defaults out of the box, but you can tweak things to your liking
 
 ### Who is this library for?
 
@@ -60,6 +58,7 @@ So, if you're looking for a full-fledged component out-of-the-box, I recommend t
   - [mergeRefs()](#mergerefs)
 - [Concepts](#concepts)
   - [Relative positioning](#relative-positioning)
+  - [Placement priority](#placement-priority)
   - [Nesting](#nesting)
   - [Animations](#animations)
   - [z-index / container](#z-index-/-container)
@@ -155,14 +154,14 @@ import { useLayer } from "react-laag";
 | overflowContainer  | `boolean`                                                   |          | `true`         | should the layer be contained within the closest scroll-container (`false`), or is the layer allowed to overflow its closest scroll-container (`true`)?                                                                                                                                                                                                                                        |
 | placement          | `string`                                                    |          | `"top-center"` | preferred placement of the layer. One of: `"top-center"` / `"top-start"` / `"top-end"` / `"left-start"` / `"left-center"` / `"left-end"` / `"right-start"` / `"right-center"` / `"right-end"` / `"bottom-start"` / `"bottom-center"` / `"bottom-end"` / `"center"`                                                                                                                             |
 | possiblePlacements | `string[]`                                                  |          | all            | in case of `auto: true`, describes which placements are possible. Default are all placements.                                                                                                                                                                                                                                                                                                  |
-| preferX            | `"left" \| "right"`                                         |          | `"right"`      | in case of `auto: true`, when both left and right sides are available, which one is preferred?                                                                                                                                                                                                                                                                                                 |
-| preferY            | `"top" \| "bottom"`                                         |          | `"bottom"`     | in case of `auto: true`, when both top and bottom sides are available, which one is preferred?                                                                                                                                                                                                                                                                                                 |
+| preferX            | `"left" \| "right"`                                         |          | `"right"`      | in case of `auto: true`, when both left and right sides are available, which one is preferred? Note: this option only has effect when `placement` is "top-\*" or "bottom-\*".                                                                                                                                                                                                                  |
+| preferY            | `"top" \| "bottom"`                                         |          | `"bottom"`     | in case of `auto: true`, when both top and bottom sides are available, which one is preferred? Note: this option only has effect when `placement` is "left-\*" or "right-\*"                                                                                                                                                                                                                   |
 | auto               | `boolean`                                                   |          | `false`        | should we switch automatically to a placement that is more visible on the screen?                                                                                                                                                                                                                                                                                                              |
 | snap               | `boolean`                                                   |          | `false`        | in case of `auto: true`, should we stick to the possible placements (`true`), or should we gradually move between two placements (`false`)                                                                                                                                                                                                                                                     |
 | triggerOffset      | `number`                                                    |          | `0`            | distance in pixels between layer and trigger                                                                                                                                                                                                                                                                                                                                                   |
 | containerOffset    | `number`                                                    |          | `10`           | distance in pixels between layer and scroll-containers                                                                                                                                                                                                                                                                                                                                         |
 | arrowOffset        | `number`                                                    |          | `0`            | minimal distance between arrow and edges of layer and trigger                                                                                                                                                                                                                                                                                                                                  |
-| layerDimensions    | `(layerSide: LayerSide): { width: number, height: number }` |          |                | lets you anticipate on the dimensions of the layer. Usefull when the dimensions of the layer differ per side, preventing an infinite loop of re-positioning                                                                                                                                                                                                                                    |
+| layerDimensions    | `(layerSide: LayerSide): { width: number, height: number }` |          |                | lets you anticipate on the dimensions of the layer. Useful when the dimensions of the layer differ per side, preventing an infinite loop of re-positioning                                                                                                                                                                                                                                     |
 | onDisappear        | `(type: "partial" \| "full"): void`                         |          |                | gets called when the layer or trigger partially or fully disappears from the screen when the layer is open. If `overflowContainer` is set to true, it looks at the trigger element. If `overflowContainer` is set to false, it looks at the layer element.                                                                                                                                     |
 | onOutsideClick     | `(): void`                                                  |          |                | gets called when user clicks somewhere except the trigger or layer when the layer is open                                                                                                                                                                                                                                                                                                      |
 | onParentClose      | `(): void`                                                  |          |                | Useful when working with nested layers. It is used by the parent layer to signal child layers that their layers should close also.                                                                                                                                                                                                                                                             |
@@ -170,7 +169,7 @@ import { useLayer } from "react-laag";
 | trigger            | `object`                                                    |          |                | This prop let's you specify information about the trigger you don't know beforehand. This is typically for situations like context-clicks (right-mouse-clicks) and text-selection. By using this prop the returning `triggerProps` of this hook will have no effect.                                                                                                                           |
 |                    | `getBounds: () => ClientRect`                               |          |                | A callback function that returns the bounds of the trigger.                                                                                                                                                                                                                                                                                                                                    |
 |                    | `getParent?: () => HTMLElement`                             |          |                | A callback function that returns the parent element. This is optional but may be needed in cases where you'll want to prevent overflow of the layer. In other words, if you use the default option `overflowContainer: true`, this callback will have no effect. The returning element is used to position the layer relatively and to register event-listeners.                               |
-| environment        | `Window`                                                    | `window` |                | useful when working with iframes for instance, when things like event-listeners should be attached to another context (environment).                                                                                                                                                                                                                                                           |
+| environment        | `Window`                                                    | `window` |                | useful when working with i-frames for instance, when things like event-listeners should be attached to another context (environment).                                                                                                                                                                                                                                                          |
 | ResizeObserver     | `ResizeObserverClass`                                       |          |                | pass a polyfill when the browser does not support ResizeObserver out of the box                                                                                                                                                                                                                                                                                                                |
 
 #### UseLayerProps
@@ -186,7 +185,7 @@ import { useLayer } from "react-laag";
 |               | `ref: () => void`                        |                                       | Obtains a reference to the arrow-element                                                           |
 |               | `style: CSSProperties`                   |                                       | style-object containing positional styles                                                          |
 |               | `layerSide: LayerSide`                   |                                       | let the arrow-component know in which direction it should point                                    |
-| renderLayer   | `(children: ReactNode) => ReactPortal`   |                                       | Render the layer inside this function. Essentially, this is a wrapper arround `createPortal()`     |
+| renderLayer   | `(children: ReactNode) => ReactPortal`   |                                       | Render the layer inside this function. Essentially, this is a wrapper around `createPortal()`      |
 | layerSide     | `"top" \| "bottom" \| "right" \| "left"` |                                       | The side the layer is currently on relative to the trigger                                         |
 | triggerBounds | `ClientRect \| null`                     |                                       | Bounds of the trigger when `isOpen: true`. Useful when sizing the layer relatively to the trigger. |
 
@@ -324,7 +323,7 @@ See the [context-menu example](https://storybook.react-laag.com/?path=/docs/nest
 
 ### mergeRefs()
 
-Utility function that let's you assign multiple references to a 'ref' prop.
+Utility function that lets you assign multiple references to a 'ref' prop.
 
 ```jsx
 import * as React from "react";
@@ -342,9 +341,30 @@ const ref2 = element => console.log(element);
 
 ### Relative positioning
 
-react-laag allows you to use to methods or modes for positioning with help of the `overflowContainer` option in `useLayer()`. When using `overflowContainer: true`, which is the default behavior, the layer is mounted somewhere high in the document in its own container. In such a case, the positing of the layer will be `fixed`, meaning that it will be positioned relative to the window.  
+react-laag allows you to use to methods or modes for positioning with help of the `overflowContainer` option in `useLayer()`. When using `overflowContainer: true`, which is the default behavior, the layer is mounted somewhere high in the document in its own container. In such a case, the position of the layer will be `fixed`, meaning that it will be positioned relative to the window.  
 On the other hand, you can decide you don't want to overflow the container by setting `overflowContainer` to `false`. In this scenario the layer will be mounted right under the scroll-container.  
-So, what do we mean by the term 'scroll-container' anyways? react-laag considers a scroll-container an element which has set the `overflow`, `overflow-x` or `overflow-y` style to one of `"auto"` or `"scroll"`. react-laag tries to find these scrollable-containers by traversing up the dom-tree, starting with the trigger-element. This way, the layer will be positioned relatively to the closest scroll-container. There's one catch though: it expect you to set the `position: relative` style on this scroll-container. If you accidentally forgot to set this style, react-laag will output a friendly warning in the console.
+So, what do we mean by the term 'scroll-container' anyways? react-laag considers a scroll-container an element which has set the `overflow`, `overflow-x` or `overflow-y` style to one of `"auto"` or `"scroll"`. react-laag tries to find these scrollable-containers by traversing up the dom-tree, starting with the trigger-element. This way, the layer will be positioned relatively to the closest scroll-container. There's one catch though: it expects you to set the `position: relative` style on this scroll-container. If you accidentally forgot to set this style, react-laag will output a friendly warning in the console.
+
+### Placement priority
+
+This usually is something you don't have to think about, but in some cases it may come in handy.  
+When setting the `auto` option to `true` in `useLayer()`, react-laag will create an priority-order under the hood. The preferred `placement` will always be on top of the list, meaning this placement will be tried first. To determine the placements after that, react-laag looks at the following things:
+
+- the preferred placement for determining the preferred direction / axis. When using `"top-start"` for instance, we can assume that although this exact placement may not fit, somewhere on top is still preferred. This direction / axis will have more priority over `preferX` / `preferY`.
+- `preferX` / `preferY` for determining priority on the **opposite** axis regarding the preferred placement.
+- The next placement in line must always be as close to the previous placement as possible.
+- placements which are not defined in `possiblePlacements` (all by default) are skipped
+
+Let look at an example given placement `"top-start"` with a preferX of `"right"`:
+
+```
+top-start -> top-center -> top-end -> right-end -> left-end -> right-center -> left-center -> right-start -> left-start -> bottom-start -> bottom-center -> bottom-end
+```
+
+During rendering react-laag will given the list containing priorities...
+
+- try to find the first placement in line that fits the current screen / layout
+- if none fits, it will find the placement with the most visible surface
 
 ### Nesting
 
@@ -397,7 +417,7 @@ function AnimationExample() {
 ### z-index / container
 
 By design react-laag doesn't handle any z-indexes for you. There are too many different use-cases and scenario's possible for this library to manage. You are free to implement your own z-index strategy. However, there is a cheap fix that will probably fix 95% of your problems.  
-By default, react-laag render your layers in a container right under the document's body:
+By default, react-laag renders your layers in a container right under the document's body:
 
 ```html
 <body>
@@ -421,7 +441,7 @@ All layers will now automatically inherent the z-index of this container.
 
 If you want react-laag the mount the layers into another element, you have two options:
 
-- use the option in `useLayer()`:
+- use the `container` option in `useLayer()`:
 
 ```jsx
 const {} = useLayer({
@@ -436,7 +456,7 @@ const {} = useLayer({
 });
 ```
 
-- set the container globally:
+- set the container globally with `setGlobalContainer()`:
 
 ```jsx
 // somewhere in the root of your application
@@ -448,7 +468,7 @@ setGlobalContainer("my-own-container-id");
 
 ### Resize observer
 
-If you want to take full advantage of react-laag positioning change detection, make sure your target browsers support `ResizeObserver`. To get a detailed list which browsers support this feature consult [Can I use](https://caniuse.com/resizeobserver).
+If you want to take full advantage of react-laag's positioning change detection, make sure your target browser(s) support `ResizeObserver`. To get a detailed list which browsers support this feature consult [Can I use](https://caniuse.com/resizeobserver).
 As of now, this sort of means all modern browsers except IE 11.
 If you need to support IE 11 you can optionally provide your app with a [polyfill](https://github.com/que-etc/resize-observer-polyfill).
 If you don't want to pollute the global context you can also pass in the polyfill via the option in `useLayer`:

@@ -85,7 +85,7 @@ function Options({ options, onOptionsChange }: Props) {
         value={options.snap}
         onClick={() => handleOptionsChange("snap", !options.snap)}
       />
-      <Label info="When both left and right sides are available, which side is preferred? Only has impact when 'auto' is set to true.">
+      <Label info="When both left and right sides are available, which side is preferred? Only has impact when 'auto' is set to true and placement starts with 'top-*' or 'bottom-*.'">
         preferX
       </Label>
       <RadioGroup
@@ -97,7 +97,7 @@ function Options({ options, onOptionsChange }: Props) {
         value={options.preferX}
         onChange={value => handleOptionsChange("preferX", value as any)}
       />
-      <Label info="When both top and bottom sides are available, which side is preferred? Only has impact when 'auto' is set to true.">
+      <Label info="When both top and bottom sides are available, which side is preferred? Only has impact when 'auto' is set to true and placement starts with 'left-*' or 'right-*.'">
         preferY
       </Label>
       <RadioGroup
