@@ -1,3 +1,4 @@
+import expect from "expect";
 import { PLACEMENT_TYPES } from "../src/PlacementType";
 import { Bounds } from "../src/Bounds";
 import { Placements } from "../src/Placements";

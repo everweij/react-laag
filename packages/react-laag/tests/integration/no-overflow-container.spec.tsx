@@ -2,10 +2,13 @@ import {
   render,
   cleanup,
   PLACEMENTS_NO_CENTER,
-  ExpectBoundsProps
+  ExpectBoundsProps,
+  fixViewport
 } from "./util";
 import { Placement } from "../../src";
 import { constants } from "../../sandbox/constants";
+
+before(fixViewport);
 
 describe("e2e/no-overflow-container", () => {
   afterEach(cleanup);

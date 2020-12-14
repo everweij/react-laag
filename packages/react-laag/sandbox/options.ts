@@ -1,14 +1,17 @@
-import { UseLayerOptions, DisappearType, PLACEMENT_TYPES } from "../src";
+import { DisappearType, Options } from "../src/types";
+import { PLACEMENT_TYPES } from "../src/PlacementType";
 
 export type TestCaseOptions = Required<
   Omit<
-    UseLayerOptions,
+    Options,
     | "isOpen"
     | "ResizeObserver"
     | "environment"
     | "onDisappear"
     | "onOutsideClick"
     | "onParentClose"
+    | "container"
+    | "trigger"
   > & {
     closeOnDisappear?: false | DisappearType;
     closeOnOutsideClick?: boolean;

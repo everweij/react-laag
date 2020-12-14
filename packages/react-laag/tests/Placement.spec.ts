@@ -1,3 +1,4 @@
+import expect from "expect";
 import { Placement } from "../src/Placement";
 import { BoundSide, Side } from "../src/Sides";
 import { SubjectsBounds } from "../src/SubjectsBounds";

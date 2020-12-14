@@ -6,6 +6,5 @@
     "module": "esnext",
     "rootDir": "./src",
     "baseUrl": "./"
-  },
-  "files": ["../../node_modules/@test-it/core/globals.d.ts"]
+  }
 }

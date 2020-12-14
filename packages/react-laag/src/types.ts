@@ -225,3 +225,5 @@ export type Styles = {
 };
 
 export type RefCallback = (element: any) => void;
+
+export const dummy = "";

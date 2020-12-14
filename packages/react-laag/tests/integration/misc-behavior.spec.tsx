@@ -1,5 +1,8 @@
+import expect from "expect";
 import { fireEvent, waitFor } from "@testing-library/react";
-import { render, cleanup } from "./util";
+import { render, cleanup, fixViewport } from "./util";
+
+before(fixViewport);
 
 afterEach(cleanup);
 

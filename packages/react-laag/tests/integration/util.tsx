@@ -1,3 +1,4 @@
+import expect from "expect";
 import * as React from "react";
 import {
   RenderResult,
@@ -10,6 +11,11 @@ import { baseOptions, TestCaseOptions } from "../../sandbox/options";
 import { TestCase } from "../../sandbox/TestCase";
 import { LayerSide, Placement, PLACEMENT_TYPES } from "../../src";
 import { IBounds } from "../../src/Bounds";
+import { setViewport } from "@web/test-runner-commands";
+
+export async function fixViewport() {
+  return setViewport({ width: 1400, height: 900 });
+}
 
 function elementToBounds(element: HTMLElement): IBounds {
   const {

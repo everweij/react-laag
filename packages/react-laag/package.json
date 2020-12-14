@@ -14,10 +14,10 @@
     "build": "tsdx build --format esm,cjs && yarn ssr-test && yarn size",
     "prepare": "yarn build",
     "ssr-test": "node ssr-test.js",
-    "test": "test-it './tests/**/*.spec.(ts|tsx)' --test-setup-files ./test-setup.ts",
-    "test:watch": "yarn test --watch",
     "sandbox": "parcel ./sandbox/index.html",
-    "size": "size-limit"
+    "size": "size-limit",
+    "test": "wtr \"./tests/**/*.spec.(ts|tsx)\" --node-resolve --puppeteer",
+    "test:watch": "wtr \"./tests/**/*.spec.(ts|tsx)\" --node-resolve --puppeteer --watch"
   },
   "size-limit": [
     {
@@ -32,11 +32,12 @@
   "devDependencies": {
     "@ampproject/rollup-plugin-closure-compiler": "^0.26.0",
     "@size-limit/preset-small-lib": "^4.9.0",
-    "@test-it/cli": "0.6.4",
-    "@test-it/core": "^0.6.6",
+    "@snowpack/web-test-runner-plugin": "^0.1.5",
     "@testing-library/react": "^11.2.2",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@web/test-runner": "^0.10.2",
+    "@web/test-runner-puppeteer": "^0.7.3",
     "copy-text-to-clipboard": "^2.2.0",
     "husky": "^4.3.0",
     "parcel-bundler": "^1.12.4",
@@ -44,6 +45,7 @@
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
     "size-limit": "^4.9.0",
+    "snowpack": "^2.18.4",
     "tsdx": "^0.14.1",
     "tslib": "^2.0.3",
     "typescript": "^4.1.2"

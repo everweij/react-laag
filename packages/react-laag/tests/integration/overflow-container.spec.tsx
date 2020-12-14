@@ -3,8 +3,11 @@ import {
   render,
   cleanup,
   PLACEMENTS_NO_CENTER,
-  ExpectBoundsProps
+  ExpectBoundsProps,
+  fixViewport
 } from "./util";
+
+before(fixViewport);
 
 describe("e2e/overflow-container", () => {
   afterEach(cleanup);

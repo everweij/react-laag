@@ -1,3 +1,4 @@
+import expect from "expect";
 import * as React from "react";
 import { render, cleanup, waitFor } from "@testing-library/react";
 import { scroll } from "./test-util";
@@ -78,8 +79,7 @@ function TestCase({ onChange, showLayer, swapTrigger }: TestCaseProps) {
     onChange,
     enabled: showLayer,
     environment: window,
-    ResizeObserverPolyfill: MockResizeObserver,
-    ignoreUpdate: false
+    ResizeObserverPolyfill: MockResizeObserver
   });
 
   return (

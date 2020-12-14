@@ -1,31 +1,42 @@
 export {
   useLayer,
   DEFAULT_OPTIONS,
+  setGlobalContainer
+} from "./useLayer";
+// eslint-disable-next-line prettier/prettier
+export type { 
   UseLayerProps,
   LayerProps,
   TriggerProps,
-  UseLayerArrowProps,
-  setGlobalContainer
-} from "./useLayer";
-export { Arrow, ArrowProps } from "./Arrow";
+  UseLayerArrowProps
+} from './useLayer';
+export { Arrow } from "./Arrow";
+export type { ArrowProps } from './Arrow';
 export {
-  useHover,
+  useHover
+} from "./useHover";
+export type  {
   UseHoverProps,
   UseHoverOptions,
   PlainCallback
 } from "./useHover";
-export {
+
+export type {
   LayerSide,
   DisappearType,
   ResizeObserverClass,
   Options as UseLayerOptions
 } from "./types";
-export { PLACEMENT_TYPES, PlacementType as Placement } from "./PlacementType";
+export { PLACEMENT_TYPES } from "./PlacementType";
+export type { PlacementType as Placement } from "./PlacementType";
 export { mergeRefs } from "./util";
-export { IBounds } from "./Bounds";
+export type { IBounds } from "./Bounds";
 export {
-  UseMousePositionAsTriggerOptions,
-  UseMousePositionAsTriggerProps,
   useMousePositionAsTrigger
 } from "./hooks";
-export { Transition, TransitionProps } from "./Transition";
+export type {
+  UseMousePositionAsTriggerOptions,
+  UseMousePositionAsTriggerProps
+} from "./hooks";
+export { Transition } from "./Transition";
+export type { TransitionProps } from "./Transition";

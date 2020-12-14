@@ -1,9 +1,10 @@
+import expect from "expect";
 import { Bounds } from "../src/Bounds";
 import { SubjectsBounds } from "../src/SubjectsBounds";
 import { createElement, clearBody } from "./test-util";
 
 describe("SubjectsBounds", () => {
-  afterAll(clearBody);
+  after(clearBody);
 
   const trigger = createElement("div", { width: "100px", height: "100px" });
   const layer = createElement("div", { width: "200px", height: "200px" });

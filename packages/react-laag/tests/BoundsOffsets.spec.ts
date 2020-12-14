@@ -1,3 +1,5 @@
+import expect from "expect";
+
 import { BoundsOffsets } from "../src/BoundsOffsets";
 
 describe("BoundsOffsets", () => {
