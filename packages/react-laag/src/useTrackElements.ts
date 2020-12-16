@@ -181,6 +181,12 @@ export function useTrackElements({
           top: scrollTop,
           left: scrollLeft
         };
+      } else {
+        const { scrollX, scrollY } = environment!;
+        scrollOffsets = {
+          top: scrollY,
+          left: scrollX
+        };
       }
 
       let borderOffsets: BorderOffsets = { left: 0, top: 0 };
