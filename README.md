@@ -33,7 +33,7 @@ Try it out for yourself [here](https://www.react-laag.com), or see some examples
 
 ### Features
 
-- 📦 Only 7kb minified & gzipped / tree-shakable / no dependencies
+- 📦 Only 8kb minified & gzipped / tree-shakable / no dependencies
 - 🛠 We do the positioning, you do the rest. You maintain full control over the look and feel.
 - 🚀 Optimized for performance / no scroll lag whatsoever
 - 🏗 Comes with sensible defaults out of the box, but you can tweak things to your liking

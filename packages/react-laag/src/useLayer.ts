@@ -32,6 +32,10 @@ import { isSet, mergeRefs } from "./util";
 let GLOBAL_CONTAINER: HTMLElement | null = null;
 
 export function setGlobalContainer(container: Container) {
+  if (typeof document === "undefined") {
+    return;
+  }
+
   warning(
     !(GLOBAL_CONTAINER instanceof HTMLElement),
     `react-laag: You've called 'setGlobalContainer() previously'. It is recommended to only set the global container once, otherwise this may lead to unexpected behaviour.`
