@@ -98,7 +98,7 @@ function Features() {
       <h2>Features</h2>
       <Items>
         <Item icon="📦" title="Lightweight">
-          Only 7kb minified & gzipped / tree-shakable / no dependencies
+          Only 8kb minified & gzipped / tree-shakable / no dependencies
         </Item>
         <Item icon="🛠" title="Headless UI">
           We do the positioning, you do the rest. You maintain full control over
