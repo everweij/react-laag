@@ -101,7 +101,6 @@ export const PasswordValidation = React.forwardRef<
     triggerProps,
     layerProps,
     arrowProps,
-    layerSide,
     triggerBounds
   } = useLayer({
     isOpen: hasFocus,
@@ -129,9 +128,7 @@ export const PasswordValidation = React.forwardRef<
               {...layerProps}
               style={{
                 ...layerProps.style,
-                width: ["right", "left"].includes(layerSide)
-                  ? 200
-                  : triggerBounds!.width
+                width: triggerBounds!.width
               }}
               initial={{ opacity: 0 }} // animate from
               animate={{ opacity: 1 }} // animate to
