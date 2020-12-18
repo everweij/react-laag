@@ -109,7 +109,12 @@ export const PasswordValidation = React.forwardRef<
     auto: true,
     snap: true,
     placement: "top-start",
-    possiblePlacements: ["top-start", "bottom-start", "right-center"],
+    possiblePlacements: [
+      "top-start",
+      "bottom-start",
+      "right-center",
+      "left-center"
+    ],
     triggerOffset: 12,
     containerOffset: 16,
     arrowOffset: 8
