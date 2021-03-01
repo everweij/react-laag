@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import warning from "tiny-warning";
 
 export type TransitionProps = {
   isOpen: boolean;
@@ -38,6 +39,13 @@ export function Transition({
       });
     }
   }, [isOpenExternal, setState]);
+
+  useEffect(() => {
+    warning(
+      children,
+      `react-laag: You are using 'Transition'. Note that this component is marked as deprecated and will be removed at future releases`
+    );
+  }, [children]);
 
   useEffect(() => {
     didMount.current = true;
