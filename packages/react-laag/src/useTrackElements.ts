@@ -130,7 +130,7 @@ export function useTrackElements({
   useEffect(() => {
     warning(
       ResizeObserver,
-      `This browser does not support ResizeObserver out of the box. We recommend to add a polyfill in order to utilize the full capabilities of react-laag. See: https://link`
+      `This browser does not support ResizeObserver out of the box. We recommend to add a polyfill in order to utilize the full capabilities of react-laag. See: https://github.com/everweij/react-laag#resize-observer`
     );
   }, [ResizeObserver]);
 
