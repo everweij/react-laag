@@ -249,7 +249,7 @@ import { Arrow } from "react-laag";
 />;
 ```
 
-`<Arrow />` is basically just an regular svg-element, so it will accept all default svg-props as well
+`<Arrow />` is basically just a regular svg-element, so it will accept all default svg-props as well
 
 #### ArrowProps
 
@@ -265,7 +265,7 @@ import { Arrow } from "react-laag";
 
 ### useMousePositionAsTrigger()
 
-Utility hook that lets you use the mouse-position as source of the trigger. This is useful in scenario's like context-menu's.
+Utility hook that lets you use the mouse-position as source of the trigger. This is useful in scenarios like context-menus.
 
 ```jsx
 import { useMousePositionAsTrigger } from "react-laag";
@@ -355,7 +355,7 @@ When setting the `auto` option to `true` in `useLayer()`, react-laag will create
 - The next placement in line must always be as close to the previous placement as possible.
 - placements which are not defined in `possiblePlacements` (all by default) are skipped
 
-Let look at an example given placement `"top-start"` with a preferX of `"right"`:
+Let's look at an example given placement `"top-start"` with a preferX of `"right"`:
 
 ```
 top-start -> top-center -> top-end -> right-end -> left-end -> right-center -> left-center -> right-start -> left-start -> bottom-start -> bottom-center -> bottom-end
@@ -368,7 +368,7 @@ During rendering react-laag will given the list containing priorities...
 
 ### Nesting
 
-Nesting multiple layer often occurs in large menu's where items are grouped. If you're looking for an example of how to accomplish this, be sure to check out the [example](https://storybook.react-laag.com/?path=/docs/nested-menu-s--page) about nesting.
+Nesting multiple layer often occurs in large menus where items are grouped. If you're looking for an example of how to accomplish this, be sure to check out the [example](https://storybook.react-laag.com/?path=/docs/nested-menu-s--page) about nesting.
 
 There are however some important things to consider. How do we for instance signal to the rest of the nested layers, that a layer higher up in the hierarchy has just closed? Fortunately, there's a special option for that in the `userLayer()` options: `onParentClose`. react-laag uses context under the hood to monitor which layers are related to each other. This has a couple of implications:
 
@@ -416,7 +416,7 @@ function AnimationExample() {
 
 ### z-index / container
 
-By design react-laag doesn't handle any z-indexes for you. There are too many different use-cases and scenario's possible for this library to manage. You are free to implement your own z-index strategy. However, there is a cheap fix that will probably fix 95% of your problems.  
+By design react-laag doesn't handle any z-indexes for you. There are too many different use-cases and scenarios possible for this library to manage. You are free to implement your own z-index strategy. However, there is a cheap fix that will probably fix 95% of your problems.  
 By default, react-laag renders your layers in a container right under the document's body:
 
 ```html
@@ -424,7 +424,7 @@ By default, react-laag renders your layers in a container right under the docume
   <!-- React's entry -->
   <div id="root"></div>
 
-  <!-- By default all layers will we rendered here -->
+  <!-- By default all layers will be rendered here -->
   <div id="layers"></div>
 </body>
 ```
@@ -437,9 +437,9 @@ Now, nothing is stopping you to do this:
 }
 ```
 
-All layers will now automatically inherent the z-index of this container.
+All layers will now automatically inherit the z-index of this container.
 
-If you want react-laag the mount the layers into another element, you have two options:
+If you want react-laag to mount the layers into another element, you have two options:
 
 - use the `container` option in `useLayer()`:
 
@@ -510,7 +510,7 @@ I'm open to the idea in the future though. I would be happy to get some help wit
 ## Contributing
 
 Want to contribute to react-laag? Your help is very much appreciated!
-Please consult the [contribution guide](./CONTRIBUTING.MD) how to get started.
+Please consult the [contribution guide](./CONTRIBUTING.MD) on how to get started.
 
 ## License
 
