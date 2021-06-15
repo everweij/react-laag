@@ -77,23 +77,25 @@ type State = {
   styles: Styles;
 };
 
-export const DEFAULT_OPTIONS: Required<Omit<
-  Options,
-  | "ResizeObserver"
-  | "environment"
-  | "onParentClose"
-  | "onOutsideClick"
-  | "onDisappear"
-  | "isOpen"
-  | "layerDimensions"
->> = {
+export const DEFAULT_OPTIONS: Required<
+  Omit<
+    Options,
+    | "ResizeObserver"
+    | "environment"
+    | "onParentClose"
+    | "onOutsideClick"
+    | "onDisappear"
+    | "isOpen"
+    | "layerDimensions"
+  >
+> = {
   auto: false,
   arrowOffset: 0,
   containerOffset: 10,
   triggerOffset: 0,
   overflowContainer: true,
   placement: "top-center",
-  possiblePlacements: (PLACEMENT_TYPES as unknown) as PlacementType[],
+  possiblePlacements: PLACEMENT_TYPES as unknown as PlacementType[],
   preferX: "right",
   preferY: "bottom",
   snap: false,
@@ -248,19 +250,15 @@ export function useLayer({
     ]
   );
 
-  const {
-    triggerRef,
-    layerRef,
-    arrowRef,
-    closestScrollContainer
-  } = useTrackElements({
-    ResizeObserverPolyfill,
-    environment,
-    enabled: isOpen,
-    overflowContainer,
-    onChange: handlePositioning,
-    triggerOption
-  });
+  const { triggerRef, layerRef, arrowRef, closestScrollContainer } =
+    useTrackElements({
+      ResizeObserverPolyfill,
+      environment,
+      enabled: isOpen,
+      overflowContainer,
+      onChange: handlePositioning,
+      triggerOption
+    });
 
   const { closeOnOutsideClickRefs, registrations } = useGroup({
     isOpen,

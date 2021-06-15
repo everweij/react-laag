@@ -85,12 +85,8 @@ type NestedMenusProps = {
 };
 
 function NestedMenus({ getItems }: NestedMenusProps) {
-  const {
-    hasMousePosition,
-    resetMousePosition,
-    handleMouseEvent,
-    trigger
-  } = useMousePositionAsTrigger();
+  const { hasMousePosition, resetMousePosition, handleMouseEvent, trigger } =
+    useMousePositionAsTrigger();
 
   const { renderLayer, layerProps } = useLayer({
     isOpen: hasMousePosition,

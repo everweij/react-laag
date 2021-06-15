@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render } from "react-dom";
+import * as ReactDOM from "react-dom";
 
 import { TestCase } from "./TestCase";
 import { OptionsPanel } from "./OptionsPanel";
@@ -16,4 +16,4 @@ function App() {
   );
 }
 
-render(<App />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));

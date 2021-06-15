@@ -38,9 +38,8 @@ export function findScrollContainers(
     return result;
   }
 
-  const { overflow, overflowX, overflowY } = environment.getComputedStyle(
-    element
-  );
+  const { overflow, overflowX, overflowY } =
+    environment.getComputedStyle(element);
 
   if (
     [overflow, overflowX, overflowY].some(prop =>
@@ -191,10 +190,8 @@ export function useTrackElements({
 
       let borderOffsets: BorderOffsets = { left: 0, top: 0 };
       if (closestScrollContainer) {
-        const {
-          borderLeftWidth,
-          borderTopWidth
-        } = environment!.getComputedStyle(closestScrollContainer);
+        const { borderLeftWidth, borderTopWidth } =
+          environment!.getComputedStyle(closestScrollContainer);
 
         borderOffsets = {
           left: getPixelValue(borderLeftWidth) || 0,
@@ -313,8 +310,9 @@ export function useTrackElements({
 
       if (closestScrollContainer) {
         // Check if we should warn the user about 'position: relative; stuff...'
-        const position = environment!.getComputedStyle(closestScrollContainer)
-          .position;
+        const position = environment!.getComputedStyle(
+          closestScrollContainer
+        ).position;
 
         const closestScrollContainerHasCorrectStyling =
           ["relative", "absolute", "fixed"].includes(position) ||

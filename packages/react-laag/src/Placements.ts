@@ -38,7 +38,7 @@ export class Placements {
   static getSidesFromPlacementType(
     type: PlacementType
   ): [BoundSideType, SideType] {
-    let [a, b] = (type.split("-") as unknown) as [
+    let [a, b] = type.split("-") as unknown as [
       keyof typeof BoundSide,
       "start" | "center" | "end"
     ];
@@ -75,9 +75,8 @@ export class Placements {
     // function which creates a prioritized list of possible placments
     // by looking at user-config
     function getListOfPlacements(preferedPlacement = config.placement) {
-      const [primary, secondary] = Placements.getSidesFromPlacementType(
-        preferedPlacement
-      );
+      const [primary, secondary] =
+        Placements.getSidesFromPlacementType(preferedPlacement);
 
       const preferredSide =
         BoundSide[primary.isHorizontal ? config.preferY : config.preferX];
@@ -250,7 +249,8 @@ export class Placements {
     if (!firstPlacementThatDoesNotFit) {
       return 0;
     }
-    const secondaryOffsetSide = firstPlacementThatDoesNotFit.secondaryOffsetSide!;
+    const secondaryOffsetSide =
+      firstPlacementThatDoesNotFit.secondaryOffsetSide!;
     if (!secondaryOffsetSide) {
       return 0;
     }
@@ -334,9 +334,9 @@ export class Placements {
       this.subjectsBounds.offsetsToScrollContainers(subject, true)
     );
 
-    const entries = (Object.entries(
+    const entries = Object.entries(
       containerOffsets.negativeSides
-    ) as unknown) as [BoundSideProp, number][];
+    ) as unknown as [BoundSideProp, number][];
 
     const hasFullyDisappeared = entries.some(([prop, value]) => {
       const side = BoundSide[prop];

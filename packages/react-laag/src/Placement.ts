@@ -81,13 +81,8 @@ export class Placement {
 
     const { primary, secondary, subjectsBounds } = this;
     const { trigger, layer, arrow } = subjectsBounds;
-    const {
-      isHorizontal,
-      oppositeCssProp,
-      oppositeSizeProp,
-      prop,
-      opposite
-    } = primary as BoundSideType;
+    const { isHorizontal, oppositeCssProp, oppositeSizeProp, prop, opposite } =
+      primary as BoundSideType;
 
     const result = Bounds.empty() as IBounds;
 
@@ -201,10 +196,8 @@ export class Placement {
    */
   public get triggerIsBigger() {
     const { isHorizontal } = this.secondary;
-    const {
-      triggerHasBiggerWidth,
-      triggerHasBiggerHeight
-    } = this.subjectsBounds;
+    const { triggerHasBiggerWidth, triggerHasBiggerHeight } =
+      this.subjectsBounds;
 
     return (
       (isHorizontal && triggerHasBiggerWidth) ||

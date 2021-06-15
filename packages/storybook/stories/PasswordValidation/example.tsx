@@ -96,28 +96,23 @@ export const PasswordValidation = React.forwardRef<
     return () => setDidOpen(false);
   }, [hasFocus]);
 
-  const {
-    renderLayer,
-    triggerProps,
-    layerProps,
-    arrowProps,
-    triggerBounds
-  } = useLayer({
-    isOpen: hasFocus,
-    overflowContainer: false,
-    auto: true,
-    snap: true,
-    placement: "top-start",
-    possiblePlacements: [
-      "top-start",
-      "bottom-start",
-      "right-center",
-      "left-center"
-    ],
-    triggerOffset: 12,
-    containerOffset: 16,
-    arrowOffset: 8
-  });
+  const { renderLayer, triggerProps, layerProps, arrowProps, triggerBounds } =
+    useLayer({
+      isOpen: hasFocus,
+      overflowContainer: false,
+      auto: true,
+      snap: true,
+      placement: "top-start",
+      possiblePlacements: [
+        "top-start",
+        "bottom-start",
+        "right-center",
+        "left-center"
+      ],
+      triggerOffset: 12,
+      containerOffset: 16,
+      arrowOffset: 8
+    });
 
   return (
     <>

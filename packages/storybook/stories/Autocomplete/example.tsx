@@ -83,22 +83,17 @@ export const Autocomplete = React.forwardRef<
     }
   });
 
-  const {
-    renderLayer,
-    triggerProps,
-    layerProps,
-    triggerBounds,
-    layerSide
-  } = useLayer({
-    isOpen,
-    overflowContainer: false,
-    auto: true,
-    snap: true,
-    placement: "bottom-start",
-    possiblePlacements: ["top-start", "bottom-start"],
-    triggerOffset: 0,
-    containerOffset: 16
-  });
+  const { renderLayer, triggerProps, layerProps, triggerBounds, layerSide } =
+    useLayer({
+      isOpen,
+      overflowContainer: false,
+      auto: true,
+      snap: true,
+      placement: "bottom-start",
+      possiblePlacements: ["top-start", "bottom-start"],
+      triggerOffset: 0,
+      containerOffset: 16
+    });
 
   return (
     <Wrapper {...getComboboxProps({ ref: ref as any, ...props })}>

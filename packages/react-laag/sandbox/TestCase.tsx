@@ -27,8 +27,9 @@ const scrollContainer: React.CSSProperties = {
   backgroundColor: "lightgrey",
   overflow: "auto",
   position: "relative",
-  margin: `calc(var(--max-height, 900px) / 2 - ${constants.scrollContainerSize /
-    2}px) auto 0 auto`
+  margin: `calc(var(--max-height, 900px) / 2 - ${
+    constants.scrollContainerSize / 2
+  }px) auto 0 auto`
 };
 const filler: React.CSSProperties = {
   width: constants.scrollContainerInnerSize,
@@ -136,35 +137,30 @@ export function TestCase({
   useTrackScrollContainerOffsets(scrollContainerRef);
   const renderCount = useRenderCount();
 
-  const {
-    triggerProps,
-    layerProps,
-    arrowProps,
-    renderLayer,
-    layerSide
-  } = useLayer({
-    isOpen,
-    overflowContainer,
-    auto,
-    arrowOffset,
-    triggerOffset,
-    containerOffset,
-    snap,
-    layerDimensions,
-    placement,
-    possiblePlacements,
-    preferX,
-    preferY,
-    onOutsideClick: closeOnOutsideClick ? () => setOpen(false) : undefined,
-    onDisappear: closeOnDisappear
-      ? type => {
-          if (type === closeOnDisappear) {
-            setOpen(false);
+  const { triggerProps, layerProps, arrowProps, renderLayer, layerSide } =
+    useLayer({
+      isOpen,
+      overflowContainer,
+      auto,
+      arrowOffset,
+      triggerOffset,
+      containerOffset,
+      snap,
+      layerDimensions,
+      placement,
+      possiblePlacements,
+      preferX,
+      preferY,
+      onOutsideClick: closeOnOutsideClick ? () => setOpen(false) : undefined,
+      onDisappear: closeOnDisappear
+        ? type => {
+            if (type === closeOnDisappear) {
+              setOpen(false);
+            }
           }
-        }
-      : undefined,
-    onParentClose: () => setOpen(false)
-  });
+        : undefined,
+      onParentClose: () => setOpen(false)
+    });
 
   const layerSizes = [constants.layerSize, constants.layerSize] as const;
   const triggerSizes = [

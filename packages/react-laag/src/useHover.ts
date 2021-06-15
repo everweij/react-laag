@@ -64,7 +64,7 @@ export function useHover({
     }
 
     status.current = Status.ENTERING;
-    timeout.current = setTimeout(() => {
+    timeout.current = window.setTimeout(() => {
       setShow(true);
       timeout.current = null;
       status.current = Status.IDLE;
@@ -90,7 +90,7 @@ export function useHover({
     }
 
     status.current = Status.LEAVING;
-    timeout.current = setTimeout(() => {
+    timeout.current = window.setTimeout(() => {
       setShow(false);
       timeout.current = null;
       status.current = Status.IDLE;

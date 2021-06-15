@@ -1,9 +1,10 @@
 module.exports = {
-  extends: [
-    "react-app",
-    "prettier/@typescript-eslint",
-    "plugin:prettier/recommended"
-  ],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: "module"
+  },
+  extends: ["react-app", "prettier", "plugin:prettier/recommended"],
   settings: {
     react: {
       version: "detect"
@@ -11,7 +12,10 @@ module.exports = {
   },
   rules: {
     "react-hooks/exhaustive-deps": "error",
-    "no-unused-vars": "error",
-    "@typescript-eslint/no-redeclare": "off"
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"]
   }
 };

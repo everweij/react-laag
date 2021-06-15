@@ -27,14 +27,8 @@ function createBoundsFromElement(
     return null;
   }
 
-  const {
-    top,
-    left,
-    bottom,
-    right,
-    width,
-    height
-  } = element.getBoundingClientRect();
+  const { top, left, bottom, right, width, height } =
+    element.getBoundingClientRect();
   return {
     top,
     left,

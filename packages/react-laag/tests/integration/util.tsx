@@ -18,14 +18,8 @@ export async function fixViewport() {
 }
 
 function elementToBounds(element: HTMLElement): IBounds {
-  const {
-    top,
-    left,
-    bottom,
-    right,
-    width,
-    height
-  } = element.getBoundingClientRect();
+  const { top, left, bottom, right, width, height } =
+    element.getBoundingClientRect();
 
   return { top, left, bottom, right, width, height };
 }

@@ -21,6 +21,8 @@
     "baseUrl": "./",
     "jsx": "react",
     "esModuleInterop": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
   }
 }

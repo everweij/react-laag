@@ -41,9 +41,7 @@ export function useTrackRef(
  * an effect, without triggering the same effect when the same state changes.
  * Note: may be seen as an anti-pattern.
  */
-export function useMutableStore<State>(
-  initialState: State
-): readonly [
+export function useMutableStore<State>(initialState: State): readonly [
   () => State,
   {
     (setter: (state: State) => State): void;
