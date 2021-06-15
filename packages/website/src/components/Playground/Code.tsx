@@ -5,7 +5,7 @@ import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-tsx";
 import { format as prettier } from "prettier/standalone";
-import parserBabylon from "prettier/parser-babylon";
+import parserBabel from "prettier/parser-babel";
 import { Options, LayerSettings } from "./types";
 import CopyButton from "../CopyButton";
 
@@ -100,8 +100,9 @@ function createCode(
               <Arrow {...arrowProps} size={${
                 layerSettings.arrowSize
                 // eslint-disable-next-line
-              }} roundness={${Math.round(layerSettings.arrowRoundness * 10) /
-    10}} />
+              }} roundness={${
+    Math.round(layerSettings.arrowRoundness * 10) / 10
+  }} />
             </Menu>
           )}
         </>
@@ -129,7 +130,7 @@ export default function Code({ layerSettings, options }: CodeProps) {
     parser: "babel",
     printWidth: 70,
     trailingComma: "none",
-    plugins: [parserBabylon]
+    plugins: [parserBabel]
   });
 
   return (

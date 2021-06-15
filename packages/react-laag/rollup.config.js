@@ -18,7 +18,7 @@ const tsCompilerOptions = ts.parseJsonConfigFileContent(
   "./"
 ).options;
 
-const isExternal = id => !id.startsWith(".") && !path.isAbsolute(id);
+const external = id => !id.startsWith(".") && !path.isAbsolute(id);
 
 const getOutputName = (format, minify, env) =>
   [
@@ -44,8 +44,7 @@ const outputBase = {
 const options = {
   input: path.join(__dirname, "src", "index.ts"),
 
-  external: id =>
-    id.startsWith("regenerator-runtime") ? false : isExternal(id),
+  external: id => (id.startsWith("regenerator-runtime") ? false : external(id)),
 
   treeshake: {
     propertyReadSideEffects: false
@@ -57,10 +56,6 @@ const options = {
       format: "cjs",
       ...outputBase,
       plugins: [
-        replace({
-          "process.env.NODE_ENV": "production",
-          preventAssignment: true
-        }),
         terser({
           output: { comments: false },
           compress: {
@@ -77,24 +72,12 @@ const options = {
     {
       file: getOutputName("cjs", false, "development"),
       format: "cjs",
-      ...outputBase,
-      plugins: [
-        replace({
-          "process.env.NODE_ENV": "development",
-          preventAssignment: true
-        })
-      ]
+      ...outputBase
     },
     {
-      file: getOutputName("esm", false, "production"),
+      file: getOutputName("esm", false, undefined),
       format: "esm",
-      ...outputBase,
-      plugins: [
-        replace({
-          "process.env.NODE_ENV": "production",
-          preventAssignment: true
-        })
-      ]
+      ...outputBase
     }
   ],
 
@@ -141,7 +124,16 @@ const options = {
         ["babel-plugin-polyfill-regenerator", { method: "usage-pure" }],
         ["@babel/plugin-proposal-class-properties", { loose: true }]
       ],
-      presets: [["@babel/preset-env", { modules: false, loose: true }]],
+      presets: [
+        [
+          "@babel/preset-env",
+          {
+            modules: false,
+            loose: true,
+            targets: "last 3 versions, IE 11, not dead"
+          }
+        ]
+      ],
       babelHelpers: "bundled"
     }),
     sourceMaps()

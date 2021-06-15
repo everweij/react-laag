@@ -6,19 +6,20 @@
   "module": "dist/react-laag.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
   "scripts": {
     "start": "tsc --noEmit",
-    "build": "rimraf dist && rollup -c && yarn size",
-    "build_old": "tsdx build --format esm,cjs && yarn ssr-test && yarn size",
+    "build": "rimraf dist && rollup -c && node create-entry.js && yarn ssr-test && yarn size",
     "prepare": "yarn build",
     "ssr-test": "node ssr-test.js",
     "sandbox": "snowpack dev",
     "size": "size-limit",
     "test": "wtr \"./tests/**/*.spec.(ts|tsx)\" --node-resolve --puppeteer",
-    "test:watch": "wtr \"./tests/**/*.spec.(ts|tsx)\" --node-resolve --puppeteer --watch"
+    "test:watch": "wtr \"./tests/**/*.spec.(ts|tsx)\" --node-resolve --puppeteer --watch",
+    "typecheck": "tsc --noEmit"
   },
   "size-limit": [
     {

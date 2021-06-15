@@ -41,6 +41,7 @@ h1.sbdocs {
   font-family: Luckiest Guy;
   background: -webkit-linear-gradient(#f57ecb, #aa3580);
   background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
