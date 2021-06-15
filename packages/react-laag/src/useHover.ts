@@ -99,8 +99,6 @@ export function useHover({
 
   // make sure to clear timeout on unmount
   useEffect(() => {
-    const currentTimeout = timeout.current;
-
     function onScroll() {
       if (show && hideOnScroll) {
         removeTimeout();
@@ -122,8 +120,8 @@ export function useHover({
       window.removeEventListener("scroll", onScroll, true);
       window.removeEventListener("touchend", onTouchEnd, true);
 
-      if (currentTimeout) {
-        clearTimeout(currentTimeout);
+      if (timeout.current) {
+        clearTimeout(timeout.current);
       }
     };
   }, [show, hideOnScroll, removeTimeout]);
